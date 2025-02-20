@@ -19,6 +19,7 @@ const getClassById = async (req, res) => {
   }
 };
 
+
 const enrollClass = async (req, res) => {
   res.json({ message: `User enrolled in class ID: ${req.params.id}` });
 };
@@ -28,14 +29,26 @@ const unenrollClass = async (req, res) => {
 };
 
 const createClass = async (req, res) => {
-  try {
-    const newClass = new Class(req.body);
-    await newClass.save();
-    res.status(201).json(newClass);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to create class" });
-  }
-};
+    try {
+      const { title, description, instructor, level, requiredMaterials, accessibilityOptions, startTime, endTime, capacity } = req.body;
+  
+      const newClass = new Class({
+        title,
+        description,
+        instructor,
+        level,
+        requiredMaterials,
+        accessibilityOptions,
+        schedule: { startTime, endTime },
+        capacity
+      });
+  
+      await newClass.save();
+      res.status(201).json(newClass);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create class" });
+    }
+  };
 
 const editClass = async (req, res) => {
   try {

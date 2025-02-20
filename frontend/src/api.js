@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:6000/api"; // Update when deployed
+const API_URL = "http://localhost:5001/api"; // Update when deployed
 
 export const getClasses = async () => {
   try {
@@ -11,3 +11,14 @@ export const getClasses = async () => {
     return [];
   }
 };
+
+export const addClass = async (classData) => {
+    try {
+      const response = await axios.post(`${API_URL}/classes`, classData);
+      return response.data;
+    } catch (error) {
+      console.error("Error adding class:", error);
+      return null;
+    }
+  };
+  
