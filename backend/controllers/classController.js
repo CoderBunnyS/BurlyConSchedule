@@ -21,8 +21,44 @@ const getClassById = async (req, res) => {
 
 
 const enrollClass = async (req, res) => {
-  res.json({ message: `User enrolled in class ID: ${req.params.id}` });
-};
+    try {
+      const classId = req.params.id;
+      const { userId } = req.body; // 🔹 This will be replaced with the JWT user ID later
+  
+      // Find the class
+      const selectedClass = await Class.findById(classId);
+      if (!selectedClass) {
+        return res.status(404).json({ error: "Class not found" });
+      }
+  
+      // Check if the class is full
+      if (selectedClass.enrolledParticipants.length >= selectedClass.capacity) {
+        // If class is full, add user to the waitlist
+        if (!selectedClass.waitlist.includes(userId)) {
+          selectedClass.waitlist.push(userId);
+          await selectedClass.save();
+          return res.status(200).json({ message: "Class is full. You have been added to the waitlist." });
+        } else {
+          return res.status(400).json({ error: "User is already on the waitlist." });
+        }
+      }
+  
+      // Check if the user is already enrolled
+      if (selectedClass.enrolledParticipants.includes(userId)) {
+        return res.status(400).json({ error: "User is already enrolled in this class." });
+      }
+  
+      // Enroll the user
+      selectedClass.enrolledParticipants.push(userId);
+      await selectedClass.save();
+  
+      res.status(200).json({ message: "Enrollment successful", class: selectedClass });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to enroll in class", details: error.message });
+    }
+  };
+  
+  
 
 const unenrollClass = async (req, res) => {
   res.json({ message: `User unenrolled from class ID: ${req.params.id}` });

@@ -13,12 +13,22 @@ export const getClasses = async () => {
 };
 
 export const addClass = async (classData) => {
-    try {
-      const response = await axios.post(`${API_URL}/classes`, classData);
-      return response.data;
-    } catch (error) {
-      console.error("Error adding class:", error);
-      return null;
-    }
-  };
-  
+  try {
+    const response = await axios.post(`${API_URL}/classes`, classData);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding class:", error);
+    return null;
+  }
+};
+
+// 🔹 New function to enroll a user in a class
+export const enrollInClass = async (classId, userId) => {
+  try {
+    const response = await axios.post(`${API_URL}/classes/${classId}/enroll`, { userId });
+    return response.data;
+  } catch (error) {
+    console.error("Error enrolling in class:", error);
+    return { error: error.response?.data?.message || "Enrollment failed" };
+  }
+};

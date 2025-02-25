@@ -1,32 +1,28 @@
 .bottom-sheet-container {
-    background: white;
-    border-radius: 15px 15px 0 0;
-    min-height: 50vh; /* Default to half-screen */
-    max-height: 80vh; /* Expandable */
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-  
-    /* 🔥 FORCING IT TO SHOW 🔥 */
+    transform: translateY(100%); /* Start off-screen */
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: auto !important;
     z-index: 9999 !important;
-    transform: translateY(0) !important; /* ✅ FIXES THE ISSUE */
-    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out; /* ✅ Smooth slide-up animation */
   }
+  
+  .react-modal-sheet-container {
+    transform: translateY(0) !important;
+    height: auto !important;
+    transition: transform 0.3s ease-in-out;
+    margin: 10%;
+  }
+  
+  
+  
   
   .bottom-sheet-content {
     padding: 20px;
     overflow-y: auto;
-    max-height: calc(80vh - 60px);
+    max-height: calc(80vh - 60px); /* Ensures scrolling inside */
     display: block !important;
+    margin: 10%;
   }
-  
-  /* ✅ Fixing react-modal-sheet behavior */
-  .react-modal-sheet-container {
-    transform: translateY(0) !important; /* ✅ This forces the sheet to stay in view */
-    height: auto !important;
-  }
+
   

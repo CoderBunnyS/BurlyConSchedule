@@ -25,10 +25,13 @@ const ClassList = () => {
   }, []);
 
   const handleClassClick = (cls) => {
-    console.log("Class clicked:", cls);
+    console.log("Clicked class:", cls);
     setSelectedClass(cls);
     setSheetOpen(true);
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <div>
@@ -43,16 +46,9 @@ const ClassList = () => {
           </li>
         ))}
       </ul>
-
+      <p>Sheet Open: {sheetOpen ? "true" : "false"}</p>
       {/* Bottom Sheet for Class Details */}
-      <ClassBottomSheet 
-        open={sheetOpen} 
-        onDismiss={() => {
-          console.log("Closing sheet");
-          setSheetOpen(false);
-        }} 
-        classDetails={selectedClass} 
-      />
+      <ClassBottomSheet open={sheetOpen} onDismiss={() => setSheetOpen(false)} classDetails={selectedClass} />
     </div>
   );
 };
