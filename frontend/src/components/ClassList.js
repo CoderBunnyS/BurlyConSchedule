@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { getClasses } from "../api";
-import ClassBottomSheet from "./ClassBottomSheet";
+import { useNavigate } from "react-router-dom"; // 🚀 For navigation
+import "../styles/global.css"; // ✅ Global styles
+import "../styles/MainPage.css"; // ✅ Main page styles
+import "../styles/BottomSheet.css"
+import ClassBottomSheet from "./ClassBottomSheet"
+
 
 const ClassList = () => {
   const [classes, setClasses] = useState([]);
@@ -8,6 +13,7 @@ const ClassList = () => {
   const [error, setError] = useState("");
   const [selectedClass, setSelectedClass] = useState(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const navigate = useNavigate(); // 🚀 Used for navigation
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -25,7 +31,6 @@ const ClassList = () => {
   }, []);
 
   const handleClassClick = (cls) => {
-    console.log("Clicked class:", cls);
     setSelectedClass(cls);
     setSheetOpen(true);
   };
@@ -36,21 +41,52 @@ const ClassList = () => {
   return (
     <div>
       <h2>Available Classes</h2>
+
+      {/* 🚀 Admin & Volunteer Buttons */}
+      <div style={{ marginBottom: "20px" }}>
+        <button onClick={() => navigate("/admin")} style={buttonStyle}>
+          Admin Panel
+        </button>
+        <button onClick={() => navigate("/volunteer")} style={buttonStyle}>
+          Volunteer Shifts
+        </button>
+      </div>
+
+      {/* List of Classes */}
       <ul>
         {classes.map((cls) => (
           <li 
             key={cls._id} 
             onClick={() => handleClassClick(cls)} 
-            style={{ cursor: "pointer", marginBottom: "10px", padding: "10px", border: "1px solid #ddd", borderRadius: "5px" }}>
+            style={classItemStyle}>
             <strong>{cls.title}</strong> - {cls.instructor}
           </li>
         ))}
       </ul>
-      <p>Sheet Open: {sheetOpen ? "true" : "false"}</p>
+
       {/* Bottom Sheet for Class Details */}
       <ClassBottomSheet open={sheetOpen} onDismiss={() => setSheetOpen(false)} classDetails={selectedClass} />
     </div>
   );
+};
+
+/* 🔹 Styling */
+const buttonStyle = {
+  padding: "10px 15px",
+  margin: "5px",
+  background: "#007bff",
+  color: "white",
+  border: "none",
+  borderRadius: "5px",
+  cursor: "pointer"
+};
+
+const classItemStyle = {
+  cursor: "pointer",
+  marginBottom: "10px",
+  padding: "10px",
+  border: "1px solid #ddd",
+  borderRadius: "5px"
 };
 
 export default ClassList;

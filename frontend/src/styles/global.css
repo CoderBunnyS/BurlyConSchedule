@@ -1,0 +1,29 @@
+/* 🔹 General Page Layout */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* 🔹 Buttons (Shared Across All Pages) */
+  .button {
+    padding: 10px 15px;
+    margin: 5px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .button:hover {
+    background: #0056b3;
+  }
+  
+  /* 🔹 Common Container Styling */
+  .page-container {
+    padding: 20px;
+  }
+  

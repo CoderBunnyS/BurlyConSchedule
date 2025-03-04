@@ -1,0 +1,20 @@
+/* 🔹 Button Container (Only for Main Page) */
+.button-container {
+    margin-bottom: 20px;
+  }
+  
+  /* 🔹 Class List Items */
+  .class-item {
+    cursor: pointer;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    transition: background 0.2s ease-in-out;
+  }
+  
+  .class-item:hover {
+    background: #f0f0f0;
+  }
+  

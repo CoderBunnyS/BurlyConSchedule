@@ -7,15 +7,14 @@ const ClassBottomSheet = ({ open, onDismiss, classDetails }) => {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    console.log("📌 Bottom Sheet Open:", open);
-    console.log("📌 Received Class Details:", classDetails);
+    // console.log("📌 Bottom Sheet Open:", open);
+    // console.log("📌 Received Class Details:", classDetails);
 
     setTimeout(() => {
       const container = document.querySelector(".react-modal-sheet-container");
       if (!container) {
         console.warn("⚠️ Bottom sheet container is NOT in the DOM.");
       } else {
-        console.log("✅ Bottom sheet container is in the DOM.");
 
         // 🛠️ Force it to be visible
         container.style.transform = "translateY(0)";
