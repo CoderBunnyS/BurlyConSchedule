@@ -1,20 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 import ClassList from "./components/ClassList";
-import AddClassForm from "./components/AddClassForm";
+// import AdminPanel from "./components/AdminPanel";
+// import VolunteerShifts from "./components/VolunteerShifts";
 
 function App() {
-  const [classes, setClasses] = useState([]);
-
-  const handleClassAdded = (newClass) => {
-    setClasses([...classes, newClass]);
-  };
-
   return (
-    <div>
-      <h1>Convention Schedule</h1>
-      <AddClassForm onClassAdded={handleClassAdded} />
-      <ClassList classes={classes} />
-    </div>
+    <Routes>
+      <Route path="/" element={<ClassList />} />
+      {/* <Route path="/admin" element={<AdminPanel />} />
+      <Route path="/volunteer" element={<VolunteerShifts />} /> */}
+    </Routes>
   );
 }
 
