@@ -22,6 +22,15 @@ export const addClass = async (classData) => {
   }
 };
 
+export const deleteClass = async (classId) => {
+  try {
+    await axios.delete(`${API_URL}/classes/${classId}`);
+  } catch (error) {
+    console.error("Error deleting class:", error);
+  }
+};
+
+
 // 🔹 New function to enroll a user in a class
 export const enrollInClass = async (classId, userId) => {
   try {
