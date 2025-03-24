@@ -1,0 +1,71 @@
+/* Global Layout & Typography */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Georgia', serif;
+    background: linear-gradient(to bottom, #f8f3f9, #fff);
+    color: #4b2142;
+  }
+  
+  .page-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    text-align: center;
+  }
+  
+  .page-title {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #60174c;
+  }
+  
+  .page-subtitle {
+    font-size: 1.2rem;
+    color: #7c4f63;
+    margin-bottom: 30px;
+  }
+  
+  .button {
+    background-color: #a75894;
+    color: #fff;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    margin: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+  }
+  
+  .button:hover {
+    background-color: #8e407b;
+  }
+  
+  .button.disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .admin-button {
+    background-color: #60174c;
+  }
+  
+  .admin-button:hover {
+    background-color: #4b1038;
+  }
+  
+  .shift-card {
+    background-color: #ffffff;
+    border: 1px solid #d8bfd8;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px auto;
+    text-align: left;
+    box-shadow: 2px 2px 8px rgba(75, 33, 66, 0.1);
+  }
+  

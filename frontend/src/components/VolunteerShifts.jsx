@@ -38,32 +38,34 @@ export default function VolunteerShifts() {
   };
 
   return (
-    <div>
-      <h1>Volunteer Shifts</h1>
-      <button><a href='/'>Home</a></button>
+    <div className="page-container">
+      <h1 className="page-title">Volunteer Shifts</h1>
+      <p className="page-subtitle">Choose your shift and support the community!</p>
 
-      {/* Dropdown to Select Day */}
-      <label>Select Day:</label>
-      <select onChange={(e) => setSelectedDay(e.target.value)} value={selectedDay}>
-        <option value="Monday">Monday</option>
-        <option value="Tuesday">Tuesday</option>
-        <option value="Wednesday">Wednesday</option>
-        <option value="Thursday">Thursday</option>
-        <option value="Friday">Friday</option>
-        <option value="Saturday">Saturday</option>
-        <option value="Sunday">Sunday</option>
-      </select>
+      <div>
+        <label>Select Day:</label>
+        <select
+          onChange={(e) => setSelectedDay(e.target.value)}
+          value={selectedDay}
+          className="button"
+        >
+          <option value="Friday">Friday</option>
+          <option value="Saturday">Saturday</option>
+          <option value="Sunday">Sunday</option>
+        </select>
+      </div>
 
-      {/* Render shifts dynamically */}
       {shifts.map(shift => (
-        <div key={shift._id}>
+        <div key={shift._id} className="shift-card">
           <h3>{shift.role}</h3>
+          <p>{shift.day} - {shift.time}</p>
+          <p>Available Spots: {shift.availableSpots}</p>
           <button
-            onClick={() => handleRegister(shift._id)}
+            className={`button ${shift.availableSpots <= 0 ? "disabled" : ""}`}
             disabled={shift.availableSpots <= 0}
-            className={shift.availableSpots <= 0 ? "disabled" : ""}
+            onClick={() => handleRegister(shift._id)}
           >
-            {shift.time} ({shift.availableSpots} spots left)
+            Register
           </button>
         </div>
       ))}

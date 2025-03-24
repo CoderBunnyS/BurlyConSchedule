@@ -28,10 +28,10 @@ export default function AdminPanel() {
   };
 
   return (
-    <div>
-      <h1>Admin Panel - Manage Shifts</h1>
+    <div className="page-container">
+      <h1 className="page-title">Admin Panel - Manage Shifts</h1>
       {shifts.length === 0 ? (
-        <p>No shifts available</p>
+        <p className="page-subtitle">No shifts available</p>
       ) : (
         shifts.map((shift) => (
           <div key={shift._id} className="shift-card">

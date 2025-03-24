@@ -32,9 +32,9 @@ export default function UserProfile() {
   };
 
   return (
-    <div>
-      <h1>My Volunteer Shifts</h1>
-      <p>🕒 Total Hours Volunteered: {totalHours}</p>
+    <div className="page-container">
+      <h1 className="page-title">My Volunteer Shifts</h1>
+      <p className="page-subtitle">🕒 Total Hours Volunteered: {totalHours}</p>
 
       {volunteerShifts.length === 0 ? (
         <p>No upcoming shifts.</p>
