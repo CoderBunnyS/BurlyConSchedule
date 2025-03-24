@@ -1,10 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "../styles/Home.css";
+import Header from "./Header";
 
 export default function Home() {
   return (
     <div className="home-container">
+    <Header />
       <h1 className="home-title">BurlyCon Volunteer Portal</h1>
       <p className="home-subtitle">Support the community. Claim your shifts. Shine bright.</p>
 

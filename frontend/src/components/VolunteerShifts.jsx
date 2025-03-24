@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import "../styles/volunteer.css";
+import Header from "./Header";
 
 export default function VolunteerShifts() {
   const [selectedDay, setSelectedDay] = useState("Monday");
@@ -39,6 +40,7 @@ export default function VolunteerShifts() {
 
   return (
     <div className="page-container">
+    <Header />
       <h1 className="page-title">Volunteer Shifts</h1>
       <p className="page-subtitle">Choose your shift and support the community!</p>
 

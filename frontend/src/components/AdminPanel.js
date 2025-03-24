@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../styles/admin.css";
+import Header from "./Header";
 
 export default function AdminPanel() {
   const [shifts, setShifts] = useState([]);
@@ -29,6 +30,7 @@ export default function AdminPanel() {
 
   return (
     <div className="page-container">
+        <Header />
       <h1 className="page-title">Admin Panel - Manage Shifts</h1>
       {shifts.length === 0 ? (
         <p className="page-subtitle">No shifts available</p>

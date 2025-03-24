@@ -1,0 +1,42 @@
+/* styles/header.css */
+
+.header {
+    background-color: #f3e6f1;
+    border-bottom: 2px solid #a75894;
+    padding: 12px 20px;
+  }
+  
+  .header-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .logo img {
+    height: 50px;
+    width: auto;
+  }
+  
+  .nav-links {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-link {
+    text-decoration: none;
+    font-family: 'Georgia', serif;
+    color: #60174c;
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding: 6px 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border-radius: 6px;
+  }
+  
+  .nav-link:hover {
+    background-color: #a75894;
+    color: #fff;
+  }
+  

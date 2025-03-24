@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../styles/profile.css";
+import Header from "./Header";
 
 export default function UserProfile() {
   const [volunteerShifts, setVolunteerShifts] = useState([]);
@@ -33,6 +34,7 @@ export default function UserProfile() {
 
   return (
     <div className="page-container">
+    <Header />
       <h1 className="page-title">My Volunteer Shifts</h1>
       <p className="page-subtitle">🕒 Total Hours Volunteered: {totalHours}</p>
 
