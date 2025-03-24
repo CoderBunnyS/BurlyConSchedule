@@ -1,58 +1,61 @@
-const VolunteerShift = require("../models/VolunteerShift");
+const Shift = require("../models/Shift");
 
-const getShifts = async (req, res) => {
+// Get all shifts (Admin Panel)
+exports.getShifts = async (req, res) => {
   try {
-    const shifts = await VolunteerShift.find();
+    const shifts = await Shift.find();
     res.json(shifts);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch volunteer shifts" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 
-const getShiftById = async (req, res) => {
+// Get a user's shifts (Profile Page)
+exports.getUserShifts = async (req, res) => {
+  const { userId } = req.params;
   try {
-    const shift = await VolunteerShift.findById(req.params.id);
-    if (!shift) return res.status(404).json({ error: "Shift not found" });
-    res.json(shift);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch shift" });
+    const shifts = await Shift.find({ volunteersRegistered: userId });
+    const totalHours = shifts.length * 4; // Assuming 4-hour shifts
+    res.json({ shifts, totalHours });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 
-const signUpForShift = async (req, res) => {
-  res.json({ message: `User signed up for shift ID: ${req.params.id}` });
-};
-
-const cancelShift = async (req, res) => {
-  res.json({ message: `User canceled shift ID: ${req.params.id}` });
-};
-
-const checkInShift = async (req, res) => {
-  res.json({ message: `User checked in for shift ID: ${req.params.id}` });
-};
-
-const checkOutShift = async (req, res) => {
-  res.json({ message: `User checked out from shift ID: ${req.params.id}` });
-};
-
-const createShift = async (req, res) => {
+// Sign up for a shift
+exports.signUpForShift = async (req, res) => {
+  const { userId } = req.body; // Future auth
   try {
-    const newShift = new VolunteerShift(req.body);
-    await newShift.save();
-    res.status(201).json(newShift);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to create volunteer shift" });
+    const shift = await Shift.findById(req.params.id);
+    if (!shift) return res.status(404).json({ message: "Shift not found" });
+
+    if (shift.availableSpots <= 0 || shift.volunteersRegistered.includes(userId)) {
+      return res.status(400).json({ message: "Shift full or already signed up" });
+    }
+
+    shift.availableSpots -= 1;
+    shift.volunteersRegistered.push(userId);
+    await shift.save();
+
+    res.json({ message: "Successfully registered!" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 
-const deleteShift = async (req, res) => {
+// Cancel shift
+exports.cancelShift = async (req, res) => {
+  const { userId } = req.body; // Future auth
   try {
-    const deletedShift = await VolunteerShift.findByIdAndDelete(req.params.id);
-    if (!deletedShift) return res.status(404).json({ error: "Shift not found" });
-    res.json({ message: "Shift deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to delete shift" });
+    const shift = await Shift.findById(req.params.id);
+    if (!shift) return res.status(404).json({ message: "Shift not found" });
+
+    shift.availableSpots += 1;
+    shift.volunteersRegistered = shift.volunteersRegistered.filter(id => id !== userId);
+    await shift.save();
+
+    res.json({ message: "Successfully canceled!" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
-
-module.exports = { getShifts, getShiftById, signUpForShift, cancelShift, checkInShift, checkOutShift, createShift, deleteShift };

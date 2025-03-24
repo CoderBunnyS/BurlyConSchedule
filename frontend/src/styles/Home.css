@@ -1,0 +1,54 @@
+/* styles/home.css */
+
+.home-container {
+    text-align: center;
+    padding: 80px 20px;
+    background: linear-gradient(to bottom, #f8f3f9, #fff);
+    font-family: 'Georgia', serif;
+    color: #4b2142; /* Deep plum */
+  }
+  
+  .home-title {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+    color: #60174c; /* Strong purple */
+  }
+  
+  .home-subtitle {
+    font-size: 1.25rem;
+    color: #7c4f63;
+    margin-bottom: 40px;
+  }
+  
+  .home-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .home-button {
+    background-color: #a75894;
+    color: #fff;
+    padding: 14px 28px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    width: 250px;
+    text-align: center;
+  }
+  
+  .home-button:hover {
+    background-color: #8e407b;
+  }
+  
+  .home-button.admin {
+    background-color: #60174c;
+  }
+  
+  .home-button.admin:hover {
+    background-color: #4b1038;
+  }
+  
