@@ -12,15 +12,11 @@ const {
 
 // Public Routes
 router.get("/", getShifts);
-router.get("/:id", getShiftById);
+//router.get("/:id", getShiftById);
 
 // Protected Routes (Auth Not Required Yet)
 router.post("/:id/signup", signUpForShift);
 router.post("/:id/cancel", cancelShift);
 router.get("/user/:userId", getUserShifts); // Get shifts for a user
-
-// Admin Routes
-router.post("/", createShift);
-router.delete("/:id", deleteShift);
 
 module.exports = router;

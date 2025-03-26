@@ -10,15 +10,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Ensure these routes are imported correctly
-const classRoutes = require("./routes/classRoutes");
+// Active routes only
 const volunteerRoutes = require("./routes/volunteerRoutes");
-const userRoutes = require("./routes/userRoutes");
+const shiftRoutes = require("./routes/shiftRoutes");
+const shiftRoleRoutes = require("./routes/shiftRoleRoutes");
 
-// ✅ Ensure these are correctly used as middleware
-app.use("/api/classes", classRoutes);
 app.use("/api/volunteer", volunteerRoutes);
-app.use("/api/users", userRoutes);
+app.use("/api/shifts", shiftRoutes);
+app.use("/api/shiftroles", shiftRoleRoutes);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
