@@ -21,18 +21,21 @@ export default function ShiftRoleForm({ onRoleCreated }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
-
+  
       if (res.ok) {
         const newRole = await res.json();
+        console.log("✅ Role created successfully:", newRole);
         onRoleCreated(newRole);
         setFormData({ name: "", description: "", requirements: "" });
       } else {
-        console.error("Failed to create role");
+        const errorText = await res.text();
+        console.error("❌ Failed to create role:", errorText);
       }
     } catch (err) {
-      console.error("Error:", err);
+      console.error("🚨 Network error submitting role:", err);
     }
   };
+  
 
   return (
     <form className="shift-form" onSubmit={handleSubmit}>

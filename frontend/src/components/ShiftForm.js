@@ -12,11 +12,14 @@ export default function ShiftForm({ onShiftCreated }) {
     notes: ""
   });
 
-  // Fetch roles from backend
+  // ✅ Fetch roles from backend
   useEffect(() => {
-    fetch(fetch("http://localhost:5001/api/shiftroles"))
+    fetch("http://localhost:5001/api/shiftroles")
       .then((res) => res.json())
-      .then((data) => setRoles(data))
+      .then((data) => {
+        console.log("Fetched roles:", data);
+        setRoles(data);
+      })
       .catch((err) => console.error("Error fetching shift roles:", err));
   }, []);
 
@@ -31,7 +34,7 @@ export default function ShiftForm({ onShiftCreated }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/shifts", {
+      const response = await fetch("http://localhost:5001/api/shifts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
@@ -39,7 +42,7 @@ export default function ShiftForm({ onShiftCreated }) {
 
       if (response.ok) {
         const newShift = await response.json();
-        onShiftCreated(newShift); // Pass back to parent to update the list
+        onShiftCreated(newShift);
         setFormData({
           date: "",
           startTime: "",
@@ -61,17 +64,46 @@ export default function ShiftForm({ onShiftCreated }) {
     <form className="shift-form" onSubmit={handleSubmit}>
       <h2>Create New Shift</h2>
 
-      <label>Date:</label>
-      <input type="date" name="date" value={formData.date} onChange={handleChange} required />
+      <label htmlFor="date">Date:</label>
+      <input
+        id="date"
+        type="date"
+        name="date"
+        value={formData.date}
+        onChange={handleChange}
+        required
+      />
 
-      <label>Start Time (military):</label>
-      <input type="text" name="startTime" value={formData.startTime} onChange={handleChange} placeholder="e.g. 0700" required />
+      <label htmlFor="startTime">Start Time (military):</label>
+      <input
+        id="startTime"
+        type="text"
+        name="startTime"
+        value={formData.startTime}
+        onChange={handleChange}
+        placeholder="e.g. 0700"
+        required
+      />
 
-      <label>End Time (military):</label>
-      <input type="text" name="endTime" value={formData.endTime} onChange={handleChange} placeholder="e.g. 1100" required />
+      <label htmlFor="endTime">End Time (military):</label>
+      <input
+        id="endTime"
+        type="text"
+        name="endTime"
+        value={formData.endTime}
+        onChange={handleChange}
+        placeholder="e.g. 1100"
+        required
+      />
 
-      <label>Role:</label>
-      <select name="role" value={formData.role} onChange={handleChange} required>
+      <label htmlFor="role">Role:</label>
+      <select
+        id="role"
+        name="role"
+        value={formData.role}
+        onChange={handleChange}
+        required
+      >
         <option value="">-- Select a role --</option>
         {roles.map((role) => (
           <option key={role._id} value={role.name}>
@@ -80,14 +112,33 @@ export default function ShiftForm({ onShiftCreated }) {
         ))}
       </select>
 
-      <label>Task Description:</label>
-      <textarea name="taskDescription" value={formData.taskDescription} onChange={handleChange} required />
+      <label htmlFor="taskDescription">Task Description:</label>
+      <textarea
+        id="taskDescription"
+        name="taskDescription"
+        value={formData.taskDescription}
+        onChange={handleChange}
+        required
+      />
 
-      <label>Volunteers Needed:</label>
-      <input type="number" name="volunteersNeeded" min="1" value={formData.volunteersNeeded} onChange={handleChange} required />
+      <label htmlFor="volunteersNeeded">Volunteers Needed:</label>
+      <input
+        id="volunteersNeeded"
+        type="number"
+        name="volunteersNeeded"
+        min="1"
+        value={formData.volunteersNeeded}
+        onChange={handleChange}
+        required
+      />
 
-      <label>Notes (admin only):</label>
-      <textarea name="notes" value={formData.notes} onChange={handleChange} />
+      <label htmlFor="notes">Notes (admin only):</label>
+      <textarea
+        id="notes"
+        name="notes"
+        value={formData.notes}
+        onChange={handleChange}
+      />
 
       <button type="submit">➕ Create Shift</button>
     </form>
