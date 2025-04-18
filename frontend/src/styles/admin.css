@@ -39,4 +39,118 @@
   .shift-form button:hover {
     background-color: #8e407b;
   }
+
+  .summary-dashboard {
+    display: flex;
+    gap: 20px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  .summary-card {
+    background: #f8f3f9;
+    border-left: 5px solid #a75894;
+    padding: 15px 20px;
+    border-radius: 8px;
+    flex: 1;
+    min-width: 180px;
+    box-shadow: 0 1px 5px rgba(96, 23, 76, 0.1);
+  }
+  
+  .summary-card h3 {
+    margin: 0 0 10px;
+    color: #60174c;
+  }
+  
+  .accordion-toggle-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 40px;
+  }
+  
+  .accordion {
+    flex: 1;
+    min-width: 280px;
+    background: #f8f3f9;
+    border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(96, 23, 76, 0.08);
+    overflow: hidden;
+  }
+  
+  .accordion summary {
+    padding: 15px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #60174c;
+    background-color: #f1e1ec;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+    list-style: none;
+  }
+  
+  .accordion[open] summary {
+    border-bottom: none;
+    background-color: #e7c5df;
+  }
+  
+  .accordion-content {
+    padding: 20px;
+  }
+  
+  
+  .summary-dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 30px 0;
+    justify-content: space-between;
+  }
+  
+  .summary-card, .alert-card {
+    background: #f8f3f9;
+    border-left: 5px solid #a75894;
+    padding: 20px;
+    border-radius: 10px;
+    flex: 1;
+    min-width: 220px;
+    box-shadow: 0 1px 6px rgba(96, 23, 76, 0.08);
+  }
+  
+  .summary-card h3,
+  .alert-card h3 {
+    color: #60174c;
+    margin-top: 0;
+  }
+  
+  .alert-card {
+    background: #fff4f8;
+    border-left-color: #d9367d;
+    margin-bottom: 30px;
+  }
+  
+  .admin-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: flex-start;
+    margin-top: 20px;
+  }
+  
+  .admin-button {
+    background-color: #a75894;
+    color: white;
+    text-decoration: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    display: inline-block;
+    transition: background-color 0.2s ease;
+  }
+  
+  .admin-button:hover {
+    background-color: #8e407b;
+  }
   

@@ -65,14 +65,12 @@ export default function ShiftForm({ onShiftCreated }) {
       <h2>Create New Shift</h2>
 
       <label htmlFor="date">Date:</label>
-      <input
-        id="date"
-        type="date"
-        name="date"
-        value={formData.date}
-        onChange={handleChange}
-        required
-      />
+      <select>
+        <option value="11/06/2025">THURSDAY 11/6</option>
+        <option value="11/07/2025">FRIDAY 11/7</option>
+        <option value="11/08/2025">SATURDAY 11/8</option>
+        <option value="11/09/2025">SUNDAY 11/9</option>
+      </select>
 
       <label htmlFor="startTime">Start Time (military):</label>
       <input

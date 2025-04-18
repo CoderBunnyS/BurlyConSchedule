@@ -1,9 +1,70 @@
-h1 {    
+.volunteer-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+    font-family: 'Georgia', serif;
+  }
+  
+  .volunteer-title {
     text-align: center;
-}
-button {
-    margin: 1% 0% 1% 2%;
-}
-h3 {    
-    margin-left: 2%;
-}
+    color: #60174c;
+    margin-bottom: 20px;
+  }
+  
+  .date-switcher {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 0 5px;
+  }
+  
+  .date-switcher button {
+    flex: none;
+    background: #a75894;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .date-switcher .active {
+    background: #60174c;
+  }
+  
+  .schedule-image img {
+    width: 50%;
+    align-self: center;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .shift-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .shift-card {
+    background: #f8f3f9;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 6px rgba(96, 23, 76, 0.1);
+  }
+  
+  .shift-card button {
+    margin-right: 10px;
+    background-color: #a75894;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .shift-card button:hover {
+    background-color: #8e407b;
+  }
+  
