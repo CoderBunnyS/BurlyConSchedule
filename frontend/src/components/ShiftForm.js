@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 export default function ShiftForm({ onShiftCreated }) {
   const [roles, setRoles] = useState([]);
   const [formData, setFormData] = useState({
-    date: "",
+    date: "2025-11-05", // Default to first day
     startTime: "",
     endTime: "",
     role: "",
@@ -12,14 +12,11 @@ export default function ShiftForm({ onShiftCreated }) {
     notes: ""
   });
 
-  // ✅ Fetch roles from backend
+  // Fetch roles
   useEffect(() => {
-    fetch("http://localhost:5001/api/shiftroles")
+    fetch(`${process.env.REACT_APP_API_BASE}/api/shiftroles`)
       .then((res) => res.json())
-      .then((data) => {
-        console.log("Fetched roles:", data);
-        setRoles(data);
-      })
+      .then((data) => setRoles(data))
       .catch((err) => console.error("Error fetching shift roles:", err));
   }, []);
 
@@ -34,7 +31,7 @@ export default function ShiftForm({ onShiftCreated }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5001/api/shifts", {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/shifts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
@@ -44,7 +41,7 @@ export default function ShiftForm({ onShiftCreated }) {
         const newShift = await response.json();
         onShiftCreated(newShift);
         setFormData({
-          date: "",
+          date: "2025-11-05",
           startTime: "",
           endTime: "",
           role: "",
@@ -65,11 +62,13 @@ export default function ShiftForm({ onShiftCreated }) {
       <h2>Create New Shift</h2>
 
       <label htmlFor="date">Date:</label>
-      <select>
-        <option value="11/06/2025">THURSDAY 11/6</option>
-        <option value="11/07/2025">FRIDAY 11/7</option>
-        <option value="11/08/2025">SATURDAY 11/8</option>
-        <option value="11/09/2025">SUNDAY 11/9</option>
+      <select name="date" value={formData.date} onChange={handleChange} required>
+        <option value="">-- Select a date --</option>
+        <option value="2025-11-05">Wednesday 11/5 (Setup)</option>
+        <option value="2025-11-06">Thursday 11/6</option>
+        <option value="2025-11-07">Friday 11/7</option>
+        <option value="2025-11-08">Saturday 11/8</option>
+        <option value="2025-11-09">Sunday 11/9</option>
       </select>
 
       <label htmlFor="startTime">Start Time (military):</label>

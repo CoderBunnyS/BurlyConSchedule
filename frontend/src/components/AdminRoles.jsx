@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import "../styles/admin.css";
+import "../styles/shiftForm.css";
 
 export default function AdminRoles() {
   const [roles, setRoles] = useState([]);
@@ -78,35 +79,40 @@ export default function AdminRoles() {
       <Header />
       <h1 className="page-title">Manage Volunteer Roles</h1>
 
-      <form onSubmit={handleSubmit} className="role-form">
-        <h2>{editingId ? "Edit Role" : "Add New Role"}</h2>
+      <section className="form-section">
+        <form onSubmit={handleSubmit} className="shift-form">
+          <h2>{editingId ? "Edit Role" : "Add New Role"}</h2>
 
-        <label htmlFor="name">Role Name:</label>
-        <input type="text" name="name" value={formData.name} onChange={handleChange} required />
+          <label htmlFor="name">Role Name:</label>
+          <input type="text" name="name" value={formData.name} onChange={handleChange} required />
 
-        <label htmlFor="description">Description:</label>
-        <textarea name="description" value={formData.description} onChange={handleChange} required />
+          <label htmlFor="description">Description:</label>
+          <textarea name="description" value={formData.description} onChange={handleChange} required />
 
-        <label htmlFor="requirements">Requirements (optional):</label>
-        <textarea name="requirements" value={formData.requirements} onChange={handleChange} />
+          <label htmlFor="requirements">Requirements (optional):</label>
+          <textarea name="requirements" value={formData.requirements} onChange={handleChange} />
 
-        <button type="submit">{editingId ? "💾 Save Changes" : "➕ Add Role"}</button>
-      </form>
+          <button type="submit">{editingId ? "💾 Save Changes" : "➕ Add Role"}</button>
+        </form>
+      </section>
 
-      <div className="role-list">
-        {roles.map((role) => (
-          <div key={role._id} className="role-card">
-            <h3>{role.name}</h3>
-            <p><strong>Description:</strong> {role.description}</p>
-            {role.requirements && <p><strong>Requirements:</strong> {role.requirements}</p>}
+      <section className="form-section">
+        <h2>Existing Roles</h2>
+        <div className="role-list">
+          {roles.map((role) => (
+            <div key={role._id} className="role-card">
+              <h3>{role.name}</h3>
+              <p><strong>Description:</strong> {role.description}</p>
+              {role.requirements && <p><strong>Requirements:</strong> {role.requirements}</p>}
 
-            <div className="shift-card-buttons">
-              <button type="button" onClick={() => handleEdit(role)}>✏️ Edit</button>
-              <button type="button" onClick={() => handleDelete(role._id)}>❌ Delete</button>
+              <div className="shift-card-buttons">
+                <button type="button" onClick={() => handleEdit(role)}>✏️ Edit</button>
+                <button type="button" onClick={() => handleDelete(role._id)}>❌ Delete</button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
