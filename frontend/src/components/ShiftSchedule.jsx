@@ -3,6 +3,7 @@ import "../styles/shiftForm.css";
 
 export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftUpdated, onShiftDeleted }) {
   const [editingId, setEditingId] = useState(null);
+  const [viewingVolunteers, setViewingVolunteers] = useState(null);
   const [editData, setEditData] = useState({
     startTime: "",
     endTime: "",
@@ -107,7 +108,13 @@ export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftU
                 <p><strong>Time:</strong> {shift.startTime}–{shift.endTime}</p>
                 <p><strong>Needed:</strong> {shift.volunteersNeeded}</p>
                 <p><strong>Signed Up:</strong> {filled}</p>
-                <p><strong>Status:</strong> {isFull ? "✅ Full" : `🟠 ${available} spots left`}</p>
+                <p><strong>Status:</strong> 
+                  {isFull ? (
+                    <span className="shift-status-full">✅ Full</span>
+                  ) : (
+                    <span className="shift-status-available">🟠 {available} spots left</span>
+                  )}
+                </p>
 
                 {viewMode === "admin" && (
                   <>
@@ -116,6 +123,7 @@ export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftU
 
                     <div className="shift-card-buttons">
                       <button type="button" onClick={() => handleEditClick(shift)}>✏️ Edit</button>
+                      <button type="button" onClick={() => setViewingVolunteers(shift)}>👥 View</button>
                       <button type="button" onClick={() => handleDelete(shift._id)}>❌ Delete</button>
                     </div>
                   </>
@@ -125,6 +133,25 @@ export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftU
           </div>
         );
       })}
+
+      {/* Volunteer Viewer Modal */}
+      {viewingVolunteers && (
+        <div className="modal-backdrop" onClick={() => setViewingVolunteers(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>Volunteers for {viewingVolunteers.role}</h2>
+            {viewingVolunteers.volunteersRegistered?.length > 0 ? (
+              <ul>
+                {viewingVolunteers.volunteersRegistered.map((v) => (
+                  <li key={v}>{v}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>No volunteers signed up yet.</p>
+            )}
+            <button type="button" onClick={() => setViewingVolunteers(null)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
