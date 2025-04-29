@@ -7,6 +7,7 @@ import AdminDashboard from "./components/AdminDashboard";
 import AdminRoles from "./components/AdminRoles";
 import UserProfile from "./components/UserProfile";
 import AdminShiftOverview from "./components/AdminShiftOverview";
+import AdminVolunteers from "./components/AdminVolunteers";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/shifts" element={<AdminShiftOverview />} />
       <Route path="/admin/roles" element={<AdminRoles />} />
+      <Route path="/admin/volunteers" element={<AdminVolunteers />} />
     </Routes>
   );
 }
