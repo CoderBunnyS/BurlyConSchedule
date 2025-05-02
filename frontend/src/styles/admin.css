@@ -153,4 +153,49 @@
   .admin-button:hover {
     background-color: #8e407b;
   }
+  .volunteer-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
   
+  .volunteer-table th,
+  .volunteer-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .volunteer-table th {
+    background-color: #f1e1ec;
+    color: #60174c;
+  }
+  
+  .volunteer-table td {
+    background-color: #fff;
+  }
+  
+  /* admin.css or volunteerList.css */
+.volunteer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.volunteer-card {
+  background: #f8f3f9;
+  padding: 20px;
+  border-left: 5px solid #a75894;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(96, 23, 76, 0.08);
+}
+
+.volunteer-card h3 {
+  margin-top: 0;
+  color: #60174c;
+}
+
+.shift-details ul {
+  padding-left: 20px;
+  margin-top: 5px;
+}
