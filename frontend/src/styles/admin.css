@@ -199,3 +199,18 @@
   padding-left: 20px;
   margin-top: 5px;
 }
+.volunteer-table input {
+  width: 30px;
+  padding: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* admin.css or shiftForm.css */
+.hourly-needs-table input.tiny-input {
+  width: 2.5em;
+  text-align: center;
+  padding: 4px;
+  font-size: 0.85rem;
+}
+

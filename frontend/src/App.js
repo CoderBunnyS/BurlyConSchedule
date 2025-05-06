@@ -8,6 +8,7 @@ import AdminRoles from "./components/AdminRoles";
 import UserProfile from "./components/UserProfile";
 import AdminShiftOverview from "./components/AdminShiftOverview";
 import AdminVolunteers from "./components/AdminVolunteers";
+import AdminHourlyNeeds from "./components/AdminHourlyNeeds";
 
 function App() {
   return (
@@ -19,6 +20,9 @@ function App() {
       <Route path="/admin/shifts" element={<AdminShiftOverview />} />
       <Route path="/admin/roles" element={<AdminRoles />} />
       <Route path="/admin/volunteers" element={<AdminVolunteers />} />
+      <Route path="/admin/hourly-needs" element={<AdminHourlyNeeds />} />
+      {/* Uncomment the line below when AdminPanel is ready */}
+      {/* <Route path="/admin/panel" element={<AdminPanel />} /> */}
     </Routes>
   );
 }

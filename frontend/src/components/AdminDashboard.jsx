@@ -38,9 +38,13 @@ export default function AdminDashboard() {
       </div>
 
       <div className="admin-links">
-        <Link to="/admin/shifts" className="admin-button">📅 Manage Shifts</Link>
-        <Link to="/admin/roles" className="admin-button">🛠️ Manage Volunteer Roles</Link>
-        <Link to="/admin/volunteers" className="admin-button">👥 View Volunteers</Link>
+      <div className="admin-links">
+  <Link to="/admin/shifts" className="admin-button">📅 Manage Shifts</Link>
+  <Link to="/admin/roles" className="admin-button">🛠️ Manage Volunteer Roles</Link>
+  <Link to="/admin/volunteers" className="admin-button">👥 View Volunteers</Link>
+  <Link to="/admin/hourly-needs" className="admin-button">⏱️ Set Hourly Needs</Link>
+</div>
+
       </div>
     </div>
   );
