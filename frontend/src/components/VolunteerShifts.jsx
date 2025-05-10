@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "../styles/volunteer.css";
-import ShiftCard from "./ShiftCard";
 import Header from "./Header";
 
 export default function VolunteerShifts() {
-  const [selectedDate, setSelectedDate] = useState("2025-11-07"); // default: Thursday
-  const [shifts, setShifts] = useState([]);
+  const [selectedDate, setSelectedDate] = useState("2025-11-07");
+  const [hourlyNeeds, setHourlyNeeds] = useState([]);
 
   const dateOptions = [
-    { label: "Thurs 11/5", value: "2025-11-05" },
-    { label: "Fri 11/6", value: "2025-11-06" },
-    { label: "Sat 11/7", value: "2025-11-07" },
-    { label: "Sun 11/8", value: "2025-11-08" },
+    { label: "Wed 11/5", value: "2025-11-05" },
+    { label: "Thu 11/6", value: "2025-11-06" },
+    { label: "Fri 11/7", value: "2025-11-07" },
+    { label: "Sat 11/8", value: "2025-11-08" },
+    { label: "Sun 11/9", value: "2025-11-09" },
   ];
 
   const scheduleImages = {
@@ -19,22 +19,55 @@ export default function VolunteerShifts() {
     "2025-11-06": "https://burlycon.org/wp-content/uploads/2024/10/friday-2024.png",
     "2025-11-07": "https://burlycon.org/wp-content/uploads/2024/10/saturday-2024.png",
     "2025-11-08": "https://burlycon.org/wp-content/uploads/2024/10/sunday-2024.png",
+    "2025-11-09": "https://burlycon.org/wp-content/uploads/2024/10/sunday-2024.png",
   };
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_BASE}/api/shifts`)
+    fetch(`${process.env.REACT_APP_API_BASE}/api/hourlyneeds/${selectedDate}`)
       .then((res) => res.json())
       .then((data) => {
-        // Filter shifts for selected date
-        const filtered = data.filter((shift) => shift.date.startsWith(selectedDate));
-        setShifts(filtered);
+        setHourlyNeeds(data);
       })
-      .catch((err) => console.error("Error loading shifts:", err));
+      .catch((err) => console.error("Error fetching hourly needs:", err));
   }, [selectedDate]);
+
+  // Group needs by role, then by hour
+  const grouped = hourlyNeeds.reduce((acc, need) => {
+    if (!acc[need.role]) acc[need.role] = [];
+    acc[need.role].push(need);
+    return acc;
+  }, {});
+
+  const handleSignup = async (needId) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/hourlyneeds/${needId}/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: "6811617f46ed53b3155162c3" }) // temp placeholder
+      });
+  
+      const data = await res.json();
+  
+      if (res.ok) {
+        alert("Signed up!");
+        // Refresh the needs list
+        setHourlyNeeds((prev) =>
+          prev.map((need) =>
+            need._id === needId ? { ...need, volunteersNeeded: need.volunteersNeeded - 1 } : need
+          )
+        );
+      } else {
+        alert(`Could not sign up: ${data.message}`);
+      }
+    } catch (err) {
+      console.error("Signup error:", err);
+    }
+  };
+  
 
   return (
     <div className="volunteer-container">
-    <Header />
+      <Header />
       <h1 className="volunteer-title">Choose Your Volunteer Shifts</h1>
 
       <div className="date-switcher">
@@ -56,10 +89,28 @@ export default function VolunteerShifts() {
       </div>
 
       <div className="shift-list">
-        {shifts.length > 0 ? (
-          shifts.map((shift) => <ShiftCard key={shift._id} shift={shift} />)
+        {Object.keys(grouped).length > 0 ? (
+          Object.entries(grouped).map(([role, needs]) => (
+            <div key={role} className="role-card">
+              <h3>{role}</h3>
+              <ul>
+  {needs.map(({ _id, hour, volunteersNeeded }) => (
+    <li key={_id}>
+      <strong>{hour}</strong>: {volunteersNeeded} needed{" "}
+      <button type="button"
+        onClick={() => handleSignup(_id)}
+        disabled={volunteersNeeded <= 0}
+      >
+        Sign Up
+      </button>
+    </li>
+  ))}
+</ul>
+
+            </div>
+          ))
         ) : (
-          <p>No volunteer shifts available for this day.</p>
+          <p>No shifts available for this day.</p>
         )}
       </div>
     </div>

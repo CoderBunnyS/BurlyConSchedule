@@ -12,15 +12,33 @@ exports.getRoles = async (req, res) => {
 
 // POST a new role
 exports.createRole = async (req, res) => {
-  const { name, description, requirements } = req.body;
+  const {
+    name,
+    location,
+    responsibilities,
+    physicalRequirements,
+    pointOfContact,
+    contactPhone
+  } = req.body;
+
   try {
-    const newRole = new ShiftRole({ name, description, requirements });
+    const newRole = new ShiftRole({
+      name,
+      location,
+      responsibilities,
+      physicalRequirements,
+      pointOfContact,
+      contactPhone
+    });
+
     await newRole.save();
     res.status(201).json(newRole);
   } catch (err) {
+    console.error("Error creating role:", err);
     res.status(400).json({ message: err.message });
   }
 };
+
 
 // PATCH update an existing role
 exports.updateRole = async (req, res) => {

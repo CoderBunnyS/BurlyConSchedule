@@ -33,6 +33,22 @@ exports.getAllShifts = async (req, res) => {
   }
 };
 
+// PATCH: Update a shift
+exports.updateShift = async (req, res) => {
+  try {
+    const updated = await Shift.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ message: "Shift not found" });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+
 // DELETE a shift
 exports.deleteShift = async (req, res) => {
   try {

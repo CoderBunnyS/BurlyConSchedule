@@ -30,10 +30,10 @@ export default function AdminHourlyNeeds() {
       .then((res) => res.json())
       .then((data) => {
         const mapped = {};
-        data.forEach((n) => {
+        for (const n of data) {
           const key = `${n.role}-${n.hour}`;
           mapped[key] = n.volunteersNeeded;
-        });
+        }
         setHourlyNeeds(mapped);
       })
       .catch((err) => console.error("Error fetching hourly needs:", err));
@@ -43,7 +43,7 @@ export default function AdminHourlyNeeds() {
     const key = `${role}-${hour}`;
     setHourlyNeeds((prev) => ({
       ...prev,
-      [key]: parseInt(value) || 0,
+      [key]: Number.parseInt(value) || 0,
     }));
   };
 
@@ -58,7 +58,7 @@ export default function AdminHourlyNeeds() {
       });
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/hourlyneeds`, {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/hourlyneeds/bulk`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ date, needs: needsArray }),
