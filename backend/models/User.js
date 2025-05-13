@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     {
       shift: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Shift",
+        ref: "HourlyNeed", // 🔄 Updated from "Shift" to "HourlyNeed"
         required: true
       },
       status: {

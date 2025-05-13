@@ -68,3 +68,177 @@
     background-color: #8e407b;
   }
   
+  .role-card {
+    background: #f8f3f9;
+    border-left: 5px solid #a75894;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(96, 23, 76, 0.1);
+  }
+  
+  .role-card h3 {
+    margin-top: 0;
+    color: #60174c;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+  
+  .role-card ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+  
+  .role-card li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 0.95rem;
+  }
+  
+  .role-card li:last-child {
+    border-bottom: none;
+  }
+  
+  .role-card button {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    background-color: #a75894;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .role-card button:hover {
+    background-color: #8e407b;
+  }
+  
+  .role-card button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .shift-signed {
+    color: green;
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding-left: 10px;
+  }
+
+  .volunteer-container {
+    padding: 20px;
+    max-width: 900px;
+    margin: auto;
+    font-family: 'Georgia', serif;
+  }
+  
+  .volunteer-title {
+    text-align: center;
+    color: #60174c;
+    margin-bottom: 20px;
+  }
+  
+  .date-switcher {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 0 5px;
+  }
+  
+  .date-switcher button {
+    flex: none;
+    background: #a75894;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .date-switcher .active {
+    background: #60174c;
+  }
+  
+  .schedule-image img {
+    width: 50%;
+    display: block;
+    margin: 0 auto 20px;
+    border-radius: 8px;
+  }
+  
+  .shift-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* Role section */
+  .role-card {
+    background: #f8f3f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(96, 23, 76, 0.1);
+    padding: 15px;
+    overflow: hidden;
+  }
+  
+  .role-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    color: #60174c;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2c6da;
+  }
+  
+  .role-card ul {
+    margin-top: 10px;
+    padding-left: 20px;
+    list-style: none;
+  }
+  
+  .role-card li {
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .role-card button {
+    margin-left: 10px;
+    background-color: #a75894;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .role-card button:hover {
+    background-color: #8e407b;
+  }
+  
+  .shift-signed {
+    font-weight: bold;
+    color: #2e7d32;
+    margin-left: 10px;
+  }
+  
+  /* Shift tally (signed up summary) */
+  .shift-tally {
+    background-color: #e7c5df;
+    border-left: 5px solid #a75894;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #60174c;
+  }
+  

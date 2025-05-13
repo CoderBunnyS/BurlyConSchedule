@@ -10,8 +10,8 @@ const {
   deleteShift
 } = require("../controllers/volunteerController");
 
-// Specific routes FIRST
-router.get("/user/:userId", getUserShifts); // Moved to top
+// Specific route first
+router.get("/user/:userId", getUserShifts);
 
 // Public Routes
 router.get("/", getShifts);

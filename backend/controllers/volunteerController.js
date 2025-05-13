@@ -12,16 +12,33 @@ exports.getShifts = async (req, res) => {
 };
 
 // Get a user's shifts (Profile Page)
+const User = require("../models/User");
+const HourlyNeed = require("../models/HourlyNeed");
+
+// Get a user's hourly shifts (Profile Page)
 exports.getUserShifts = async (req, res) => {
   const { userId } = req.params;
+
   try {
-    const shifts = await Shift.find({ volunteersRegistered: userId });
-    const totalHours = shifts.length * 4; // Assuming 4-hour shifts
-    res.json({ shifts, totalHours });
+    const user = await User.findOne({ fusionAuthId: userId });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const hourlyShiftIds = user.volunteerShifts
+      .filter((entry) => entry.status === "registered")
+      .map((entry) => entry.shift);
+
+    const shifts = await HourlyNeed.find({ _id: { $in: hourlyShiftIds } });
+
+    res.json({
+      shifts,
+      totalHours: shifts.length, // 1 hour per shift
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Error loading user shifts:", err);
+    res.status(500).json({ message: err.message });
   }
 };
+
 
 // Sign up for a shift
 exports.signUpForShift = async (req, res) => {
