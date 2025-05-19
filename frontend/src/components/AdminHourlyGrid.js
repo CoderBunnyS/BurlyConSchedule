@@ -20,7 +20,7 @@ export default function AdminHourlyGrid() {
   useEffect(() => {
     if (!selectedDate) return;
 
-    fetch(`${process.env.REACT_APP_API_BASE}/api/hourlyneeds/${selectedDate}`)
+    fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/${selectedDate}`)
       .then((res) => res.json())
       .then((data) => {
         const formatted = {};
@@ -59,7 +59,7 @@ export default function AdminHourlyGrid() {
     }
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/hourlyneeds/bulk`, {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/bulk`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

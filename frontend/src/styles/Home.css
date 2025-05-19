@@ -119,3 +119,18 @@
 .home-button.admin:hover {
   background-color: #4b1038;
 }
+.login-button-header {
+  background-color: #a75894;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-left: 12px;
+}
+
+.login-button-header:hover {
+  background-color: #60174c;
+}
+

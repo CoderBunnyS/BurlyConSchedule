@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "../styles/volunteer.css";
 import Header from "./Header";
+import { getUserId } from "../utils/authUtils";
 
 export default function VolunteerShifts() {
   const [selectedDate, setSelectedDate] = useState("2025-11-07");
-  const [hourlyNeeds, setHourlyNeeds] = useState([]);
-  const [signedUpIds, setSignedUpIds] = useState([]);
-  const [totalHours, setTotalHours] = useState(0);
+  const [shifts, setShifts] = useState([]);
+  const [userId, setUserId] = useState(null);
 
   const dateOptions = [
     { label: "Wed 11/5", value: "2025-11-05" },
@@ -24,46 +24,47 @@ export default function VolunteerShifts() {
     "2025-11-09": "https://burlycon.org/wp-content/uploads/2024/10/sunday-2024.png",
   };
 
+  // Get userId
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_BASE}/api/hourlyneeds/${selectedDate}`)
+    const id = getUserId();
+    if (id) setUserId(id);
+  }, []);
+  
+
+  // Fetch shifts for all days, then filter locally
+  useEffect(() => {
+    fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer`)
       .then((res) => res.json())
       .then((data) => {
-        setHourlyNeeds(data);
-        setSignedUpIds([]);
-        setTotalHours(0);
+        const filtered = data.filter((shift) => shift.date === selectedDate);
+        setShifts(filtered);
       })
-      .catch((err) => console.error("Error fetching hourly needs:", err));
+      .catch((err) => console.error("Error fetching shifts:", err));
   }, [selectedDate]);
 
-  const grouped = hourlyNeeds.reduce((acc, need) => {
-    if (!acc[need.role]) acc[need.role] = [];
-    acc[need.role].push(need);
-    return acc;
-  }, {});
-
-  const to12Hour = (hourStr) => {
-    const [hour, min] = hourStr.split(":").map(Number);
+  const to12Hour = (timeStr) => {
+    const [hour, min] = timeStr.split(":").map(Number);
     const suffix = hour >= 12 ? "PM" : "AM";
-    const displayHour = ((hour + 11) % 12 + 1);
+    const displayHour = ((hour + 11) % 12) + 1;
     return `${displayHour}:${min.toString().padStart(2, "0")} ${suffix}`;
   };
 
-  const handleSignup = async (needId) => {
+  const handleSignup = async (shiftId) => {
+    if (!userId) return;
+
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/hourlyneeds/${needId}/signup`, {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/${shiftId}/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: "6811617f46ed53b3155162c3" }) // placeholder
+        body: JSON.stringify({ userId })
       });
 
       if (res.ok) {
-        setSignedUpIds((prev) => [...prev, needId]);
-        setTotalHours((prev) => prev + 1);
-        setHourlyNeeds((prev) =>
-          prev.map((need) =>
-            need._id === needId
-              ? { ...need, volunteersNeeded: need.volunteersNeeded - 1 }
-              : need
+        setShifts((prev) =>
+          prev.map((shift) =>
+            shift._id === shiftId
+              ? { ...shift, volunteersRegistered: [...shift.volunteersRegistered, userId] }
+              : shift
           )
         );
       }
@@ -72,22 +73,25 @@ export default function VolunteerShifts() {
     }
   };
 
-  const handleCancel = async (needId) => {
+  const handleCancel = async (shiftId) => {
+    if (!userId) return;
+
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/hourlyneeds/${needId}/cancel`, {
-        method: "POST",      
+      const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/${shiftId}/cancel`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: "6811617f46ed53b3155162c3" })
+        body: JSON.stringify({ userId })
       });
 
       if (res.ok) {
-        setSignedUpIds((prev) => prev.filter((id) => id !== needId));
-        setTotalHours((prev) => prev - 1);
-        setHourlyNeeds((prev) =>
-          prev.map((need) =>
-            need._id === needId
-              ? { ...need, volunteersNeeded: need.volunteersNeeded + 1 }
-              : need
+        setShifts((prev) =>
+          prev.map((shift) =>
+            shift._id === shiftId
+              ? {
+                  ...shift,
+                  volunteersRegistered: shift.volunteersRegistered.filter((id) => id !== userId)
+                }
+              : shift
           )
         );
       }
@@ -96,6 +100,12 @@ export default function VolunteerShifts() {
     }
   };
 
+  const grouped = shifts.reduce((acc, shift) => {
+    if (!acc[shift.role]) acc[shift.role] = [];
+    acc[shift.role].push(shift);
+    return acc;
+  }, {});
+
   return (
     <div className="volunteer-container">
       <Header />
@@ -103,7 +113,7 @@ export default function VolunteerShifts() {
 
       <div className="date-switcher">
         {dateOptions.map(({ label, value }) => (
-          <button type  ="button"
+          <button type="button"
             key={value}
             className={value === selectedDate ? "active" : ""}
             onClick={() => setSelectedDate(value)}
@@ -119,44 +129,36 @@ export default function VolunteerShifts() {
         </a>
       </div>
 
-      {signedUpIds.length > 0 && (
-        <div className="shift-tally">
-          {(() => {
-            const selectedShifts = hourlyNeeds.filter((n) => signedUpIds.includes(n._id));
-            const hours = selectedShifts.map((n) => n.hour).sort();
-            const start = to12Hour(hours[0]);
-            const endRaw = Number.parseInt(hours[hours.length - 1].split(":")[0]) + 1;
-            const end = to12Hour(`${endRaw}:00`);
-            return (
-              <p>
-                ✅ You’re signed up from <strong>{start}</strong> to <strong>{end}</strong>{" "}
-                ({signedUpIds.length} hour{signedUpIds.length > 1 ? "s" : ""})
-              </p>
-            );
-          })()}
-        </div>
-      )}
-
       <div className="shift-list">
-        {Object.entries(grouped).map(([role, needs]) => (
+        {Object.entries(grouped).map(([role, shifts]) => (
           <div key={role} className="role-card">
             <h3>{role}</h3>
             <ul>
-              {needs.map(({ _id, hour, volunteersNeeded }) => (
-                <li key={_id}>
-                  <strong>{to12Hour(hour)}</strong>: {volunteersNeeded} needed{" "}
-                  {signedUpIds.includes(_id) ? (
-                    <button type="button" onClick={() => handleCancel(_id)} className="cancel-btn">❌ Cancel</button>
-                  ) : (
-                    <button type="button"
-                      onClick={() => handleSignup(_id)}
-                      disabled={volunteersNeeded <= 0}
-                    >
-                      Sign Up
-                    </button>
-                  )}
-                </li>
-              ))}
+              {shifts
+                .sort((a, b) => a.startTime.localeCompare(b.startTime))
+                .map((shift) => {
+                  const isSignedUp = shift.volunteersRegistered.includes(userId);
+                  const available = shift.volunteersNeeded - shift.volunteersRegistered.length;
+                  return (
+                    <li key={shift._id}>
+                      <strong>{to12Hour(shift.startTime)}–{to12Hour(shift.endTime)}</strong>:{" "}
+                      {available} spot{available !== 1 ? "s" : ""} left{" "}
+                      {isSignedUp ? (
+                        <button type="button" onClick={() => handleCancel(shift._id)} className="cancel-btn">
+                          ❌ Cancel
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleSignup(shift._id)}
+                          disabled={available <= 0}
+                        >
+                          Sign Up
+                        </button>
+                      )}
+                    </li>
+                  );
+                })}
             </ul>
           </div>
         ))}

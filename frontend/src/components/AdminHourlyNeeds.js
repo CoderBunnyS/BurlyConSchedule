@@ -26,7 +26,7 @@ export default function AdminHourlyNeeds() {
 
   useEffect(() => {
     if (!date) return;
-    fetch(`${process.env.REACT_APP_API_BASE}/api/hourlyneeds/${date}`)
+    fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/${date}`)
       .then((res) => res.json())
       .then((data) => {
         const mapped = {};
@@ -58,7 +58,7 @@ export default function AdminHourlyNeeds() {
       });
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/hourlyneeds/bulk`, {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/bulk`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ date, needs: needsArray }),

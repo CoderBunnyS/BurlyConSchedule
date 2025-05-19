@@ -5,24 +5,39 @@ import Header from "./Header";
 export default function UserProfile() {
   const [volunteerShifts, setVolunteerShifts] = useState([]);
   const [totalHours, setTotalHours] = useState(0);
-  const userId = "6811617f46ed53b3155162c3"; // Temporary ID
 
+  // ✅ Get userId safely from JWT
+  let userId = null;
+  try {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      userId = payload.sub;
+    }
+  } catch (error) {
+    console.error("Error parsing JWT:", error);
+  }
+
+  // ✅ Fetch user shifts
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_BASE}/api/hourlyneeds/user/${userId}`)
+    if (!userId) return;
+
+    fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/user/${userId}`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("Fetched volunteer data:", data);
         setVolunteerShifts(data.shifts || []);
         setTotalHours(data.totalHours || 0);
       })
       .catch((error) => console.error("Error fetching volunteer info:", error));
-  }, []);
+  }, [userId]);
 
   const handleCancelShift = async (shiftId) => {
-    const confirmed = window.confirm("Are you sure you want to cancel this hour?");
+    const confirmed = window.confirm("Are you sure you want to cancel this shift?");
     if (!confirmed) return;
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/hourlyneeds/${shiftId}/cancel`, {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/${shiftId}/cancel`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId })
@@ -30,7 +45,7 @@ export default function UserProfile() {
 
       if (response.ok) {
         setVolunteerShifts((prev) => prev.filter((shift) => shift._id !== shiftId));
-        setTotalHours((prev) => Math.max(prev - 1, 0));
+        // Optional: recalculate totalHours here if needed
       } else {
         const error = await response.json();
         console.error("Cancel failed:", error.message);
@@ -40,8 +55,8 @@ export default function UserProfile() {
     }
   };
 
-  const formatTime = (hourStr) => {
-    const [hour, min] = hourStr.split(":").map(Number);
+  const formatTime = (timeStr) => {
+    const [hour, min] = timeStr.split(":").map(Number);
     const suffix = hour >= 12 ? "PM" : "AM";
     const displayHour = ((hour + 11) % 12) + 1;
     return `${displayHour}:${min.toString().padStart(2, "0")} ${suffix}`;
@@ -53,14 +68,13 @@ export default function UserProfile() {
     return null;
   };
 
-  // Group shifts by role and date
+  // ✅ Group shifts by role and date
   const grouped = volunteerShifts.reduce((acc, shift) => {
     const key = `${shift.role}|${shift.date}`;
     if (!acc[key]) acc[key] = [];
     acc[key].push(shift);
     return acc;
   }, {});
-  
 
   return (
     <div className="page-container">
@@ -80,13 +94,11 @@ export default function UserProfile() {
       )}
 
       {volunteerShifts.length === 0 ? (
-        <p>You have no upcoming volunteer hours.</p>
+        <p>You have no upcoming volunteer shifts.</p>
       ) : (
         Object.entries(grouped).map(([key, shifts]) => {
           const [role, date] = key.split("|");
-          const sorted = shifts
-            .slice()
-            .sort((a, b) => a.hour.localeCompare(b.hour));
+          const sorted = shifts.slice().sort((a, b) => a.startTime.localeCompare(b.startTime));
 
           return (
             <div key={key} className="shift-card">
@@ -101,8 +113,8 @@ export default function UserProfile() {
 
               <ul>
                 {sorted.map((shift) => {
-                  const start = formatTime(shift.hour);
-                  const end = formatTime(`${Number.parseInt(shift.hour.split(":")[0]) + 1}:00`);
+                  const start = formatTime(shift.startTime);
+                  const end = formatTime(shift.endTime);
                   return (
                     <li key={shift._id}>
                       🕒 {start} – {end}{" "}

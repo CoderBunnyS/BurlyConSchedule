@@ -16,19 +16,12 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   volunteerShifts: [
-    {
-      shift: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "HourlyNeed", // 🔄 Updated from "Shift" to "HourlyNeed"
-        required: true
-      },
-      status: {
-        type: String,
-        enum: ["registered", "no-show"],
-        default: "registered"
-      }
-    }
-  ],
+  {
+    shift: { type: mongoose.Schema.Types.ObjectId, refPath: 'volunteerShifts.refModel' },
+    refModel: { type: String, enum: ['HourlyNeed', 'FlexibleShift'], required: true },
+    status: { type: String, enum: ['registered', 'no-show'], default: 'registered' }
+  }
+],
   totalHours: {
     type: Number,
     default: 0

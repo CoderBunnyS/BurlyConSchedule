@@ -20,7 +20,7 @@ export default function AdminDashboard() {
 
       for (const date of dates) {
         try {
-          const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/hourlyneeds/${date}`);
+          const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/${date}`);
           const data = await res.json();
           const filtered = data.filter(n => n.volunteersNeeded > 0);
           if (filtered.length > 0) {

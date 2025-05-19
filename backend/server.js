@@ -3,6 +3,8 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const hourlyNeedsRoutes = require("./routes/hourlyNeedsRoutes");
+const authRoutes = require("./routes/authRoutes");
+
 
 
 
@@ -21,10 +23,13 @@ const adminVolunteerRoutes = require("./routes/adminVolunteerRoutes");
 
 
 app.use("/api/shifts", shiftRoutes);
-app.use("/api/shifts", volunteerRoutes); 
+app.use("/api/volunteer", volunteerRoutes);  
 app.use("/api/shiftroles", shiftRoleRoutes);
 app.use("/api/admin", adminVolunteerRoutes);
 app.use("/api/hourlyneeds", hourlyNeedsRoutes);
+
+// Authentication routes
+app.use("/api/auth", authRoutes);
 
 
 const PORT = process.env.PORT || 5001;

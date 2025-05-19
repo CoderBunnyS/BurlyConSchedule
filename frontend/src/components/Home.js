@@ -3,19 +3,31 @@ import "../styles/home.css";
 import Header from "./Header";
 
 export default function Home() {
+  const handleLogin = () => {
+    const clientId = process.env.REACT_APP_FUSIONAUTH_CLIENT_ID;
+    const redirectUri = encodeURIComponent(process.env.REACT_APP_FUSIONAUTH_REDIRECT_URI);
+    const domain = process.env.REACT_APP_FUSIONAUTH_DOMAIN;
+
+    window.location.href = `${domain}/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid`;
+  };
+
   return (
     <div className="page-container">
-          <Header  />
-      <h1 className="page-title">Welcome to the BurlyCon Volunteer Portal</h1>
+      <Header />
+      <h1 className="page-title">Welcome to the BurlyCon <br />Sparkle Squad</h1>
 
       <p className="page-subtitle">
         Thank you for being a vital part of BurlyCon! This space is just for you—our volunteers.
-        Here, you can view open shifts, manage your schedule, and track your hours.
       </p>
 
-      <section className="info-section">
+      {/* <div className="home-login-section">
+        <button className="login-button" onClick={handleLogin}>
+          🔐 Login with FusionAuth
+        </button>
+      </div> */}
 
-        <h2 className="section-heading">What You Can Do Here</h2>
+      <section className="info-section">
+        <h2 className="section-heading">✨ What You Can Do</h2>
         <ul className="info-list">
           <li>📅 Browse available volunteer shifts by day and role</li>
           <li>🧍 Sign up for shifts that match your interests and availability</li>
@@ -28,13 +40,16 @@ export default function Home() {
       <section className="info-section">
         <h2 className="section-heading">Need Help?</h2>
         <p>
-          If you have any questions, issues, or just want to check in, please don’t hesitate to reach out to the
-          <a href="mailto:bunny@burlycon.org" className="email-link"> Volunteer Coordinator</a>.
+          Email the{" "}
+          <a href="mailto:bunny@burlycon.org" className="email-link">
+            Volunteer Coordinator
+          </a>{" "}
+          with any questions.
         </p>
       </section>
 
       <div className="home-buttons">
-        <a href="/volunteer" className="button">View Volunteer Shifts</a>
+        <a href="/volunteer" className="button">View Shifts</a>
         <a href="/profile" className="button">My Profile</a>
         <a href="/admin" className="button admin-button">Admin Panel</a>
       </div>

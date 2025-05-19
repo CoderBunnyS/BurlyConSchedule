@@ -9,6 +9,8 @@ import UserProfile from "./components/UserProfile";
 import AdminShiftOverview from "./components/AdminShiftOverview";
 import AdminVolunteers from "./components/AdminVolunteers";
 import AdminHourlyNeeds from "./components/AdminHourlyNeeds";
+import Callback from "./components/Callback";
+import OAuthCallback from "./components/OAuthCallback";
 
 function App() {
   return (
@@ -21,6 +23,9 @@ function App() {
       <Route path="/admin/roles" element={<AdminRoles />} />
       <Route path="/admin/volunteers" element={<AdminVolunteers />} />
       <Route path="/admin/hourly-needs" element={<AdminHourlyNeeds />} />
+      <Route path="/callback" element={<Callback />} />
+      <Route path="/oauth-callback" element={<OAuthCallback />} />
+
       {/* Uncomment the line below when AdminPanel is ready */}
       {/* <Route path="/admin/panel" element={<AdminPanel />} /> */}
     </Routes>
