@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
 
-export default function ShiftForm({ onShiftCreated }) {
+export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
   const [roles, setRoles] = useState([]);
   const [formData, setFormData] = useState({
-    date: "2025-11-05", // Default to first day
+    date: "2025-11-05",
     startTime: "",
     endTime: "",
     role: "",
-    taskDescription: "",
     volunteersNeeded: 1,
     notes: ""
   });
 
-  // Fetch roles
   useEffect(() => {
     fetch(`${process.env.REACT_APP_API_BASE}/api/shiftroles`)
       .then((res) => res.json())
@@ -22,30 +20,64 @@ export default function ShiftForm({ onShiftCreated }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const formatTime = (milStr) => {
+    if (!/^\d{4}$/.test(milStr)) return milStr;
+    const hour = milStr.slice(0, 2);
+    const min = milStr.slice(2);
+    return `${hour}:${min}`;
+  };
+
+  const toMinutes = (timeStr) => {
+    const [h, m] = timeStr.split(":").map(Number);
+    return h * 60 + m;
+  };
+
+  const hasConflict = (newShift, shifts) => {
+    const newStart = toMinutes(newShift.startTime);
+    const newEnd = toMinutes(newShift.endTime);
+
+    return shifts.some((shift) => {
+      if (shift.date !== newShift.date) return false;
+      const start = toMinutes(shift.startTime);
+      const end = toMinutes(shift.endTime);
+      return newStart < end && newEnd > start; // overlap
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const payload = {
+      ...formData,
+      startTime: formatTime(formData.startTime),
+      endTime: formatTime(formData.endTime)
+    };
+
+    if (hasConflict(payload, existingShifts)) {
+      const proceed = window.confirm(
+        "⚠️ This shift overlaps with another one.\nDo you want to save it anyway?"
+      );
+      if (!proceed) return;
+    }
+
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/shifts`, {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       if (response.ok) {
         const newShift = await response.json();
-        onShiftCreated(newShift);
+        onShiftCreated?.(newShift);
         setFormData({
           date: "2025-11-05",
           startTime: "",
           endTime: "",
           role: "",
-          taskDescription: "",
           volunteersNeeded: 1,
           notes: ""
         });
@@ -71,7 +103,7 @@ export default function ShiftForm({ onShiftCreated }) {
         <option value="2025-11-09">Sunday 11/9</option>
       </select>
 
-      <label htmlFor="startTime">Start Time (military):</label>
+      <label htmlFor="startTime">Start Time (e.g. 0700):</label>
       <input
         id="startTime"
         type="text"
@@ -82,7 +114,7 @@ export default function ShiftForm({ onShiftCreated }) {
         required
       />
 
-      <label htmlFor="endTime">End Time (military):</label>
+      <label htmlFor="endTime">End Time (e.g. 1100):</label>
       <input
         id="endTime"
         type="text"
@@ -108,15 +140,6 @@ export default function ShiftForm({ onShiftCreated }) {
           </option>
         ))}
       </select>
-
-      <label htmlFor="taskDescription">Task Description:</label>
-      <textarea
-        id="taskDescription"
-        name="taskDescription"
-        value={formData.taskDescription}
-        onChange={handleChange}
-        required
-      />
 
       <label htmlFor="volunteersNeeded">Volunteers Needed:</label>
       <input

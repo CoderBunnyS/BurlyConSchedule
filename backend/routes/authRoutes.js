@@ -12,10 +12,14 @@ const {
 
 router.post("/callback", async (req, res) => {
   const { code } = req.body;
+  console.log("Callback POST received. req.body:", req.body);
+
+  if (!code) {
+    return res.status(400).json({ message: "Missing authorization code" });
+  }
 
   try {
-    // Exchange code for token
-    const tokenRes = await fetch(`${FUSIONAUTH_DOMAIN}/oauth2/token`, {
+    const tokenResponse = await fetch(`${FUSIONAUTH_DOMAIN}/oauth2/token`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
@@ -27,29 +31,47 @@ router.post("/callback", async (req, res) => {
       })
     });
 
-    const tokenData = await tokenRes.json();
-    const userRes = await fetch(`${FUSIONAUTH_DOMAIN}/oauth2/userinfo`, {
+    const tokenData = await tokenResponse.json();
+
+    if (!tokenResponse.ok) {
+      console.error("Token exchange failed:", tokenData);
+      return res.status(400).json({ message: "Token exchange failed", error: tokenData });
+    }
+
+    const userResponse = await fetch(`${FUSIONAUTH_DOMAIN}/oauth2/userinfo`, {
       headers: {
         Authorization: `Bearer ${tokenData.access_token}`
       }
     });
 
-    const profile = await userRes.json();
+    const profile = await userResponse.json();
+    const faUser = profile.user || profile;
 
-    // Find or create user
-    let user = await User.findOne({ fusionAuthId: profile.sub });
-    if (!user) {
-      user = await User.create({
-        fusionAuthId: profile.sub,
-        preferredName: profile.name || profile.email,
-        email: profile.email
+    // Use 'sub' as the unique identifier 
+    const fusionAuthId = faUser.sub;
+
+
+    if (!fusionAuthId || !faUser.email) {
+      console.error("Missing required fields in FusionAuth response:", faUser);
+      return res.status(400).json({
+        message: "Missing required user fields from FusionAuth",
+        profile: faUser
       });
     }
 
-    res.json({ user });
+    let user = await User.findOne({ fusionAuthId });
+    if (!user) {
+      user = await User.create({
+        fusionAuthId,
+        preferredName: faUser.fullName || faUser.email || "User",
+        email: faUser.email
+      });
+    }
+
+    res.json({ user, access_token: tokenData.access_token });
   } catch (err) {
     console.error("FusionAuth login failed", err);
-    res.status(500).json({ message: "Login failed" });
+    res.status(500).json({ message: "Login failed", error: err.message });
   }
 });
 

@@ -88,7 +88,8 @@ exports.markNoShow = async (req, res) => {
   const { userId, shiftId } = req.body;
 
   try {
-    const user = await User.findById(userId);
+    const user = await User.findOne({ fusionAuthId: userId });
+
     const entry = user.volunteerShifts.find(s => s.shift.toString() === shiftId);
 
     if (!entry) {

@@ -13,7 +13,7 @@ export default function VolunteerShifts() {
     { label: "Thu 11/6", value: "2025-11-06" },
     { label: "Fri 11/7", value: "2025-11-07" },
     { label: "Sat 11/8", value: "2025-11-08" },
-    { label: "Sun 11/9", value: "2025-11-09" },
+    { label: "Sun 11/9", value: "2025-11-09" }
   ];
 
   const scheduleImages = {
@@ -21,17 +21,14 @@ export default function VolunteerShifts() {
     "2025-11-06": "https://burlycon.org/wp-content/uploads/2024/10/friday-2024.png",
     "2025-11-07": "https://burlycon.org/wp-content/uploads/2024/10/saturday-2024.png",
     "2025-11-08": "https://burlycon.org/wp-content/uploads/2024/10/sunday-2024.png",
-    "2025-11-09": "https://burlycon.org/wp-content/uploads/2024/10/sunday-2024.png",
+    "2025-11-09": "https://burlycon.org/wp-content/uploads/2024/10/sunday-2024.png"
   };
 
-  // Get userId
   useEffect(() => {
     const id = getUserId();
     if (id) setUserId(id);
   }, []);
-  
 
-  // Fetch shifts for all days, then filter locally
   useEffect(() => {
     fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer`)
       .then((res) => res.json())
@@ -113,7 +110,8 @@ export default function VolunteerShifts() {
 
       <div className="date-switcher">
         {dateOptions.map(({ label, value }) => (
-          <button type="button"
+          <button
+            type="button"
             key={value}
             className={value === selectedDate ? "active" : ""}
             onClick={() => setSelectedDate(value)}
@@ -143,8 +141,14 @@ export default function VolunteerShifts() {
                     <li key={shift._id}>
                       <strong>{to12Hour(shift.startTime)}–{to12Hour(shift.endTime)}</strong>:{" "}
                       {available} spot{available !== 1 ? "s" : ""} left{" "}
-                      {isSignedUp ? (
-                        <button type="button" onClick={() => handleCancel(shift._id)} className="cancel-btn">
+                      {!userId ? (
+                        <span className="note">🔒 Log in to sign up</span>
+                      ) : isSignedUp ? (
+                        <button
+                          type="button"
+                          onClick={() => handleCancel(shift._id)}
+                          className="cancel-btn"
+                        >
                           ❌ Cancel
                         </button>
                       ) : (

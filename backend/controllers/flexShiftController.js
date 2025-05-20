@@ -6,7 +6,7 @@ const User = require("../models/User");
 // GET /api/volunteer/user/:userId
 const getUserFlexShifts = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId).populate({
+    const user = await User.findOne({ fusionAuthId: req.params.userId }).populate({
       path: "volunteerShifts.shift",
       model: "FlexibleShift"
     });
@@ -22,10 +22,17 @@ const getUserFlexShifts = async (req, res) => {
       }));
 
     const totalHours = shifts.reduce((sum, shift) => {
-      const start = new Date(`1970-01-01T${shift.startTime}`);
-      const end = new Date(`1970-01-01T${shift.endTime}`);
-      const hours = (end - start) / (1000 * 60 * 60);
-      return sum + hours;
+        const start = new Date(`1970-01-01T${shift.startTime}`);
+        let end = new Date(`1970-01-01T${shift.endTime}`);
+        
+        if (end < start) {
+          // If shift goes past midnight, add 1 day to the end time
+          end.setDate(end.getDate() + 1);
+        }
+        
+        const hours = (end - start) / (1000 * 60 * 60);
+        return sum + hours;
+        
     }, 0);
 
     res.json({ shifts, totalHours });
@@ -75,14 +82,19 @@ const signUpForFlexShift = async (req, res) => {
     shift.volunteersRegistered.push(userId);
     await shift.save();
 
-    await User.findByIdAndUpdate(userId, {
-      $push: {
-        volunteerShifts: {
-          shift: shift._id,
-          status: "registered"
+    await User.findOneAndUpdate(
+        { fusionAuthId: userId },
+        {
+          $push: {
+            volunteerShifts: {
+              shift: shift._id,
+              refModel: "FlexibleShift",
+              status: "registered"
+            }
+          }
         }
-      }
-    });
+      );
+      
 
     res.json({ message: "Signed up successfully" });
   } catch (err) {
@@ -104,13 +116,17 @@ const cancelFlexShift = async (req, res) => {
     );
     await shift.save();
 
-    await User.findByIdAndUpdate(userId, {
-      $pull: {
-        volunteerShifts: {
-          shift: shift._id
+    await User.findOneAndUpdate(
+        { fusionAuthId: userId },
+        {
+          $pull: {
+            volunteerShifts: {
+              shift: shift._id
+            }
+          }
         }
-      }
-    });
+      );
+      
 
     res.json({ message: "Shift canceled" });
   } catch (err) {

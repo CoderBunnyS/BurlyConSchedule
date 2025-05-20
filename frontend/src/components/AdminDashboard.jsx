@@ -52,10 +52,10 @@ export default function AdminDashboard() {
 
   const groupByRole = (needs) => {
     const grouped = {};
-    needs.forEach((n) => {
+    for (const n of needs) {
       if (!grouped[n.role]) grouped[n.role] = [];
       grouped[n.role].push(n);
-    });
+    }
     return grouped;
   };
 

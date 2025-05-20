@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import ShiftSchedule from "./ShiftSchedule";
-import "../styles/admin.css";
 import ShiftForm from "./ShiftForm";
+import "../styles/admin.css";
+import { hasRole } from "../utils/authUtils";
+
 
 const CON_DATES = [
   "2025-11-05", // Wednesday - setup only
   "2025-11-06", // Thursday
   "2025-11-07", // Friday
   "2025-11-08", // Saturday
-  "2025-11-09", // Sunday
+  "2025-11-09"  // Sunday
 ];
 
 const dateLabel = (iso) =>
   new Date(iso).toLocaleDateString(undefined, {
     weekday: "long",
     month: "short",
-    day: "numeric",
+    day: "numeric"
   });
 
 export default function AdminShiftOverview() {
@@ -24,7 +26,7 @@ export default function AdminShiftOverview() {
   const [expandedDay, setExpandedDay] = useState(null);
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_BASE}/api/shifts`)
+    fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer`)
       .then((res) => res.json())
       .then((data) => setAllShifts(data))
       .catch((err) => console.error("Error loading shifts:", err));
@@ -42,7 +44,7 @@ export default function AdminShiftOverview() {
     return {
       total: shifts.length,
       unfilled,
-      status: unfilled === 0 ? "green" : unfilled <= 2 ? "yellow" : "red",
+      status: unfilled === 0 ? "green" : unfilled <= 2 ? "yellow" : "red"
     };
   };
 
@@ -52,16 +54,18 @@ export default function AdminShiftOverview() {
       <h1 className="page-title">Shift Coverage by Day</h1>
 
       <div className="accordion-toggle-row">
-      <details className="accordion" open={false}>
-  <summary>➕ Add a New Shift</summary>
-  <div className="accordion-content">
-    <ShiftForm
-      onShiftCreated={(newShift) =>
-        setAllShifts((prev) => [...prev, newShift])
-      }
-    />
-  </div>
-</details>
+        <details className="accordion" open={false}>
+          <summary>➕ Add a New Shift</summary>
+          <div className="accordion-content">
+            <ShiftForm
+              existingShifts={allShifts}
+              onShiftCreated={(newShift) => {
+                setAllShifts((prev) => [...prev, newShift]);
+                setExpandedDay(newShift.date); // optional: auto-expand that day
+              }}
+            />
+          </div>
+        </details>
 
         {CON_DATES.map((date) => {
           const shifts = getShiftsByDate(date);
@@ -84,8 +88,10 @@ export default function AdminShiftOverview() {
                     height: "12px",
                     borderRadius: "50%",
                     backgroundColor:
-                      status === "green" ? "#4caf50" : status === "yellow" ? "#ffc107" : "#f44336",
-                    verticalAlign: "middle",
+                      status === "green" ? "#4caf50" :
+                      status === "yellow" ? "#ffc107" :
+                      "#f44336",
+                    verticalAlign: "middle"
                   }}
                 />{" "}
                 <small style={{ marginLeft: "10px" }}>
@@ -97,19 +103,20 @@ export default function AdminShiftOverview() {
                 {shifts.length === 0 ? (
                   <p>No shifts scheduled.</p>
                 ) : (
-                    <ShiftSchedule
-  shifts={shifts}
-  viewMode="admin"
-  onShiftUpdated={(updated) =>
-    setAllShifts((prev) =>
-      prev.map((s) => (s._id === updated._id ? updated : s))
-    )
-  }
-  onShiftDeleted={(deletedId) =>
-    setAllShifts((prev) => prev.filter((s) => s._id !== deletedId))
-  }
-/>
-
+                  <ShiftSchedule
+                    shifts={shifts}
+                    viewMode="admin"
+                    onShiftUpdated={(updated) =>
+                      setAllShifts((prev) =>
+                        prev.map((s) => (s._id === updated._id ? updated : s))
+                      )
+                    }
+                    onShiftDeleted={(deletedId) =>
+                      setAllShifts((prev) =>
+                        prev.filter((s) => s._id !== deletedId)
+                      )
+                    }
+                  />
                 )}
               </div>
             </details>

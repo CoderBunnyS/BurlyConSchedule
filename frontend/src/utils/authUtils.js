@@ -27,4 +27,21 @@ export function getAccessToken() {
   export function isLoggedIn() {
     return !!getUserId();
   }
+  export function getRoles() {
+    const token = localStorage.getItem("access_token");
+    if (!token) return [];
+  
+    try {
+      const base64 = token.split('.')[1];
+      const decoded = JSON.parse(atob(base64));
+      return decoded.roles || []; // adjust if stored under a different key
+    } catch (err) {
+      console.error("Error decoding token:", err);
+      return [];
+    }
+  }
+  
+  export function hasRole(role) {
+    return getRoles().includes(role);
+  }
   

@@ -4,12 +4,10 @@ import Header from "./Header";
 
 export default function Home() {
   const handleLogin = () => {
-    const clientId = process.env.REACT_APP_FUSIONAUTH_CLIENT_ID;
-    const redirectUri = encodeURIComponent(process.env.REACT_APP_FUSIONAUTH_REDIRECT_URI);
-    const domain = process.env.REACT_APP_FUSIONAUTH_DOMAIN;
-
-    window.location.href = `${domain}/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid`;
+    const authorizationUrl = `${process.env.REACT_APP_FUSIONAUTH_DOMAIN}/oauth2/authorize?client_id=${process.env.REACT_APP_FUSIONAUTH_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_FUSIONAUTH_REDIRECT_URI}&response_type=code&scope=openid%20email%20profile`;
+    window.location.href = authorizationUrl;
   };
+  
 
   return (
     <div className="page-container">

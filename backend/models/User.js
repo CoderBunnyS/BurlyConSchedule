@@ -7,13 +7,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  preferredName: {
-    type: String,
-    required: true
-  },
+  preferredName: String,
   email: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   volunteerShifts: [
   {

@@ -1,36 +1,47 @@
+// src/components/OAuthCallback.jsx
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function OauthCallback() {
+export default function OAuthCallback() {
   const navigate = useNavigate();
+  console.log("✅ OAuthCallback loaded");
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
 
     if (!code) {
-      console.error("No code in callback");
-      navigate("/"); // fallback
+      console.error("No code present in URL.");
+      navigate("/");
       return;
     }
 
-    // Send the code to the backend for validation and user info
+    console.log("Found code:", code);
+
     fetch(`${process.env.REACT_APP_API_BASE}/api/auth/callback`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code })
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.user) {
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        console.log("Callback response:", data);
+
+        if (data.access_token && data.user) {
+          localStorage.setItem("access_token", data.access_token);
           localStorage.setItem("user", JSON.stringify(data.user));
+
+          console.log("✅ Token saved. Redirecting...");
           navigate("/profile");
         } else {
-          console.error("Login failed:", data);
+          console.error("❌ Missing token or user:", data);
           navigate("/");
         }
       })
-      .catch((err) => {
+      .catch(err => {
         console.error("Callback error:", err);
         navigate("/");
       });
