@@ -29,7 +29,14 @@ export default function ShiftRoleForm({ onRoleCreated }) {
         const newRole = await res.json();
         console.log("✅ Role created successfully:", newRole);
         onRoleCreated(newRole);
-        setFormData({ name: "", description: "", requirements: "" });
+        setFormData({
+          name: "",
+          location: "",
+          responsibilities: "",
+          physicalRequirements: "",
+          pointOfContact: "",
+          contactPhone: "",
+        });
       } else {
         const errorText = await res.text();
         console.error("❌ Failed to create role:", errorText);
