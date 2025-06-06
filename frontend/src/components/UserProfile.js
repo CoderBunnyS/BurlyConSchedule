@@ -55,12 +55,14 @@ export default function UserProfile() {
     }
   };
 
-  const formatTime = (timeStr) => {
-    const [hour, min] = timeStr.split(":").map(Number);
-    const suffix = hour >= 12 ? "PM" : "AM";
-    const displayHour = ((hour + 11) % 12) + 1;
-    return `${displayHour}:${min.toString().padStart(2, "0")} ${suffix}`;
-  };
+  function formatTime(timeStr) {
+    if (!timeStr || typeof timeStr !== "string" || !timeStr.includes(":")) return "Invalid time";
+    const [hour, minute] = timeStr.split(":");
+    const h = parseInt(hour, 10);
+    const ampm = h >= 12 ? "PM" : "AM";
+    const adjustedHour = h % 12 || 12;
+    return `${adjustedHour}:${minute} ${ampm}`;
+  }
 
   const getDiscountCode = () => {
     if (totalHours >= 8) return "FULLPASS2024";
@@ -115,6 +117,7 @@ export default function UserProfile() {
                 {sorted.map((shift) => {
                   const start = formatTime(shift.startTime);
                   const end = formatTime(shift.endTime);
+                  console.log("SHIFT DEBUG", shift);
                   return (
                     <li key={shift._id}>
                       🕒 {start} – {end}{" "}

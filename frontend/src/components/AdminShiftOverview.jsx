@@ -1,29 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
-import ShiftSchedule from "./ShiftSchedule";
 import ShiftForm from "./ShiftForm";
+import ShiftSchedule from "./ShiftSchedule";
 import "../styles/admin.css";
-import { hasRole } from "../utils/authUtils";
-
-
-const CON_DATES = [
-  "2025-11-05", // Wednesday - setup only
-  "2025-11-06", // Thursday
-  "2025-11-07", // Friday
-  "2025-11-08", // Saturday
-  "2025-11-09"  // Sunday
-];
-
-const dateLabel = (iso) =>
-  new Date(iso).toLocaleDateString(undefined, {
-    weekday: "long",
-    month: "short",
-    day: "numeric"
-  });
 
 export default function AdminShiftOverview() {
   const [allShifts, setAllShifts] = useState([]);
-  const [expandedDay, setExpandedDay] = useState(null);
+  const [expandedRole, setExpandedRole] = useState(null);
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer`)
@@ -32,10 +15,16 @@ export default function AdminShiftOverview() {
       .catch((err) => console.error("Error loading shifts:", err));
   }, []);
 
-  const getShiftsByDate = (date) =>
-    allShifts.filter((s) => s.date.startsWith(date));
+  const getRoles = () => {
+    const roleSet = new Set();
+    allShifts.forEach((s) => s.role && roleSet.add(s.role));
+    return [...roleSet].sort();
+  };
 
-  const getShiftStats = (shifts) => {
+  const getShiftsByRole = (role) =>
+    allShifts.filter((s) => s.role === role);
+
+  const getStats = (shifts) => {
     let unfilled = 0;
     for (let shift of shifts) {
       const filled = shift.volunteersRegistered?.length || 0;
@@ -44,14 +33,14 @@ export default function AdminShiftOverview() {
     return {
       total: shifts.length,
       unfilled,
-      status: unfilled === 0 ? "green" : unfilled <= 2 ? "yellow" : "red"
+      status: unfilled === 0 ? "green" : unfilled <= 2 ? "yellow" : "red",
     };
   };
 
   return (
     <div className="page-container">
       <Header />
-      <h1 className="page-title">Shift Coverage by Day</h1>
+      <h1 className="page-title">Shift Coverage by Role</h1>
 
       <div className="accordion-toggle-row">
         <details className="accordion" open={false}>
@@ -61,63 +50,62 @@ export default function AdminShiftOverview() {
               existingShifts={allShifts}
               onShiftCreated={(newShift) => {
                 setAllShifts((prev) => [...prev, newShift]);
-                setExpandedDay(newShift.date); // optional: auto-expand that day
+                setExpandedRole(newShift.role); // auto-expand that role
               }}
             />
           </div>
         </details>
 
-        {CON_DATES.map((date) => {
-          const shifts = getShiftsByDate(date);
-          const { total, unfilled, status } = getShiftStats(shifts);
-          const isOpen = expandedDay === date;
+        {getRoles().map((role) => {
+          const shifts = getShiftsByRole(role);
+          const { total, unfilled, status } = getStats(shifts);
+          const isOpen = expandedRole === role;
 
           return (
             <details
-              key={date}
+              key={role}
               className="accordion"
               open={isOpen}
-              onToggle={(e) => setExpandedDay(e.target.open ? date : null)}
+              onToggle={(e) =>
+                setExpandedRole(e.target.open ? role : null)
+              }
             >
               <summary>
-                <span style={{ marginRight: "10px" }}>{dateLabel(date)}</span>
-                <span
-                  style={{
-                    display: "inline-block",
-                    width: "12px",
-                    height: "12px",
-                    borderRadius: "50%",
-                    backgroundColor:
-                      status === "green" ? "#4caf50" :
-                      status === "yellow" ? "#ffc107" :
-                      "#f44336",
-                    verticalAlign: "middle"
-                  }}
-                />{" "}
-                <small style={{ marginLeft: "10px" }}>
-                  {unfilled} unfilled / {total} shifts
-                </small>
+                <div className="shift-summary-header">
+                  <span className="date-label">{role}</span>
+                  <div className="status-group">
+                    <span
+                      className="shift-status-indicator"
+                      style={{
+                        backgroundColor:
+                          status === "green"
+                            ? "#4caf50"
+                            : status === "yellow"
+                            ? "#ffc107"
+                            : "#f44336",
+                      }}
+                    />
+                    <span className="shift-stat-pill">
+                      {unfilled} unfilled / {total} shifts
+                    </span>
+                  </div>
+                </div>
               </summary>
-
               <div className="accordion-content">
-                {shifts.length === 0 ? (
-                  <p>No shifts scheduled.</p>
-                ) : (
-                  <ShiftSchedule
-                    shifts={shifts}
-                    viewMode="admin"
-                    onShiftUpdated={(updated) =>
-                      setAllShifts((prev) =>
-                        prev.map((s) => (s._id === updated._id ? updated : s))
-                      )
-                    }
-                    onShiftDeleted={(deletedId) =>
-                      setAllShifts((prev) =>
-                        prev.filter((s) => s._id !== deletedId)
-                      )
-                    }
-                  />
-                )}
+                <ShiftSchedule
+                  shifts={shifts}
+                  viewMode="admin"
+                  onShiftUpdated={(updated) =>
+                    setAllShifts((prev) =>
+                      prev.map((s) => (s._id === updated._id ? updated : s))
+                    )
+                  }
+                  onShiftDeleted={(deletedId) =>
+                    setAllShifts((prev) =>
+                      prev.filter((s) => s._id !== deletedId)
+                    )
+                  }
+                />
               </div>
             </details>
           );

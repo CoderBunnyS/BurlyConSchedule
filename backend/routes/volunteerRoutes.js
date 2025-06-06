@@ -6,6 +6,7 @@ const FlexibleShift = require("../models/FlexibleShift");
 const {
   getUserFlexShifts,
   getAllFlexShifts,
+  getShiftsByDate,
   createFlexShift,
   signUpForFlexShift,
   cancelFlexShift,
@@ -14,6 +15,9 @@ const {
 
 // Specific route first
 router.get("/user/:userId", getUserFlexShifts);
+
+// Get shifts by date
+router.get("/:date", getShiftsByDate);
 
 // Public Routes
 router.get("/", getAllFlexShifts);

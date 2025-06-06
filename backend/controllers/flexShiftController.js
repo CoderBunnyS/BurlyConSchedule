@@ -51,6 +51,17 @@ const getAllFlexShifts = async (req, res) => {
   }
 };
 
+// GET /api/volunteer/:date
+const getShiftsByDate = async (req, res) => {
+    const { date } = req.params;
+    try {
+      const shifts = await FlexibleShift.find({ date }).sort({ startTime: 1 });
+      res.json(shifts);
+    } catch (err) {
+      res.status(500).json({ message: "Error fetching shifts for date", error: err.message });
+    }
+  };
+
 // POST /api/volunteer/ (admin only)
 const createFlexShift = async (req, res) => {
   try {
@@ -155,6 +166,7 @@ const deleteFlexShift = async (req, res) => {
 module.exports = {
   getUserFlexShifts,
   getAllFlexShifts,
+  getShiftsByDate,
   createFlexShift,
   signUpForFlexShift,
   cancelFlexShift,

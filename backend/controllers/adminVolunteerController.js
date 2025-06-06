@@ -1,24 +1,37 @@
-const User = require("../models/User"); // Your user model
-const Shift = require("../models/Shift"); // Your shift model
+const User = require("../models/User");
+const Shift = require("../models/FlexibleShift");
 
-// Fetch volunteers and their assigned shifts
 exports.getVolunteers = async (req, res) => {
   try {
-    // Fetch all users who are assigned to at least one shift
-    const users = await User.find({}).lean(); // assuming all users are potential volunteers
-
-    // Fetch shifts to check who's assigned where
+    const users = await User.find({}).lean();
     const shifts = await Shift.find({}).lean();
 
     const volunteerData = users.map((user) => {
-      // Find shifts this user is registered for
       const userShifts = shifts.filter((shift) =>
-        shift.volunteersRegistered?.includes(user._id)
+        shift.volunteersRegistered?.includes(user.fusionAuthId)
+
       );
-
-      // Calculate total hours (we'll assume each shift is 4 hours for now unless you later want a better calculation!)
-      const totalHours = userShifts.length * 4;
-
+    
+      const totalHours = userShifts.reduce((sum, shift) => {
+        const start = new Date(`${shift.date}T${shift.startTime}`);
+        let end = new Date(`${shift.date}T${shift.endTime}`);
+      
+        // If the end time is earlier than the start, it's likely past midnight → add a day
+        if (end <= start) {
+          end.setDate(end.getDate() + 1);
+        }
+      
+        const duration = (end - start) / (1000 * 60 * 60); // hours
+        return sum + duration;
+      }, 0);
+      
+    
+      // DEBUG LOGS
+      console.log(`User: ${user.email}`);
+      console.log(`  ➤ Matched shifts: ${userShifts.length}`);
+      console.log(`  ➤ Total hours: ${totalHours}`);
+      console.log("  ➤ Shift IDs:", userShifts.map((s) => s._id));
+    
       return {
         id: user._id,
         name: user.preferredName || user.name || "Unnamed Volunteer",
@@ -30,9 +43,10 @@ exports.getVolunteers = async (req, res) => {
           startTime: shift.startTime,
           endTime: shift.endTime,
         })),
-        totalHours,
+        totalHours: Math.round(totalHours * 100) / 100,
       };
     });
+    
 
     res.json(volunteerData);
   } catch (err) {

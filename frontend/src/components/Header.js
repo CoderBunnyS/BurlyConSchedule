@@ -49,7 +49,7 @@ export default function Header() {
           <Link to="/" className="nav-link">Home</Link>
           <Link to="/volunteer" className="nav-link">Volunteer</Link>
           <Link to="/profile" className="nav-link">My Profile</Link>
-          {(hasRole("admin") || hasRole("lead")) && (
+          {(hasRole("Admin") || hasRole("Lead")) && (
             <Link to="/admin" className="nav-link">Admin</Link>
           )}
 

@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import "../styles/admin.css";
-import AddVolunteerForm from "./AddVolunteerForm";
-
-
 
 export default function AdminVolunteers() {
   const [volunteers, setVolunteers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_API_BASE}/api/admin/volunteers`)
@@ -15,24 +13,30 @@ export default function AdminVolunteers() {
       .catch((err) => console.error("Error fetching volunteers:", err));
   }, []);
 
+  const filteredVolunteers = volunteers.filter((vol) =>
+    vol.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vol.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="page-container">
       <Header />
       <h1 className="page-title">Volunteer Roster</h1>
 
-      {volunteers.length === 0 ? (
-       <div> <p>No volunteers found.</p>
-       <details className="accordion" style={{ marginTop: "40px" }}>
-  <summary>➕ Manually Add a Volunteer</summary>
-  <div className="accordion-content">
-    <AddVolunteerForm onVolunteerCreated={(data) => console.log("Created volunteer:", data)} />
-  </div>
-</details></div>
+      <div className="filter-bar">
+        <input
+          type="text"
+          placeholder="Search by name or email..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
 
-        
+      {filteredVolunteers.length === 0 ? (
+        <p>No matching volunteers found.</p>
       ) : (
         <div className="volunteer-list">
-          {volunteers.map((vol) => (
+          {filteredVolunteers.map((vol) => (
             <div key={vol.id} className="role-card">
               <h3>{vol.name}</h3>
               <p><strong>Email:</strong> {vol.email}</p>
@@ -45,14 +49,8 @@ export default function AdminVolunteers() {
                   </li>
                 ))}
               </ul>
-            </div>            
+            </div>
           ))}
-          <details className="accordion" style={{ marginTop: "40px" }}>
-  <summary>➕ Manually Add a Volunteer</summary>
-  <div className="accordion-content">
-    <AddVolunteerForm onVolunteerCreated={(data) => console.log("Created volunteer:", data)} />
-  </div>
-</details>
         </div>
       )}
     </div>

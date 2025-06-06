@@ -61,11 +61,12 @@ router.post("/callback", async (req, res) => {
 
     let user = await User.findOne({ fusionAuthId });
     if (!user) {
-      user = await User.create({
-        fusionAuthId,
-        preferredName: faUser.fullName || faUser.email || "User",
-        email: faUser.email
-      });
+        user = await User.create({
+            fusionAuthId,
+            preferredName: faUser.given_name || faUser.firstName || faUser.fullName || faUser.email,
+            email: faUser.email
+          });
+          
     }
 
     res.json({ user, access_token: tokenData.access_token });
