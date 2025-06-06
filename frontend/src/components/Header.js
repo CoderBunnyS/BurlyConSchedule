@@ -6,7 +6,7 @@ import { hasRole } from "../utils/authUtils";
 export default function Header() {
   const clientId = process.env.REACT_APP_FUSIONAUTH_CLIENT_ID;
   const redirectUri = process.env.REACT_APP_FUSIONAUTH_REDIRECT_URI;
-  const logoutRedirect = process.env.REACT_APP_LOGOUT_REDIRECT || "/";
+  const logoutRedirect = process.env.REACT_APP_LOGOUT_REDIRECT;
   const domain = process.env.REACT_APP_FUSIONAUTH_DOMAIN;
 
   const handleLogin = () => {
@@ -21,10 +21,15 @@ export default function Header() {
   
 
   const handleLogout = () => {
+    // Clear local session
     localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
+  
+    // Redirect to FusionAuth logout URL
     const encodedPostLogout = encodeURIComponent(logoutRedirect);
     window.location.href = `${domain}/oauth2/logout?client_id=${clientId}&post_logout_redirect_uri=${encodedPostLogout}`;
   };
+  
 
   const isLoggedIn = !!localStorage.getItem("access_token");
 

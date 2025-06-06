@@ -37,7 +37,8 @@ exports.signUpForHourlyNeed = async (req, res) => {
     if (!need) return res.status(404).json({ message: "Need not found" });
     if (need.volunteersNeeded <= 0) return res.status(400).json({ message: "No more volunteers needed" });
 
-    const user = await User.findById(userId);
+    const user = await User.findOne({ fusionAuthId: userId });
+
     if (!user) return res.status(404).json({ message: "User not found" });
 
     console.log("👤 VolunteerShifts before check:", user.volunteerShifts);
@@ -75,7 +76,8 @@ exports.cancelHourlyNeed = async (req, res) => {
     const need = await HourlyNeed.findById(id);
     if (!need) return res.status(404).json({ message: "Need not found" });
 
-    const user = await User.findById(userId);
+    const user = await User.findOne({ fusionAuthId: userId });
+
     if (!user) return res.status(404).json({ message: "User not found" });
 
     // Remove the shift from the user's list
