@@ -33,10 +33,16 @@ router.post("/callback", async (req, res) => {
 
     const tokenData = await tokenResponse.json();
 
-    if (!tokenResponse.ok) {
-      console.error("Token exchange failed:", tokenData);
-      return res.status(400).json({ message: "Token exchange failed", error: tokenData });
-    }
+if (!tokenResponse.ok) {
+  console.error("❌ Token exchange failed with status:", tokenResponse.status);
+  console.error("💬 FusionAuth response:", tokenData);
+  return res.status(400).json({ 
+    message: "Token exchange failed", 
+    status: tokenResponse.status,
+    fusionAuthError: tokenData 
+  });
+}
+
 
     const userResponse = await fetch(`${FUSIONAUTH_DOMAIN}/oauth2/userinfo`, {
       headers: {
@@ -59,15 +65,24 @@ router.post("/callback", async (req, res) => {
       });
     }
 
-    let user = await User.findOne({ fusionAuthId });
-    if (!user) {
-        user = await User.create({
-            fusionAuthId,
-            preferredName: faUser.given_name || faUser.firstName || faUser.fullName || faUser.email,
-            email: faUser.email
-          });
-          
-    }
+let user = await User.findOne({
+  $or: [
+    { fusionAuthId },
+    { email: faUser.email }
+  ]
+});
+
+if (!user) {
+  user = await User.create({
+    fusionAuthId,
+    preferredName: faUser.given_name || faUser.firstName || faUser.fullName || faUser.email,
+    email: faUser.email
+  });
+} else if (!user.fusionAuthId) {
+  user.fusionAuthId = fusionAuthId;
+  await user.save();
+}
+
 
     res.json({ user, access_token: tokenData.access_token });
   } catch (err) {

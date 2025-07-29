@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import ShiftForm from "./ShiftForm";
-import ShiftSchedule from "./ShiftSchedule";
 import "../styles/admin.css";
+import "../styles/scheduleGrid.css";
 
 export default function AdminShiftOverview() {
   const [allShifts, setAllShifts] = useState([]);
-  const [expandedRole, setExpandedRole] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer`)
@@ -15,101 +15,109 @@ export default function AdminShiftOverview() {
       .catch((err) => console.error("Error loading shifts:", err));
   }, []);
 
-  const getRoles = () => {
-    const roleSet = new Set();
-    allShifts.forEach((s) => s.role && roleSet.add(s.role));
-    return [...roleSet].sort();
-  };
+  const roles = Array.from(new Set(allShifts.map((s) => s.role))).sort();
 
-  const getShiftsByRole = (role) =>
-    allShifts.filter((s) => s.role === role);
+  const availableDates = Array.from(
+    new Set(
+      allShifts
+        .filter((s) => !!s.date)
+        .map((s) => s.date.split("T")[0])
+    )
+  ).sort();
 
-  const getStats = (shifts) => {
-    let unfilled = 0;
-    for (let shift of shifts) {
-      const filled = shift.volunteersRegistered?.length || 0;
-      if (filled < shift.volunteersNeeded) unfilled++;
-    }
-    return {
-      total: shifts.length,
-      unfilled,
-      status: unfilled === 0 ? "green" : unfilled <= 2 ? "yellow" : "red",
-    };
-  };
+  const filteredShifts = allShifts.filter((shift) => {
+    const normalizedShiftDate = shift.date.split("T")[0];
+    const matchesDate = !selectedDate || normalizedShiftDate === selectedDate;
+    return matchesDate;
+  });
+
+  const shiftsByRole = {};
+  filteredShifts.forEach((shift) => {
+    if (!shiftsByRole[shift.role]) shiftsByRole[shift.role] = [];
+    shiftsByRole[shift.role].push(shift);
+  });
 
   return (
     <div className="page-container">
       <Header />
       <h1 className="page-title">Shift Coverage by Role</h1>
 
-      <div className="accordion-toggle-row">
-        <details className="accordion" open={false}>
-          <summary>➕ Add a New Shift</summary>
-          <div className="accordion-content">
-            <ShiftForm
-              existingShifts={allShifts}
-              onShiftCreated={(newShift) => {
-                setAllShifts((prev) => [...prev, newShift]);
-                setExpandedRole(newShift.role); // auto-expand that role
-              }}
-            />
-          </div>
-        </details>
+      <details className="accordion" open={false}>
+        <summary>➕ Add a New Shift</summary>
+        <div className="accordion-content">
+          <ShiftForm
+            existingShifts={allShifts}
+            onShiftCreated={(newShift) => {
+              setAllShifts((prev) => [...prev, newShift]);
+            }}
+          />
+        </div>
+      </details>
 
-        {getRoles().map((role) => {
-          const shifts = getShiftsByRole(role);
-          const { total, unfilled, status } = getStats(shifts);
-          const isOpen = expandedRole === role;
+      <div className="filter-bar sticky-top">
+        <label>
+          Select Date:
+          <select
+            value={selectedDate || ""}
+            onChange={(e) => setSelectedDate(e.target.value || null)}
+          >
+            <option value="">All Dates</option>
+            {availableDates.map((date) => (
+              <option key={date} value={date}>
+                {new Date(date).toLocaleDateString(undefined, {
+                  weekday: "short",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
 
-          return (
-            <details
-              key={role}
-              className="accordion"
-              open={isOpen}
-              onToggle={(e) =>
-                setExpandedRole(e.target.open ? role : null)
-              }
-            >
-              <summary>
-                <div className="shift-summary-header">
-                  <span className="date-label">{role}</span>
-                  <div className="status-group">
-                    <span
-                      className="shift-status-indicator"
-                      style={{
-                        backgroundColor:
-                          status === "green"
-                            ? "#4caf50"
-                            : status === "yellow"
-                            ? "#ffc107"
-                            : "#f44336",
-                      }}
-                    />
-                    <span className="shift-stat-pill">
-                      {unfilled} unfilled / {total} shifts
-                    </span>
+      <div className="role-accordion-container">
+        {Object.entries(shiftsByRole).map(([role, shifts]) => (
+          <details key={role} className="accordion" open>
+            <summary className="accordion-header">
+              {role} ({shifts.length} shift{shifts.length > 1 ? "s" : ""})
+            </summary>
+            <div className="accordion-content">
+              {shifts.map((shift) => {
+                const filled = shift.volunteersRegistered?.length || 0;
+                const needed = shift.volunteersNeeded || 0;
+                const statusClass =
+                  filled >= needed
+                    ? "filled"
+                    : filled === 0
+                    ? "empty"
+                    : "partial";
+
+                return (
+                  <div key={shift._id} className={`shift-card ${statusClass}`}>
+                    <strong>
+                      {new Date(shift.date).toLocaleDateString(undefined, {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                      }) + " at " + shift.startTime}
+                    </strong>
+                    <div>
+                      {filled}/{needed} filled
+                    </div>
+                    {filled < needed && (
+                      <div className="schedule-note">
+                        ❗ Needs {needed - filled} more
+                      </div>
+                    )}
+                    {shift.notes && (
+                      <div className="schedule-note">📝 {shift.notes}</div>
+                    )}
                   </div>
-                </div>
-              </summary>
-              <div className="accordion-content">
-                <ShiftSchedule
-                  shifts={shifts}
-                  viewMode="admin"
-                  onShiftUpdated={(updated) =>
-                    setAllShifts((prev) =>
-                      prev.map((s) => (s._id === updated._id ? updated : s))
-                    )
-                  }
-                  onShiftDeleted={(deletedId) =>
-                    setAllShifts((prev) =>
-                      prev.filter((s) => s._id !== deletedId)
-                    )
-                  }
-                />
-              </div>
-            </details>
-          );
-        })}
+                );
+              })}
+            </div>
+          </details>
+        ))}
       </div>
     </div>
   );

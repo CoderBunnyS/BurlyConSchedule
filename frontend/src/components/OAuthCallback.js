@@ -41,10 +41,12 @@ export default function OAuthCallback() {
           navigate("/");
         }
       })
-      .catch(err => {
-        console.error("Callback error:", err);
-        navigate("/");
-      });
+.catch(err => {
+  console.error("Callback error:", err);
+  alert("Login failed. See console for details.");
+  navigate("/");
+});
+
   }, [navigate]);
 
   return (

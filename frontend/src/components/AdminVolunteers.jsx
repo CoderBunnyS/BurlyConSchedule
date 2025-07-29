@@ -42,7 +42,9 @@ export default function AdminVolunteers() {
               <p><strong>Email:</strong> {vol.email}</p>
               <p><strong>Total Hours:</strong> {vol.totalHours}</p>
               <h4>Shifts:</h4>
+              
               <ul>
+              
                 {vol.shifts.map((s) => (
                   <li key={s.id}>
                     {s.role} – {new Date(s.date).toLocaleDateString()} ({s.startTime}–{s.endTime})
