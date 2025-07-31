@@ -1,244 +1,837 @@
-.volunteer-container {
-    padding: 20px;
-    max-width: 800px;
-    margin: auto;
-    font-family: 'Georgia', serif;
-  }
-  
-  .volunteer-title {
-    text-align: center;
-    color: #60174c;
-    margin-bottom: 20px;
-  }
-  
-  .date-switcher {
-    display: flex;
-    overflow-x: auto;
-    gap: 8px;
-    margin-bottom: 20px;
-    padding: 0 5px;
-  }
-  
-  .date-switcher button {
-    flex: none;
-    background: #a75894;
-    color: white;
-    border: none;
-    padding: 10px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-  }
-  
-  .date-switcher .active {
-    background: #60174c;
-  }
-  
-  .schedule-image img {
-    width: 50%;
-    align-self: center;
-    border-radius: 8px;
-    margin-bottom: 20px;
-  }
-  
-  .shift-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .shift-card {
-    background: #f8f3f9;
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 2px 6px rgba(96, 23, 76, 0.1);
-  }
-  
-  .shift-card button {
-    margin-right: 10px;
-    background-color: #a75894;
-    color: white;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  
-  .shift-card button:hover {
-    background-color: #8e407b;
-  }
-  
-  .role-card {
-    background: #f8f3f9;
-    border-left: 5px solid #a75894;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 2px 6px rgba(96, 23, 76, 0.1);
-  }
-  
-  .role-card h3 {
-    margin-top: 0;
-    color: #60174c;
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-  }
-  
-  .role-card ul {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
-  }
-  
-  .role-card li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 6px 0;
-    border-bottom: 1px solid #eee;
-    font-size: 0.95rem;
-  }
-  
-  .role-card li:last-child {
-    border-bottom: none;
-  }
-  
-  .role-card button {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    border-radius: 6px;
-    background-color: #a75894;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .role-card button:hover {
-    background-color: #8e407b;
-  }
-  
-  .role-card button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  
-  .shift-signed {
-    color: green;
-    font-weight: bold;
-    font-size: 0.9rem;
-    padding-left: 10px;
+.modern-role-details-content {
+    background: rgba(236, 72, 153, 0.08);
+    border-color: rgba(236, 72, 153, 0.2);
   }
 
-  .volunteer-container {
-    padding: 20px;
-    max-width: 900px;
-    margin: auto;
-    font-family: 'Georgia', serif;
+  .modern-detail-title {
+    color: var(--rose);
   }
-  
-  .volunteer-title {
-    text-align: center;
-    color: #60174c;
-    margin-bottom: 20px;
+
+  .modern-detail-text {
+    color: #e2e8f0;
   }
-  
-  .date-switcher {
-    display: flex;
+
+  .modern-contact-name {
+    color: #e2e8f0;
+  }
+
+  .modern-contact-phone {
+    color: var(--rose);
+  }
+
+  .modern-contact-phone:hover {
+    color: #f472b6;
+  }  .modern-role-header.clickable {
+    padding: 0.25rem;
+    margin: -0.25rem -0.25rem 1rem -0.25rem;
+  }
+
+  .modern-role-details-content {
+    padding: 1rem;
+  }
+
+  .modern-contact-info {
+    align-items: flex-start;
+  }
+
+  .modern-detail-section {
+    margin-bottom: 1rem;
+  }
+
+  .modern-detail-title {
+    font-size: 0.875rem;
+  }
+
+  .modern-detail-text {
+    font-size: 0.875rem;
+  }/* Modern Volunteer Page Styles */
+
+/* CSS Variables */
+:root {
+  --plum: #7c3aed;
+  --rose: #ec4899;
+  --deep-plum: #6d28d9;
+  --hover-rose: #db2777;
+  --white: #ffffff;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --green-500: #10b981;
+  --yellow-500: #f59e0b;
+  --red-500: #ef4444;
+  --max-width: 1400px;
+}
+
+/* Base Page Container */
+.modern-page-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #ffffff 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* Volunteer Hero Section */
+.modern-volunteer-hero {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(236, 72, 153, 0.1));
+  padding: 3rem 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(147, 51, 234, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-volunteer-hero::before {
+  content: '✨';
+  position: absolute;
+  top: 20%;
+  left: 15%;
+  font-size: 2rem;
+  opacity: 0.3;
+  animation: float 3s ease-in-out infinite;
+}
+
+.modern-volunteer-hero::after {
+  content: '🎭';
+  position: absolute;
+  bottom: 20%;
+  right: 15%;
+  font-size: 2rem;
+  opacity: 0.3;
+  animation: float 3s ease-in-out infinite 1.5s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-10px) rotate(5deg); }
+  66% { transform: translateY(5px) rotate(-3deg); }
+}
+
+.modern-volunteer-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.modern-volunteer-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--plum), var(--rose));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+}
+
+.modern-volunteer-subtitle {
+  font-size: 1.125rem;
+  color: rgba(124, 58, 237, 0.8);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.6;
+}
+
+.modern-signup-summary {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: var(--green-500);
+  padding: 1rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* Content Wrapper */
+.modern-content-wrapper {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* Date Selection */
+.modern-date-section {
+  margin-bottom: 2rem;
+}
+
+.modern-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin: 0 0 1rem 0;
+  text-align: center;
+}
+
+.modern-date-switcher {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+.modern-date-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform: translateY(0);
+  min-width: 100px;
+}
+
+.modern-date-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.modern-date-button.active {
+  background: linear-gradient(135deg, var(--plum), var(--rose));
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+}
+
+.modern-date-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.modern-date-day {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  line-height: 1;
+}
+
+/* Schedule Section */
+.modern-schedule-section {
+  margin-bottom: 2rem;
+}
+
+.modern-schedule-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  text-align: center;
+  margin: 0 0 1rem 0;
+}
+
+.modern-schedule-image {
+  max-width: 500px;
+  margin: 0 auto;
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(124, 58, 237, 0.15);
+  transition: all 0.3s ease;
+}
+
+.modern-schedule-image:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(124, 58, 237, 0.2);
+}
+
+.modern-schedule-link {
+  display: block;
+  position: relative;
+  text-decoration: none;
+}
+
+.modern-schedule-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: all 0.3s ease;
+}
+
+.modern-schedule-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(124, 58, 237, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+.modern-schedule-link:hover .modern-schedule-overlay {
+  opacity: 1;
+}
+
+.modern-schedule-text {
+  color: white;
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+/* Shifts Section */
+.modern-shifts-section {
+  margin-bottom: 2rem;
+}
+
+.modern-section-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.modern-section-description {
+  color: rgba(124, 58, 237, 0.7);
+  font-size: 1rem;
+  margin: 0.5rem 0 0 0;
+}
+
+/* Loading State */
+.modern-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem;
+  text-align: center;
+}
+
+.modern-loading-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid rgba(124, 58, 237, 0.2);
+  border-top: 3px solid var(--plum);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.modern-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 3rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 1.25rem;
+  border: 1px solid rgba(147, 51, 234, 0.1);
+}
+
+.modern-empty-icon {
+  font-size: 4rem;
+  opacity: 0.6;
+}
+
+.modern-empty-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin: 0;
+}
+
+.modern-empty-description {
+  color: var(--gray-600);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+/* Roles Grid */
+.modern-roles-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+}
+
+.modern-role-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(147, 51, 234, 0.1);
+  transition: all 0.3s ease;
+  transform: translateY(0);
+}
+
+.modern-role-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modern-role-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  transition: all 0.2s ease;
+}
+
+.modern-role-header.clickable {
+  cursor: pointer;
+  padding: 0.5rem;
+  margin: -0.5rem -0.5rem 1.5rem -0.5rem;
+  border-radius: 0.75rem;
+}
+
+.modern-role-header.clickable:hover {
+  background: rgba(124, 58, 237, 0.05);
+}
+
+.modern-role-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modern-expand-icon {
+  font-size: 0.875rem;
+  color: var(--plum);
+  transition: transform 0.3s ease;
+  font-weight: bold;
+}
+
+.modern-expand-icon.expanded {
+  transform: rotate(180deg);
+}
+
+/* Role Details - Expandable Section */
+.modern-role-details {
+  margin: -1rem 0 1.5rem 0;
+  overflow: hidden;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+  }
+}
+
+.modern-role-details-content {
+  background: rgba(124, 58, 237, 0.03);
+  border: 1px solid rgba(124, 58, 237, 0.1);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.modern-detail-section {
+  margin-bottom: 1.5rem;
+}
+
+.modern-detail-section:last-child {
+  margin-bottom: 0;
+}
+
+.modern-detail-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--plum);
+  margin: 0 0 0.5rem 0;
+}
+
+.modern-detail-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.modern-detail-text {
+  color: var(--gray-700);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.modern-detail-text.modern-note {
+  background: rgba(245, 158, 11, 0.1);
+  border-left: 3px solid var(--yellow-500);
+  padding: 0.75rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-style: italic;
+}
+
+.modern-contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modern-contact-name {
+  color: var(--gray-700);
+  font-weight: 500;
+  margin: 0;
+}
+
+.modern-contact-phone {
+  color: var(--plum);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.modern-contact-phone:hover {
+  color: var(--deep-plum);
+  transform: translateX(2px);
+}
+
+.modern-role-card.expanded {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.15), 0 6px 12px -5px rgba(0, 0, 0, 0.08);
+}
+
+.modern-role-info {
+  flex: 1;
+}
+
+.modern-role-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--plum);
+  margin: 0 0 0.25rem 0;
+}
+
+.modern-role-count {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  margin: 0;
+}
+
+.modern-role-icon {
+  font-size: 2rem;
+  opacity: 0.7;
+}
+
+.modern-shifts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.modern-shift-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(124, 58, 237, 0.05);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(124, 58, 237, 0.1);
+  transition: all 0.2s ease;
+}
+
+.modern-shift-item:hover {
+  background: rgba(124, 58, 237, 0.08);
+}
+
+.modern-shift-time {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.modern-time-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.modern-time-range {
+  font-weight: 500;
+  color: var(--gray-700);
+  white-space: nowrap;
+}
+
+.modern-shift-availability {
+  flex-shrink: 0;
+}
+
+.modern-availability-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modern-availability-badge.available {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--green-500);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.modern-availability-badge.low {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--yellow-500);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.modern-availability-badge.full {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--red-500);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.modern-shift-action {
+  flex-shrink: 0;
+}
+
+.modern-login-prompt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gray-600);
+  font-size: 0.875rem;
+}
+
+.modern-lock-icon {
+  font-size: 1rem;
+}
+
+.modern-signup-button,
+.modern-cancel-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  transform: translateY(0);
+}
+
+.modern-signup-button {
+  background: linear-gradient(135deg, var(--plum), var(--rose));
+  color: white;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
+}
+
+.modern-signup-button:hover:not(.disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.modern-signup-button.disabled {
+  background: var(--gray-100);
+  color: var(--gray-600);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.modern-cancel-button {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.modern-cancel-button:hover {
+  background: rgba(239, 68, 68, 0.15);
+  transform: translateY(-1px);
+}
+
+.modern-button-icon {
+  font-size: 0.875rem;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --gray-800: #f1f5f9;
+    --gray-600: #e2e8f0;
+    --gray-700: #cbd5e1;
+  }
+
+  .modern-page-container {
+    background: linear-gradient(135deg, #1f1b24 0%, #2d1f2e 50%, #1a1a1a 100%);
+  }
+
+  .modern-volunteer-hero {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(236, 72, 153, 0.15));
+  }
+
+  .modern-volunteer-subtitle {
+    color: rgba(236, 72, 153, 0.9);
+  }
+
+  .modern-section-title,
+  .modern-schedule-title {
+    color: #f1e1ec;
+  }
+
+  .modern-section-description {
+    color: rgba(236, 72, 153, 0.8);
+  }
+
+  .modern-date-button {
+    background: rgba(45, 31, 46, 0.8);
+    border-color: rgba(236, 72, 153, 0.3);
+    color: #f1e1ec;
+  }
+
+  .modern-date-button:hover {
+    background: rgba(45, 31, 46, 0.95);
+  }
+
+  .modern-role-card {
+    background: rgba(45, 31, 46, 0.8);
+    border-color: rgba(236, 72, 153, 0.2);
+  }
+
+  .modern-role-title {
+    color: var(--rose);
+  }
+
+  .modern-role-count {
+    color: #d1d5db;
+  }
+
+  .modern-shift-item {
+    background: rgba(236, 72, 153, 0.1);
+    border-color: rgba(236, 72, 153, 0.2);
+  }
+
+  .modern-shift-item:hover {
+    background: rgba(236, 72, 153, 0.15);
+  }
+
+  .modern-time-range {
+    color: #e2e8f0;
+  }
+
+  .modern-empty-state {
+    background: rgba(45, 31, 46, 0.6);
+    border-color: rgba(236, 72, 153, 0.2);
+  }
+
+  .modern-empty-title {
+    color: #f1e1ec;
+  }
+
+  .modern-empty-description {
+    color: #d1d5db;
+  }
+
+  .modern-login-prompt {
+    color: #d1d5db;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modern-volunteer-title {
+    font-size: 2rem;
+  }
+
+  .modern-volunteer-subtitle {
+    font-size: 1rem;
+  }
+
+  .modern-volunteer-hero {
+    padding: 2rem 1rem;
+  }
+
+  .modern-content-wrapper {
+    padding: 1.5rem 1rem;
+  }
+
+  .modern-date-switcher {
+    gap: 0.5rem;
+    justify-content: flex-start;
     overflow-x: auto;
-    gap: 8px;
-    margin-bottom: 20px;
-    padding: 0 5px;
+    padding: 0 0.5rem;
+    flex-wrap: nowrap;
   }
-  
-  .date-switcher button {
-    flex: none;
-    background: #a75894;
-    color: white;
-    border: none;
-    padding: 10px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
+
+  .modern-date-button {
+    min-width: 80px;
+    padding: 0.75rem;
+    flex-shrink: 0;
   }
-  
-  .date-switcher .active {
-    background: #60174c;
+
+  .modern-roles-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
-  
-  .schedule-image img {
-    width: 50%;
-    display: block;
-    margin: 0 auto 20px;
-    border-radius: 8px;
-  }
-  
-  .shift-list {
-    display: flex;
+
+  .modern-shift-item {
     flex-direction: column;
-    gap: 20px;
+    align-items: stretch;
+    gap: 0.75rem;
   }
-  
-  /* Role section */
-  .role-card {
-    background: #f8f3f9;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(96, 23, 76, 0.1);
-    padding: 15px;
-    overflow: hidden;
+
+  .modern-shift-time,
+  .modern-shift-availability,
+  .modern-shift-action {
+    flex: none;
+    width: 100%;
   }
-  
-  .role-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    color: #60174c;
-    font-size: 1.1rem;
-    font-weight: bold;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #e2c6da;
+
+  .modern-shift-availability {
+    text-align: center;
   }
-  
-  .role-card ul {
-    margin-top: 10px;
-    padding-left: 20px;
-    list-style: none;
+
+  .modern-signup-button,
+  .modern-cancel-button {
+    width: 100%;
+    justify-content: center;
   }
-  
-  .role-card li {
-    margin-bottom: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+}
+
+@media (max-width: 480px) {
+  .modern-volunteer-hero {
+    padding: 1.5rem 1rem;
   }
-  
-  .role-card button {
-    margin-left: 10px;
-    background-color: #a75894;
-    color: white;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+
+  .modern-content-wrapper {
+    padding: 1rem;
   }
-  
-  .role-card button:hover {
-    background-color: #8e407b;
+
+  .modern-role-card {
+    padding: 1rem;
   }
-  
-  .shift-signed {
-    font-weight: bold;
-    color: #2e7d32;
-    margin-left: 10px;
+
+  .modern-shift-item {
+    padding: 0.75rem;
   }
-  
-  /* Shift tally (signed up summary) */
-  .shift-tally {
-    background-color: #e7c5df;
-    border-left: 5px solid #a75894;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-weight: bold;
-    color: #60174c;
+
+  .modern-date-button {
+    min-width: 70px;
+    padding: 0.5rem;
   }
-  
+
+  .modern-date-label {
+    font-size: 0.75rem;
+  }
+
+  .modern-date-day {
+    font-size: 0.625rem;
+  }
+}

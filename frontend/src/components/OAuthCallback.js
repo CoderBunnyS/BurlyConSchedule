@@ -35,7 +35,7 @@ export default function OAuthCallback() {
           localStorage.setItem("user", JSON.stringify(data.user));
 
           console.log("✅ Token saved. Redirecting...");
-          navigate("/profile");
+          navigate("/profile", { state: { justLoggedIn: true } });
         } else {
           console.error("❌ Missing token or user:", data);
           navigate("/");
