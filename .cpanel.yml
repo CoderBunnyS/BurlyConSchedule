@@ -2,4 +2,7 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/burlojnv/public_html/
-    - /bin/cp -R frontend/* $DEPLOYPATH
+    - cd source/frontend
+    - npm install
+    - npm run build
+    - /bin/cp -R build/* $DEPLOYPATH

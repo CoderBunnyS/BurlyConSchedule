@@ -34,6 +34,10 @@ const shiftSchema = new mongoose.Schema({
   ],
   notes: {
     type: String // optional admin notes
+  },
+  reminderSent: {
+    type: Boolean,
+    default: false // Track if SMS reminder has been sent
   }
 }, {
   timestamps: true
