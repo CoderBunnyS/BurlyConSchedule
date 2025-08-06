@@ -9,6 +9,9 @@ export default function ShiftRoleForm({ onRoleCreated }) {
     physicalRequirements: "",
     pointOfContact: "",
     contactPhone: "",
+    // Added missing fields that your form uses
+    description: "",
+    requirements: "",
   });
 
   const handleChange = (e) => {
@@ -19,7 +22,9 @@ export default function ShiftRoleForm({ onRoleCreated }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5001/api/shiftroles", {
+      // Use environment variable for API base URL
+      const apiBase = process.env.REACT_APP_API_BASE || "http://localhost:5001";
+      const res = await fetch(`${apiBase}/api/shiftroles`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -27,8 +32,10 @@ export default function ShiftRoleForm({ onRoleCreated }) {
 
       if (res.ok) {
         const newRole = await res.json();
-        console.log("✅ Role created successfully:", newRole);
+        console.log("Role created successfully:", newRole);
         onRoleCreated(newRole);
+        
+        // Reset form
         setFormData({
           name: "",
           location: "",
@@ -36,20 +43,22 @@ export default function ShiftRoleForm({ onRoleCreated }) {
           physicalRequirements: "",
           pointOfContact: "",
           contactPhone: "",
+          description: "",
+          requirements: "",
         });
       } else {
         const errorText = await res.text();
-        console.error("❌ Failed to create role:", errorText);
+        console.error("Failed to create role:", errorText);
       }
     } catch (err) {
-      console.error("🚨 Network error submitting role:", err);
+      console.error("Network error submitting role:", err);
     }
   };
 
   return (
     <form className="shift-form" onSubmit={handleSubmit}>
       <h2>Add New Shift Role</h2>
-
+      
       <label htmlFor="name">Name:</label>
       <input
         type="text"
@@ -58,7 +67,15 @@ export default function ShiftRoleForm({ onRoleCreated }) {
         onChange={handleChange}
         required
       />
-
+      
+      <label htmlFor="location">Location:</label>
+      <input
+        type="text"
+        name="location"
+        value={formData.location}
+        onChange={handleChange}
+      />
+      
       <label htmlFor="description">Description:</label>
       <textarea
         name="description"
@@ -66,13 +83,28 @@ export default function ShiftRoleForm({ onRoleCreated }) {
         onChange={handleChange}
         required
       />
-
+      
+      <label htmlFor="responsibilities">Responsibilities:</label>
+      <textarea
+        name="responsibilities"
+        value={formData.responsibilities}
+        onChange={handleChange}
+      />
+      
       <label htmlFor="requirements">Requirements (optional):</label>
       <textarea
         name="requirements"
         value={formData.requirements}
         onChange={handleChange}
       />
+      
+      <label htmlFor="physicalRequirements">Physical Requirements:</label>
+      <textarea
+        name="physicalRequirements"
+        value={formData.physicalRequirements}
+        onChange={handleChange}
+      />
+      
       <label htmlFor="pointOfContact">Point of Contact Name:</label>
       <input
         type="text"
@@ -80,7 +112,7 @@ export default function ShiftRoleForm({ onRoleCreated }) {
         value={formData.pointOfContact}
         onChange={handleChange}
       />
-
+      
       <label htmlFor="contactPhone">Contact Phone (optional):</label>
       <input
         type="tel"
@@ -89,7 +121,7 @@ export default function ShiftRoleForm({ onRoleCreated }) {
         onChange={handleChange}
         placeholder="e.g. 555-123-4567"
       />
-
+      
       <button type="submit">➕ Add Role</button>
     </form>
   );
