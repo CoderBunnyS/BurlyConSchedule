@@ -1,6 +1,7 @@
 const axios = require("axios");
 
-const API_URL = "http://localhost:5001/api"; // Update when deployed
+const API_URL = window.location.origin + '/api';
+fetch(`${API_URL}/endpoint`)
 
 export const getClasses = async () => {
   try {

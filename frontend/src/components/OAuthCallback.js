@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function OAuthCallback() {
   const navigate = useNavigate();
-  console.log("✅ OAuthCallback loaded");
+  console.log("OAuthCallback loaded");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -34,10 +34,10 @@ export default function OAuthCallback() {
           localStorage.setItem("access_token", data.access_token);
           localStorage.setItem("user", JSON.stringify(data.user));
 
-          console.log("✅ Token saved. Redirecting...");
+          console.log("Token saved. Redirecting...");
           navigate("/profile", { state: { justLoggedIn: true } });
         } else {
-          console.error("❌ Missing token or user:", data);
+          console.error("Missing token or user:", data);
           navigate("/");
         }
       })
