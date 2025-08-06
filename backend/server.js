@@ -20,10 +20,11 @@ connectDB();
 const app = express();
 
 const corsOptions = {
-  origin: "https://www.burlyconvolunteers.com",
+  origin: true,
   methods: ["GET", "POST", "OPTIONS"],
   credentials: true,
 };
+
 
 //Handle OPTIONS preflight before any routes or redirect logic
 app.options("*", cors(corsOptions));
