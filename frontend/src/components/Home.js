@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/home.css"; // Using the same modern CSS
+import "../styles/home.css";  
 import Header from "./Header";
 
 export default function Home() {
