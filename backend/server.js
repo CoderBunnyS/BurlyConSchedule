@@ -55,10 +55,9 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-// Start the server
-const port = process.env.PORT || 3000;
-app.listen(port, '127.0.0.1', () => {
-  console.log(`Server running on http://127.0.0.1:${port}`);
+const port = process.env.PORT || 5001;
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on http://0.0.0.0:${port}`);
   
   // Start the SMS reminder job
   console.log('Starting SMS reminder system...');
