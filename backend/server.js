@@ -5,7 +5,6 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("path");
 const connectDB = require("./config/db");
-const authRoutes = require("./routes/authRoutes");
 const hourlyNeedsRoutes = require("./routes/hourlyNeedsRoutes");
 const shiftRoutes = require("./routes/shiftRoutes");
 const volunteerRoutes = require("./routes/volunteerRoutes");
@@ -44,16 +43,9 @@ app.use("/api/admin", adminVolunteerRoutes);
 app.use("/api/hourlyneeds", hourlyNeedsRoutes);
 app.use("/api/sms", smsRoutes);
 
-// Override auth callback route to return JSON instead of redirect
-app.post("/api/auth/callback", async (req, res) => {
-  try {
-    const result = await authRoutes.handleCallback(req); // your FusionAuth logic
-    res.json({ success: true, ...result });
-  } catch (error) {
-    console.error("Auth callback error:", error);
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
+// Authentication routes
+app.use("/api/auth", require("./routes/authRoutes"));
+
 
 // Serve React frontend build
 app.use(express.static(path.join(__dirname, "../frontend/build")));
