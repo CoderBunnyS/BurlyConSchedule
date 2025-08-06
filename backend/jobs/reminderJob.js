@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const smsService = require('../utils/smsService');
 const fusionAuthService = require('../utils/fusionAuthService');
 
-// Import  shift model 
+// Import the shift model
 const Shift = require('../models/Shift');
 
 class ReminderJob {
