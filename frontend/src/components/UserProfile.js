@@ -65,7 +65,7 @@ export default function UserProfile() {
 
       if (response.ok) {
         setVolunteerShifts((prev) => prev.filter((shift) => shift._id !== shiftId));
-        // Optional: recalculate totalHours here if needed
+
       } else {
         const error = await response.json();
         console.error("Cancel failed:", error.message);
