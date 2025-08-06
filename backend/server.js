@@ -23,6 +23,11 @@ const shiftRoutes = require("./routes/shiftRoutes");
 const shiftRoleRoutes = require("./routes/shiftRoleRoutes");
 const adminVolunteerRoutes = require("./routes/adminVolunteerRoutes");
 
+// Middleware to log requests (for debugging)
+app.get('/health', (req, res) => {
+  res.send('Backend is alive 🎉');
+});
+
 app.use("/api/shifts", shiftRoutes);
 app.use("/api/volunteer", volunteerRoutes);  
 app.use("/api/shiftroles", shiftRoleRoutes);
@@ -50,11 +55,12 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+// Start the server
+const port = process.env.PORT || 3000;
+app.listen(port, '127.0.0.1', () => {
+  console.log(`Server running on http://127.0.0.1:${port}`);
   
   // Start the SMS reminder job
-  console.log('🚀 Starting SMS reminder system...');
+  console.log('Starting SMS reminder system...');
   reminderJob.start();
 });

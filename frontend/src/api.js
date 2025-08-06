@@ -1,4 +1,4 @@
-import axios from "axios";
+const axios = require("axios");
 
 const API_URL = "http://localhost:5001/api"; // Update when deployed
 
