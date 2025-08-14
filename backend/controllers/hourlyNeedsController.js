@@ -1,5 +1,5 @@
 const HourlyNeed = require("../models/HourlyNeed");
-const User = require("../models/User"); // <-- make sure this is imported
+const User = require("../models/User"); // 
 
 // GET all hourly needs for a given date
 exports.getHourlyNeedsByDate = async (req, res) => {
@@ -50,8 +50,8 @@ exports.signUpForHourlyNeed = async (req, res) => {
 
     if (alreadySignedUp) return res.status(400).json({ message: "Already signed up" });
 
-    // Save to user record with explicit model reference to avoid validation errors
-    user.volunteerShifts.push({ shift: id, refModel: "HourlyNeed", status: "registered" });
+    // Save to user record
+    user.volunteerShifts.push({ shift: id, status: "registered" });
     user.totalHours += 1;
     await user.save();
 

@@ -17,7 +17,7 @@ export default function Header() {
     const domain = process.env.REACT_APP_FUSIONAUTH_DOMAIN;
     const scope = encodeURIComponent("openid email profile");
     
-    const authorizationUrl = `${domain}/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&prompt=login`;
+    const authorizationUrl = `${domain}/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
     window.location.href = authorizationUrl;
   };
     
