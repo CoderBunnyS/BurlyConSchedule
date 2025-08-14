@@ -202,39 +202,39 @@ export default function UserProfile() {
           </div>
         </div>
 
-        {/* Discount Alert */}
-        {totalHours >= 4 && (
-          <div className={`modern-discount-alert ${getDiscountType()}`}>
-            <div className="modern-discount-icon">
-              {totalHours >= 8 ? "🎉" : "✨"}
-            </div>
-            <div className="modern-discount-content">
-              <h3 className="modern-discount-title">
-                {totalHours >= 8
-                  ? "FREE FULL PASS EARNED!"
-                  : "HALF PRICE PASS EARNED!"}
-              </h3>
-              <p className="modern-discount-description">
-                Amazing work! You've earned a{" "}
-                {totalHours >= 8 ? "free full pass" : "half price pass"} to
-                BurlyCon.
-              </p>
-              <div className="modern-discount-code">
-                <span className="modern-code-label">Your discount code:</span>
-                <span className="modern-code-value">{getDiscountCode()}</span>
-                <button
-                  className="modern-copy-button"
-                  onClick={() =>
-                    navigator.clipboard.writeText(getDiscountCode())
-                  }
-                  title="Copy code"
-                >
-                  📋
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+{/* Discount Alert */}
+{totalHours >= 8 && (
+  <div className={`modern-discount-alert ${getDiscountType()}`}>
+    <div className="modern-discount-icon">
+      {totalHours >= 16 ? "🎉" : "✨"}
+    </div>
+    <div className="modern-discount-content">
+      <h3 className="modern-discount-title">
+        {totalHours >= 16
+          ? "FREE FULL PASS EARNED!"
+          : "HALF PRICE PASS EARNED!"}
+      </h3>
+      <p className="modern-discount-description">
+        Amazing work! You've earned a{" "}
+        {totalHours >= 16 ? "free full pass" : "half price pass"} to
+        BurlyCon.
+      </p>
+      <div className="modern-discount-code">
+        <span className="modern-code-label">Your discount code:</span>
+        <span className="modern-code-value">{getDiscountCode()}</span>
+        <button
+          className="modern-copy-button"
+          onClick={() =>
+            navigator.clipboard.writeText(getDiscountCode())
+          }
+          title="Copy code"
+        >
+          📋
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
         {/* Shifts Section */}
         <div className="modern-shifts-section">
