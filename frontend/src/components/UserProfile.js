@@ -124,8 +124,8 @@ export default function UserProfile() {
   }
 
   const getDiscountCode = () => {
-    if (totalHours >= 8) return "FULLPASS2024";
-    if (totalHours >= 4) return "HALFPASS2024";
+    if (totalHours >= 16) return "100VOLUNTEER2025";
+    if (totalHours >= 8) return "50VOLUNTEER2025";
     return null;
   };
 
