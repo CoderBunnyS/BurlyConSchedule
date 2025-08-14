@@ -9,6 +9,24 @@ export default function UserProfile() {
   const [totalHours, setTotalHours] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  // Build URLs safely (handles /api prefix from .env)
+  const API = (p) => `${process.env.REACT_APP_API_BASE || ""}${p}`;
+
+  // Centralized fetch so list + totalHours always stay in sync
+  const refreshProfile = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(API(`/api/volunteer/user/${userId}`));
+      const data = await res.json();
+      setVolunteerShifts(data.shifts || []);
+      setTotalHours(data.totalHours || 0);
+    } catch (err) {
+      console.error("Error fetching volunteer info:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []); // userId is defined below; we'll call refreshProfile after userId is set
+
   // Check if we navigated from login
   useEffect(() => {
     const justLoggedIn = location.state?.justLoggedIn;
@@ -20,8 +38,8 @@ export default function UserProfile() {
   try {
     const token = localStorage.getItem("access_token");
     if (token) {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      userId = payload.sub;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      userId = payload.sub; // FusionAuth user id (UUID)
     }
   } catch (error) {
     console.error("Error parsing JWT:", error);
@@ -29,43 +47,63 @@ export default function UserProfile() {
 
   // Get user info
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const userName = user?.given_name || user?.email?.split("@")[0] || "Volunteer";
+  const userName =
+    user?.given_name || user?.email?.split("@")[0] || "Volunteer";
 
-  // Fetch user shifts
+  // Fetch user shifts (initial + whenever userId changes)
   useEffect(() => {
     if (!userId) {
       setLoading(false);
       return;
     }
-
-    fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/user/${userId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Fetched volunteer data:", data);
+    // call with current userId
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(API(`/api/volunteer/user/${userId}`));
+        const data = await res.json();
         setVolunteerShifts(data.shifts || []);
         setTotalHours(data.totalHours || 0);
+      } catch (err) {
+        console.error("Error fetching volunteer info:", err);
+      } finally {
         setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching volunteer info:", error);
-        setLoading(false);
-      });
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const handleCancelShift = async (shiftId) => {
-    const confirmed = window.confirm("Are you sure you want to cancel this shift?");
+    const confirmed = window.confirm(
+      "Are you sure you want to cancel this shift?"
+    );
     if (!confirmed) return;
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/${shiftId}/cancel`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId })
-      });
+      const response = await fetch(
+        API(`/api/volunteer/${shiftId}/cancel`),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId })
+        }
+      );
 
       if (response.ok) {
-        setVolunteerShifts((prev) => prev.filter((shift) => shift._id !== shiftId));
-
+        // Re-fetch to keep both the list and totalHours in sync
+        await (async () => {
+          try {
+            setLoading(true);
+            const res = await fetch(API(`/api/volunteer/user/${userId}`));
+            const data = await res.json();
+            setVolunteerShifts(data.shifts || []);
+            setTotalHours(data.totalHours || 0);
+          } catch (err) {
+            console.error("Error refreshing after cancel:", err);
+          } finally {
+            setLoading(false);
+          }
+        })();
       } else {
         const error = await response.json();
         console.error("Cancel failed:", error.message);
@@ -76,7 +114,8 @@ export default function UserProfile() {
   };
 
   function formatTime(timeStr) {
-    if (!timeStr || typeof timeStr !== "string" || !timeStr.includes(":")) return "Invalid time";
+    if (!timeStr || typeof timeStr !== "string" || !timeStr.includes(":"))
+      return "Invalid time";
     const [hour, minute] = timeStr.split(":");
     const h = parseInt(hour, 10);
     const ampm = h >= 12 ? "PM" : "AM";
@@ -107,16 +146,20 @@ export default function UserProfile() {
   return (
     <div className="modern-page-container">
       <Header />
-      
+
       {/* Hero Section */}
       <div className="modern-profile-hero">
         <div className="modern-profile-hero-content">
           <div className="modern-profile-avatar">
             {userName.charAt(0).toUpperCase()}
           </div>
-          <div className="modern-profile-info">
-            <h1 className="modern-profile-title">Welcome back, {userName}!</h1>
-            <p className="modern-profile-subtitle">Your volunteer dashboard</p>
+        <div className="modern-profile-info">
+            <h1 className="modern-profile-title">
+              Welcome back, {userName}!
+            </h1>
+            <p className="modern-profile-subtitle">
+              Your volunteer dashboard
+            </p>
           </div>
         </div>
       </div>
@@ -132,20 +175,26 @@ export default function UserProfile() {
                 <div className="modern-stat-label">Hours Volunteered</div>
               </div>
             </div>
-            
+
             <div className="modern-stat-card shifts">
               <div className="modern-stat-icon">📅</div>
               <div className="modern-stat-content">
-                <div className="modern-stat-number">{volunteerShifts.length}</div>
+                <div className="modern-stat-number">
+                  {volunteerShifts.length}
+                </div>
                 <div className="modern-stat-label">Active Shifts</div>
               </div>
             </div>
-            
+
             <div className="modern-stat-card status">
               <div className="modern-stat-icon">⭐</div>
               <div className="modern-stat-content">
                 <div className="modern-stat-number">
-                  {totalHours >= 8 ? "Superstar" : totalHours >= 4 ? "All-Star" : "Rising Star"}
+                  {totalHours >= 8
+                    ? "Superstar"
+                    : totalHours >= 4
+                    ? "All-Star"
+                    : "Rising Star"}
                 </div>
                 <div className="modern-stat-label">Volunteer Status</div>
               </div>
@@ -161,17 +210,23 @@ export default function UserProfile() {
             </div>
             <div className="modern-discount-content">
               <h3 className="modern-discount-title">
-                {totalHours >= 8 ? "FREE FULL PASS EARNED!" : "HALF PRICE PASS EARNED!"}
+                {totalHours >= 8
+                  ? "FREE FULL PASS EARNED!"
+                  : "HALF PRICE PASS EARNED!"}
               </h3>
               <p className="modern-discount-description">
-                Amazing work! You've earned a {totalHours >= 8 ? "free full pass" : "half price pass"} to BurlyCon.
+                Amazing work! You've earned a{" "}
+                {totalHours >= 8 ? "free full pass" : "half price pass"} to
+                BurlyCon.
               </p>
               <div className="modern-discount-code">
                 <span className="modern-code-label">Your discount code:</span>
                 <span className="modern-code-value">{getDiscountCode()}</span>
-                <button 
+                <button
                   className="modern-copy-button"
-                  onClick={() => navigator.clipboard.writeText(getDiscountCode())}
+                  onClick={() =>
+                    navigator.clipboard.writeText(getDiscountCode())
+                  }
                   title="Copy code"
                 >
                   📋
@@ -202,7 +257,8 @@ export default function UserProfile() {
               <div className="modern-empty-icon">📅</div>
               <h3 className="modern-empty-title">No shifts scheduled</h3>
               <p className="modern-empty-description">
-                Ready to help make BurlyCon amazing? Browse available volunteer opportunities!
+                Ready to help make BurlyCon amazing? Browse available volunteer
+                opportunities!
               </p>
               <a href="/volunteer" className="modern-empty-action">
                 <span className="modern-button-icon">🔍</span>
@@ -213,7 +269,9 @@ export default function UserProfile() {
             <div className="modern-shifts-grid">
               {Object.entries(grouped).map(([key, shifts]) => {
                 const [role, date] = key.split("|");
-                const sorted = shifts.slice().sort((a, b) => a.startTime.localeCompare(b.startTime));
+                const sorted = shifts
+                  .slice()
+                  .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
                 return (
                   <div key={key} className="modern-shift-card">
@@ -229,7 +287,7 @@ export default function UserProfile() {
                         </p>
                       </div>
                       <div className="modern-shift-badge">
-                        {sorted.length} {sorted.length === 1 ? 'shift' : 'shifts'}
+                        {sorted.length} {sorted.length === 1 ? "shift" : "shifts"}
                       </div>
                     </div>
 
@@ -241,7 +299,9 @@ export default function UserProfile() {
                           <div key={shift._id} className="modern-shift-time-slot">
                             <div className="modern-time-info">
                               <span className="modern-time-icon">🕒</span>
-                              <span className="modern-time-range">{start} – {end}</span>
+                              <span className="modern-time-range">
+                                {start} – {end}
+                              </span>
                             </div>
                             <button
                               type="button"
