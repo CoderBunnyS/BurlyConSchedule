@@ -65,23 +65,21 @@ if (!tokenResponse.ok) {
       });
     }
 
-let user = await User.findOne({
-  $or: [
-    { fusionAuthId },
-    { email: faUser.email }
-  ]
-});
+const preferredName =
+  faUser.given_name || faUser.firstName || faUser.fullName || faUser.email;
 
-if (!user) {
-  user = await User.create({
-    fusionAuthId,
-    preferredName: faUser.given_name || faUser.firstName || faUser.fullName || faUser.email,
-    email: faUser.email
-  });
-} else if (!user.fusionAuthId) {
-  user.fusionAuthId = fusionAuthId;
-  await user.save();
-}
+const user = await User.findOneAndUpdate(
+  { $or: [{ fusionAuthId }, { email: faUser.email }] },
+  {
+    $set: {
+      fusionAuthId,      
+      email: faUser.email,
+      preferredName
+    }
+  },
+  { new: true, upsert: true }   
+);
+
 
 
     res.json({ user, access_token: tokenData.access_token });
