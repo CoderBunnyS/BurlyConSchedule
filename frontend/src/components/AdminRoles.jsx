@@ -16,12 +16,11 @@ export default function AdminRoles() {
     contactPhone: ""
   });
 
-  // NEW: search/sort/filter state
+  // search/sort/filter state (location filter removed)
   const [searchRaw, setSearchRaw] = useState("");
   const [search, setSearch] = useState(""); // debounced
   const [sortBy, setSortBy] = useState("name"); // "name" | "location"
   const [sortDir, setSortDir] = useState("asc"); // "asc" | "desc"
-  const [locationFilter, setLocationFilter] = useState("all");
   const [hasContact, setHasContact] = useState(false);
   const [hasPhysicalReqs, setHasPhysicalReqs] = useState(false);
 
@@ -32,7 +31,7 @@ export default function AdminRoles() {
       .catch(err => console.error("Error loading roles:", err));
   }, []);
 
-  // NEW: debounce search
+  // debounce search
   useEffect(() => {
     const t = setTimeout(() => setSearch(searchRaw.trim().toLowerCase()), 200);
     return () => clearTimeout(t);
@@ -111,17 +110,7 @@ export default function AdminRoles() {
     }
   };
 
-  // NEW: unique locations for filter
-  const locations = useMemo(() => {
-    const set = new Set();
-    roles.forEach(r => {
-      const loc = (r.location || "").trim();
-      if (loc) set.add(loc);
-    });
-    return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [roles]);
-
-  // NEW: filtered + sorted roles (memoized)
+  // filtered + sorted roles (no locationFilter anymore)
   const filteredSortedRoles = useMemo(() => {
     const q = search;
     const by = sortBy;
@@ -129,29 +118,26 @@ export default function AdminRoles() {
 
     const matchSearch = r => {
       if (!q) return true;
-      const fields = [
-        r.name,
-        r.location,
-        r.responsibilities,
-        r.pointOfContact
-      ]
+      const fields = [r.name, r.location, r.responsibilities, r.pointOfContact]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
       return fields.includes(q);
     };
 
-    const matchLocation = r =>
-      locationFilter === "all" ? true : (r.location || "") === locationFilter;
-
     const matchContact = r =>
-      !hasContact ? true : Boolean((r.pointOfContact && r.pointOfContact.trim()) || (r.contactPhone && r.contactPhone.toString().trim()));
+      !hasContact
+        ? true
+        : Boolean(
+            (r.pointOfContact && r.pointOfContact.trim()) ||
+            (r.contactPhone && r.contactPhone.toString().trim())
+          );
 
     const matchPhys = r =>
       !hasPhysicalReqs ? true : Boolean(r.physicalRequirements && r.physicalRequirements.trim());
 
     const sorted = [...roles]
-      .filter(r => matchSearch(r) && matchLocation(r) && matchContact(r) && matchPhys(r))
+      .filter(r => matchSearch(r) && matchContact(r) && matchPhys(r))
       .sort((a, b) => {
         const aVal = (a[by] || "").toString().toLowerCase();
         const bVal = (b[by] || "").toString().toLowerCase();
@@ -166,11 +152,10 @@ export default function AdminRoles() {
       });
 
     return sorted;
-  }, [roles, search, sortBy, sortDir, locationFilter, hasContact, hasPhysicalReqs]);
+  }, [roles, search, sortBy, sortDir, hasContact, hasPhysicalReqs]);
 
   const clearFilters = () => {
     setSearchRaw("");
-    setLocationFilter("all");
     setHasContact(false);
     setHasPhysicalReqs(false);
     setSortBy("name");
@@ -198,7 +183,7 @@ export default function AdminRoles() {
           </button>
         </div>
 
-        {/* NEW: Controls row */}
+        {/* Controls row (location dropdown removed) */}
         <div className="roles-controls">
           <div className="roles-controls-left">
             <div className="roles-control">
@@ -209,20 +194,6 @@ export default function AdminRoles() {
                 value={searchRaw}
                 onChange={e => setSearchRaw(e.target.value)}
               />
-            </div>
-
-            <div className="roles-control">
-              <label className="roles-control-label">Location</label>
-              <select
-                className="roles-control-select"
-                value={locationFilter}
-                onChange={e => setLocationFilter(e.target.value)}
-              >
-                <option value="all">All</option>
-                {locations.map(loc => (
-                  <option key={loc} value={loc}>{loc}</option>
-                ))}
-              </select>
             </div>
 
             <div className="roles-control checkbox">
@@ -361,7 +332,7 @@ export default function AdminRoles() {
           )}
         </div>
 
-        {/* Modal (unchanged structure — consider portalling as discussed) */}
+        {/* Modal */}
         {formVisible && (
           <div className="modern-modal-overlay">
             <div className="modern-modal">
