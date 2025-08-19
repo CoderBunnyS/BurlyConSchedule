@@ -342,6 +342,68 @@
   font-weight: 700;
   color: #1f2937;
 }
+.roles-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.roles-controls-left,
+.roles-controls-right {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.roles-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.roles-control-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.roles-control-input,
+.roles-control-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+  min-width: 220px;
+}
+
+.roles-control.checkbox {
+  align-self: center;
+}
+.roles-control-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.roles-sort-dir-btn,
+.roles-clear-btn {
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.roles-sort-dir-btn:hover,
+.roles-clear-btn:hover {
+  background: #eef2ff;
+}
+
 
 /* Empty State */
 .modern-empty-state {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Header from "./Header";
 import "../styles/admin.css";
 import "../styles/shiftForm.css";
@@ -16,12 +16,27 @@ export default function AdminRoles() {
     contactPhone: ""
   });
 
+  // NEW: search/sort/filter state
+  const [searchRaw, setSearchRaw] = useState("");
+  const [search, setSearch] = useState(""); // debounced
+  const [sortBy, setSortBy] = useState("name"); // "name" | "location"
+  const [sortDir, setSortDir] = useState("asc"); // "asc" | "desc"
+  const [locationFilter, setLocationFilter] = useState("all");
+  const [hasContact, setHasContact] = useState(false);
+  const [hasPhysicalReqs, setHasPhysicalReqs] = useState(false);
+
   useEffect(() => {
     fetch(`${process.env.REACT_APP_API_BASE}/api/shiftroles`)
       .then(res => res.json())
-      .then(data => setRoles(data))
+      .then(data => setRoles(Array.isArray(data) ? data : []))
       .catch(err => console.error("Error loading roles:", err));
   }, []);
+
+  // NEW: debounce search
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(searchRaw.trim().toLowerCase()), 200);
+    return () => clearTimeout(t);
+  }, [searchRaw]);
 
   const openForm = (role = null) => {
     if (role) {
@@ -70,12 +85,15 @@ export default function AdminRoles() {
       });
       const newRole = await res.json();
 
+      if (!res.ok) throw new Error(newRole?.message || "Save failed");
+
       if (editingId) setRoles(prev => prev.map(r => (r._id === editingId ? newRole : r)));
       else setRoles(prev => [...prev, newRole]);
 
       closeForm();
     } catch (err) {
       console.error("Error saving role:", err);
+      alert("Could not save role.");
     }
   };
 
@@ -86,15 +104,83 @@ export default function AdminRoles() {
         method: "DELETE"
       });
       if (res.ok) setRoles(prev => prev.filter(r => r._id !== id));
+      else alert("Delete failed.");
     } catch (err) {
       console.error("Error deleting role:", err);
+      alert("Delete failed.");
     }
+  };
+
+  // NEW: unique locations for filter
+  const locations = useMemo(() => {
+    const set = new Set();
+    roles.forEach(r => {
+      const loc = (r.location || "").trim();
+      if (loc) set.add(loc);
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [roles]);
+
+  // NEW: filtered + sorted roles (memoized)
+  const filteredSortedRoles = useMemo(() => {
+    const q = search;
+    const by = sortBy;
+    const dir = sortDir === "asc" ? 1 : -1;
+
+    const matchSearch = r => {
+      if (!q) return true;
+      const fields = [
+        r.name,
+        r.location,
+        r.responsibilities,
+        r.pointOfContact
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return fields.includes(q);
+    };
+
+    const matchLocation = r =>
+      locationFilter === "all" ? true : (r.location || "") === locationFilter;
+
+    const matchContact = r =>
+      !hasContact ? true : Boolean((r.pointOfContact && r.pointOfContact.trim()) || (r.contactPhone && r.contactPhone.toString().trim()));
+
+    const matchPhys = r =>
+      !hasPhysicalReqs ? true : Boolean(r.physicalRequirements && r.physicalRequirements.trim());
+
+    const sorted = [...roles]
+      .filter(r => matchSearch(r) && matchLocation(r) && matchContact(r) && matchPhys(r))
+      .sort((a, b) => {
+        const aVal = (a[by] || "").toString().toLowerCase();
+        const bVal = (b[by] || "").toString().toLowerCase();
+        if (aVal < bVal) return -1 * dir;
+        if (aVal > bVal) return 1 * dir;
+        // stable tie-breaker by name then _id
+        const aName = (a.name || "").toLowerCase();
+        const bName = (b.name || "").toLowerCase();
+        if (aName < bName) return -1;
+        if (aName > bName) return 1;
+        return (a._id || "").localeCompare(b._id || "");
+      });
+
+    return sorted;
+  }, [roles, search, sortBy, sortDir, locationFilter, hasContact, hasPhysicalReqs]);
+
+  const clearFilters = () => {
+    setSearchRaw("");
+    setLocationFilter("all");
+    setHasContact(false);
+    setHasPhysicalReqs(false);
+    setSortBy("name");
+    setSortDir("asc");
   };
 
   return (
     <div className="modern-page-container">
       <Header />
-      
+
       {/* Modern Header Section */}
       <div className="modern-header-section">
         <div className="modern-header-content">
@@ -104,154 +190,95 @@ export default function AdminRoles() {
       </div>
 
       <div className="modern-content-wrapper">
-        {/* Add Role Button */}
+        {/* Action Bar */}
         <div className="modern-action-bar">
-          <button
-            onClick={() => openForm()}
-            className="modern-primary-button"
-          >
+          <button onClick={() => openForm()} className="modern-primary-button">
             <span className="button-icon">➕</span>
             Add New Role
           </button>
         </div>
 
-        {/* Form Modal */}
-        {formVisible && (
-          <div className="modern-modal-overlay">
-            <div className="modern-modal">
-              <div className="modern-modal-header">
-                <div className="modern-modal-title-section">
-                  <h2 className="modern-modal-title">
-                    {editingId ? "Edit Role" : "Create New Role"}
-                  </h2>
-                  <button
-                    onClick={closeForm}
-                    className="modern-close-button"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
+        {/* NEW: Controls row */}
+        <div className="roles-controls">
+          <div className="roles-controls-left">
+            <div className="roles-control">
+              <label className="roles-control-label">Search</label>
+              <input
+                className="roles-control-input"
+                placeholder="Search name, location, responsibilities…"
+                value={searchRaw}
+                onChange={e => setSearchRaw(e.target.value)}
+              />
+            </div>
 
-              <div className="modern-modal-content">
-                <form onSubmit={handleSubmit} className="modern-form">
-                  {/* Role Name */}
-                  <div className="modern-form-group">
-                    <label className="modern-form-label">
-                      📋 Role Name *
-                    </label>
-                    <input
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="modern-form-input"
-                      placeholder="e.g., Event Coordinator"
-                    />
-                  </div>
+            <div className="roles-control">
+              <label className="roles-control-label">Location</label>
+              <select
+                className="roles-control-select"
+                value={locationFilter}
+                onChange={e => setLocationFilter(e.target.value)}
+              >
+                <option value="all">All</option>
+                {locations.map(loc => (
+                  <option key={loc} value={loc}>{loc}</option>
+                ))}
+              </select>
+            </div>
 
-                  {/* Location */}
-                  <div className="modern-form-group">
-                    <label className="modern-form-label">
-                      📍 Location
-                    </label>
-                    <input
-                      name="location"
-                      value={formData.location}
-                      onChange={handleChange}
-                      className="modern-form-input"
-                      placeholder="e.g., Main Venue, Building A"
-                    />
-                  </div>
+            <div className="roles-control checkbox">
+              <label className="roles-control-checkbox">
+                <input
+                  type="checkbox"
+                  checked={hasContact}
+                  onChange={(e) => setHasContact(e.target.checked)}
+                />
+                Has contact info
+              </label>
+            </div>
 
-                  {/* Responsibilities */}
-                  <div className="modern-form-group">
-                    <label className="modern-form-label">
-                      📝 Responsibilities *
-                    </label>
-                    <textarea
-                      name="responsibilities"
-                      value={formData.responsibilities}
-                      onChange={handleChange}
-                      required
-                      rows={4}
-                      className="modern-form-textarea"
-                      placeholder="Describe the key responsibilities and duties..."
-                    />
-                  </div>
-
-                  {/* Physical Requirements */}
-                  <div className="modern-form-group">
-                    <label className="modern-form-label">
-                      👤 Physical Requirements
-                    </label>
-                    <textarea
-                      name="physicalRequirements"
-                      value={formData.physicalRequirements}
-                      onChange={handleChange}
-                      rows={3}
-                      className="modern-form-textarea"
-                      placeholder="Any physical requirements or limitations..."
-                    />
-                  </div>
-
-                  {/* Contact Fields */}
-                  <div className="modern-form-row">
-                    <div className="modern-form-group">
-                      <label className="modern-form-label">
-                        👤 Point of Contact
-                      </label>
-                      <input
-                        name="pointOfContact"
-                        value={formData.pointOfContact}
-                        onChange={handleChange}
-                        className="modern-form-input"
-                        placeholder="Contact person name"
-                      />
-                    </div>
-
-                    <div className="modern-form-group">
-                      <label className="modern-form-label">
-                        📞 Contact Phone
-                      </label>
-                      <input
-                        type="tel"
-                        name="contactPhone"
-                        value={formData.contactPhone}
-                        onChange={handleChange}
-                        className="modern-form-input"
-                        placeholder="(555) 123-4567"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Form Actions */}
-                  <div className="modern-form-actions">
-                    <button
-                      type="submit"
-                      className="modern-submit-button"
-                    >
-                      💾 {editingId ? "Save Changes" : "Create Role"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={closeForm}
-                      className="modern-cancel-button"
-                    >
-                      ✕ Cancel
-                    </button>
-                  </div>
-                </form>
-              </div>
+            <div className="roles-control checkbox">
+              <label className="roles-control-checkbox">
+                <input
+                  type="checkbox"
+                  checked={hasPhysicalReqs}
+                  onChange={(e) => setHasPhysicalReqs(e.target.checked)}
+                />
+                Has physical requirements
+              </label>
             </div>
           </div>
-        )}
+
+          <div className="roles-controls-right">
+            <div className="roles-control">
+              <label className="roles-control-label">Sort by</label>
+              <select
+                className="roles-control-select"
+                value={sortBy}
+                onChange={e => setSortBy(e.target.value)}
+              >
+                <option value="name">Name</option>
+                <option value="location">Location</option>
+              </select>
+            </div>
+
+            <button
+              className="roles-sort-dir-btn"
+              onClick={() => setSortDir(d => (d === "asc" ? "desc" : "asc"))}
+              title={sortDir === "asc" ? "Ascending" : "Descending"}
+            >
+              {sortDir === "asc" ? "↑ A–Z" : "↓ Z–A"}
+            </button>
+
+            <button className="roles-clear-btn" onClick={clearFilters}>Clear</button>
+          </div>
+        </div>
 
         {/* Roles Section */}
         <div className="modern-roles-section">
           <div className="modern-section-header">
             <h2 className="modern-section-title">
-              Current Roles ({roles.length})
+              Current Roles ({filteredSortedRoles.length}
+              {filteredSortedRoles.length !== roles.length ? ` of ${roles.length}` : ""})
             </h2>
           </div>
 
@@ -260,17 +287,14 @@ export default function AdminRoles() {
               <div className="modern-empty-icon">📋</div>
               <h3 className="modern-empty-title">No roles yet</h3>
               <p className="modern-empty-description">Create your first volunteer role to get started</p>
-              <button
-                onClick={() => openForm()}
-                className="modern-primary-button"
-              >
+              <button onClick={() => openForm()} className="modern-primary-button">
                 <span className="button-icon">➕</span>
                 Add First Role
               </button>
             </div>
           ) : (
             <div className="modern-roles-grid">
-              {roles.map(role => (
+              {filteredSortedRoles.map(role => (
                 <div key={role._id} className="modern-role-card">
                   {/* Card Header */}
                   <div className="modern-card-header">
@@ -293,7 +317,7 @@ export default function AdminRoles() {
                         </button>
                       </div>
                     </div>
-                    
+
                     {role.location && (
                       <div className="modern-location-tag">
                         📍 {role.location}
@@ -303,43 +327,27 @@ export default function AdminRoles() {
 
                   {/* Card Content */}
                   <div className="modern-card-content">
-                    {/* Responsibilities */}
                     <div className="modern-card-section">
-                      <h4 className="modern-card-section-title">
-                        📝 Responsibilities
-                      </h4>
-                      <p className="modern-card-text">
-                        {role.responsibilities}
-                      </p>
+                      <h4 className="modern-card-section-title">📝 Responsibilities</h4>
+                      <p className="modern-card-text">{role.responsibilities}</p>
                     </div>
 
-                    {/* Physical Requirements */}
                     {role.physicalRequirements && (
                       <div className="modern-card-section">
-                        <h4 className="modern-card-section-title">
-                          👤 Physical Requirements
-                        </h4>
-                        <p className="modern-card-text">
-                          {role.physicalRequirements}
-                        </p>
+                        <h4 className="modern-card-section-title">👤 Physical Requirements</h4>
+                        <p className="modern-card-text">{role.physicalRequirements}</p>
                       </div>
                     )}
 
-                    {/* Contact Info */}
                     {(role.pointOfContact || role.contactPhone) && (
                       <div className="modern-card-contact">
                         <h4 className="modern-card-section-title">Contact</h4>
                         <div className="modern-contact-info">
                           {role.pointOfContact && (
-                            <p className="modern-contact-item">
-                              👤 {role.pointOfContact}
-                            </p>
+                            <p className="modern-contact-item">👤 {role.pointOfContact}</p>
                           )}
                           {role.contactPhone && (
-                            <a
-                              href={`tel:${role.contactPhone}`}
-                              className="modern-contact-phone"
-                            >
+                            <a href={`tel:${role.contactPhone}`} className="modern-contact-phone">
                               📞 {role.contactPhone}
                             </a>
                           )}
@@ -352,6 +360,109 @@ export default function AdminRoles() {
             </div>
           )}
         </div>
+
+        {/* Modal (unchanged structure — consider portalling as discussed) */}
+        {formVisible && (
+          <div className="modern-modal-overlay">
+            <div className="modern-modal">
+              <div className="modern-modal-header">
+                <div className="modern-modal-title-section">
+                  <h2 className="modern-modal-title">
+                    {editingId ? "Edit Role" : "Create New Role"}
+                  </h2>
+                  <button onClick={closeForm} className="modern-close-button">✕</button>
+                </div>
+              </div>
+
+              <div className="modern-modal-content">
+                <form onSubmit={handleSubmit} className="modern-form">
+                  <div className="modern-form-group">
+                    <label className="modern-form-label">📋 Role Name *</label>
+                    <input
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      className="modern-form-input"
+                      placeholder="e.g., Event Coordinator"
+                    />
+                  </div>
+
+                  <div className="modern-form-group">
+                    <label className="modern-form-label">📍 Location</label>
+                    <input
+                      name="location"
+                      value={formData.location}
+                      onChange={handleChange}
+                      className="modern-form-input"
+                      placeholder="e.g., Main Venue, Building A"
+                    />
+                  </div>
+
+                  <div className="modern-form-group">
+                    <label className="modern-form-label">📝 Responsibilities *</label>
+                    <textarea
+                      name="responsibilities"
+                      value={formData.responsibilities}
+                      onChange={handleChange}
+                      required
+                      rows={4}
+                      className="modern-form-textarea"
+                      placeholder="Describe the key responsibilities and duties..."
+                    />
+                  </div>
+
+                  <div className="modern-form-group">
+                    <label className="modern-form-label">👤 Physical Requirements</label>
+                    <textarea
+                      name="physicalRequirements"
+                      value={formData.physicalRequirements}
+                      onChange={handleChange}
+                      rows={3}
+                      className="modern-form-textarea"
+                      placeholder="Any physical requirements or limitations..."
+                    />
+                  </div>
+
+                  <div className="modern-form-row">
+                    <div className="modern-form-group">
+                      <label className="modern-form-label">👤 Point of Contact</label>
+                      <input
+                        name="pointOfContact"
+                        value={formData.pointOfContact}
+                        onChange={handleChange}
+                        className="modern-form-input"
+                        placeholder="Contact person name"
+                      />
+                    </div>
+
+                    <div className="modern-form-group">
+                      <label className="modern-form-label">📞 Contact Phone</label>
+                      <input
+                        type="tel"
+                        name="contactPhone"
+                        value={formData.contactPhone}
+                        onChange={handleChange}
+                        className="modern-form-input"
+                        placeholder="(555) 123-4567"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="modern-form-actions">
+                    <button type="submit" className="modern-submit-button">
+                      💾 {editingId ? "Save Changes" : "Create Role"}
+                    </button>
+                    <button type="button" onClick={closeForm} className="modern-cancel-button">
+                      ✕ Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
