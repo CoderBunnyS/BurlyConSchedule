@@ -289,7 +289,7 @@ export default function VolunteerShifts() {
                             </div>
                           )}
 
-                          {/* Contact Information */}
+                          {/* Contact Information
                           {(roleInfo.pointOfContact || roleInfo.contactPhone) && (
                             <div className="modern-detail-section">
                               <h4 className="modern-detail-title">
@@ -310,7 +310,7 @@ export default function VolunteerShifts() {
                                 )}
                               </div>
                             </div>
-                          )}
+                          )} */}
 
                           {/* Admin Notes if available */}
                           {roleShifts.some(shift => shift.notes) && (
