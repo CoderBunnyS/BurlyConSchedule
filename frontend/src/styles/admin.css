@@ -436,11 +436,13 @@
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
 }
 
-@media (max-width: 768px) {
+
+@media (max-width: 900px) {
   .modern-roles-grid {
     grid-template-columns: 1fr;
   }
 }
+
 
 /* Role Cards */
 .modern-role-card {
@@ -2209,5 +2211,113 @@
   .modern-alert-header,
   .modern-alert-content {
     padding: 1rem;
+  }
+}
+
+/* Roles Controls – responsive */
+.roles-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.roles-controls-left,
+.roles-controls-right {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.roles-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 220px;
+  flex: 1 1 260px; /* let items wrap cleanly */
+}
+
+.roles-control-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.roles-control-input,
+.roles-control-select {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #fff;
+  width: 100%;
+}
+
+.roles-control.checkbox {
+  min-width: unset;
+  flex: 0 0 auto;
+}
+
+.roles-control-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+/* Sort/clear buttons */
+.roles-sort-dir-btn,
+.roles-clear-btn {
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.roles-sort-dir-btn:hover,
+.roles-clear-btn:hover {
+  background: #eef2ff;
+}
+
+/* Tablet: split into two rows, full-width inputs */
+@media (max-width: 1024px) {
+  .roles-controls {
+    align-items: stretch;
+  }
+  .roles-controls-left,
+  .roles-controls-right {
+    width: 100%;
+  }
+  .roles-control {
+    min-width: min(320px, 100%);
+    flex: 1 1 300px;
+  }
+  .roles-controls-right {
+    justify-content: flex-start;
+  }
+}
+
+/* Phone: stack everything in a single column */
+@media (max-width: 640px) {
+  .roles-controls {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .roles-controls-left,
+  .roles-controls-right {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .roles-control {
+    min-width: 100%;
+    flex: 1 1 100%;
+  }
+  .roles-sort-dir-btn,
+  .roles-clear-btn {
+    width: 100%;
   }
 }
