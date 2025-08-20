@@ -1348,6 +1348,14 @@
   font-size: 0.75rem;
   color: var(--gray-600);
 }
+.modern-edit-field-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.modern-edit-field-row .modern-edit-field {
+  flex: 1;
+}
 
 /* No Shifts State */
 .modern-no-shifts {
