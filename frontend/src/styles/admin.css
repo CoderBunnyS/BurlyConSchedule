@@ -1348,14 +1348,7 @@
   font-size: 0.75rem;
   color: var(--gray-600);
 }
-.modern-edit-field-row {
-  display: flex;
-  gap: 1rem;
-}
 
-.modern-edit-field-row .modern-edit-field {
-  flex: 1;
-}
 
 /* No Shifts State */
 .modern-no-shifts {
@@ -1563,6 +1556,99 @@
 
 .modern-form-content {
   padding: 1.5rem;
+}
+
+/* Grid layout */
+.modern-edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Make the grid responsive on smaller screens */
+@media (max-width: 768px) {
+  .modern-edit-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Ensure form fields fill their containers */
+.modern-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.modern-edit-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.modern-edit-input {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  transition: border-color 0.15s;
+}
+
+.modern-edit-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.modern-edit-textarea {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  resize: vertical;
+  transition: border-color 0.15s;
+}
+
+.modern-edit-textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Edit form actions */
+.modern-edit-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.modern-save-button,
+.modern-cancel-edit-button {
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.15s;
+}
+
+.modern-save-button {
+  background: #10b981;
+  color: white;
+}
+
+.modern-save-button:hover {
+  background: #059669;
+  transform: scale(1.05);
+}
+
+.modern-cancel-edit-button {
+  background: #ef4444;
+  color: white;
+}
+
+.modern-cancel-edit-button:hover {
+  background: #dc2626;
+  transform: scale(1.05);
 }
 
 /* Filter Section */

@@ -96,7 +96,8 @@ export default function AdminShiftOverview() {
         date: localDateToUTC(editFormData.date)
       };
 
-      const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/shifts/${editingShift}`, {
+      // Use the correct endpoint - just /api/volunteer/{id}
+      const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/${editingShift}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -112,10 +113,13 @@ export default function AdminShiftOverview() {
         setEditingShift(null);
         setEditFormData({});
       } else {
-        console.error('Failed to update shift');
+        const errorText = await response.text();
+        console.error('Failed to update shift:', errorText);
+        alert('Failed to update shift. Please try again.');
       }
     } catch (error) {
       console.error('Error updating shift:', error);
+      alert('Error updating shift. Please check your connection.');
     }
   };
 
@@ -415,22 +419,23 @@ export default function AdminShiftOverview() {
                                         </div>
 
                                         <div className="modern-edit-fields">
-                                          <div className="modern-edit-field">
-                                            <label className="modern-edit-label">
-                                              📅 Date:
-                                            </label>
-                                            <input
-                                              type="date"
-                                              value={editFormData.date || ''}
-                                              onChange={(e) => setEditFormData(prev => ({
-                                                ...prev,
-                                                date: e.target.value
-                                              }))}
-                                              className="modern-edit-input"
-                                            />
-                                          </div>
+                                          <div className="modern-edit-grid">
+                                            <div className="modern-edit-field">
+                                              <label className="modern-edit-label">
+                                                📅 Date:
+                                              </label>
+                                              <input
+                                                type="date"
+                                                value={editFormData.date || ''}
+                                                onChange={(e) => setEditFormData(prev => ({
+                                                  ...prev,
+                                                  date: e.target.value
+                                                }))}
+                                                className="modern-edit-input"
+                                                required
+                                              />
+                                            </div>
 
-                                          <div className="modern-edit-field-row">
                                             <div className="modern-edit-field">
                                               <label className="modern-edit-label">
                                                 🕐 Start Time:
@@ -443,6 +448,7 @@ export default function AdminShiftOverview() {
                                                   startTime: e.target.value
                                                 }))}
                                                 className="modern-edit-input"
+                                                required
                                               />
                                             </div>
 
@@ -458,24 +464,26 @@ export default function AdminShiftOverview() {
                                                   endTime: e.target.value
                                                 }))}
                                                 className="modern-edit-input"
+                                                required
                                               />
                                             </div>
-                                          </div>
 
-                                          <div className="modern-edit-field">
-                                            <label className="modern-edit-label">
-                                              👥 Volunteers Needed:
-                                            </label>
-                                            <input
-                                              type="number"
-                                              min="1"
-                                              value={editFormData.volunteersNeeded || ''}
-                                              onChange={(e) => setEditFormData(prev => ({
-                                                ...prev,
-                                                volunteersNeeded: parseInt(e.target.value) || 1
-                                              }))}
-                                              className="modern-edit-input"
-                                            />
+                                            <div className="modern-edit-field">
+                                              <label className="modern-edit-label">
+                                                👥 Volunteers:
+                                              </label>
+                                              <input
+                                                type="number"
+                                                min="1"
+                                                value={editFormData.volunteersNeeded || ''}
+                                                onChange={(e) => setEditFormData(prev => ({
+                                                  ...prev,
+                                                  volunteersNeeded: parseInt(e.target.value) || 1
+                                                }))}
+                                                className="modern-edit-input"
+                                                required
+                                              />
+                                            </div>
                                           </div>
 
                                           <div className="modern-edit-field">
