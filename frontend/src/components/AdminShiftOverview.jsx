@@ -3,7 +3,7 @@ import Header from "./Header";
 import ShiftForm from "./ShiftForm";
 import "../styles/admin.css";
 import { hasRole } from "../utils/authUtils";
-import { getDatePortion, formatDateDisplay } from "../utils/dateUtils";  
+import { getDatePortion, formatDateDisplay, localDateToUTC } from "../utils/dateUtils";  // <-- ADD THIS IMPORT
 
 export default function AdminShiftOverview() {
   const [allShifts, setAllShifts] = useState([]);
@@ -35,18 +35,18 @@ export default function AdminShiftOverview() {
 
   const roles = Array.from(new Set(allShifts.map((s) => s.role))).sort();
 
-  // getDatePortion for consistent date extraction
+  // FIX: Use getDatePortion for consistent date extraction
   const availableDates = Array.from(
     new Set(
       allShifts
         .filter((s) => !!s.date)
-        .map((s) => getDatePortion(s.date))  
+        .map((s) => getDatePortion(s.date))  // <-- CHANGED: Use getDatePortion
     )
   ).sort();
 
-  // getDatePortion for consistent date comparison
+  // FIX: Use getDatePortion for consistent date comparison
   const filteredShifts = allShifts.filter((shift) => {
-    const normalizedShiftDate = getDatePortion(shift.date);  
+    const normalizedShiftDate = getDatePortion(shift.date);  // <-- CHANGED: Use getDatePortion
     const matchesDate = !selectedDate || normalizedShiftDate === selectedDate;
     return matchesDate;
   });
@@ -78,6 +78,9 @@ export default function AdminShiftOverview() {
   const handleEditShift = (shift) => {
     setEditingShift(shift._id);
     setEditFormData({
+      date: getDatePortion(shift.date),
+      startTime: shift.startTime,
+      endTime: shift.endTime,
       volunteersNeeded: shift.volunteersNeeded,
       notes: shift.notes || ''
     });
@@ -87,12 +90,18 @@ export default function AdminShiftOverview() {
     if (!editingShift) return;
 
     try {
+      // Prepare data with proper date conversion
+      const updateData = {
+        ...editFormData,
+        date: localDateToUTC(editFormData.date)
+      };
+
       const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/shifts/${editingShift}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(editFormData),
+        body: JSON.stringify(updateData),
       });
 
       if (response.ok) {
@@ -165,7 +174,7 @@ export default function AdminShiftOverview() {
     return filled === 0;
   }).length;
 
-  // Create date object for display
+  // FIX: Create date object more carefully for display
   const selectedDateLabel = selectedDate 
     ? (() => {
         const [year, month, day] = selectedDate.split('-').map(Number);
@@ -271,6 +280,7 @@ export default function AdminShiftOverview() {
               >
                 <option value="">All Dates</option>
                 {availableDates.map((date) => {
+                  // FIX: Create date object more carefully
                   const [year, month, day] = date.split('-').map(Number);
                   return (
                     <option key={date} value={date}>
@@ -380,7 +390,7 @@ export default function AdminShiftOverview() {
                                         <div className="modern-edit-header">
                                           <div className="modern-shift-time-info">
                                             <div className="modern-shift-date">
-                                              {formatDateDisplay(shift.date)}  
+                                              {formatDateDisplay(shift.date)}  {/* <-- CHANGED: Use formatDateDisplay */}
                                             </div>
                                             <div className="modern-shift-time">
                                               🕒 {formatTime(shift.startTime)} - {formatTime(shift.endTime)}
@@ -405,6 +415,53 @@ export default function AdminShiftOverview() {
                                         </div>
 
                                         <div className="modern-edit-fields">
+                                          <div className="modern-edit-field">
+                                            <label className="modern-edit-label">
+                                              📅 Date:
+                                            </label>
+                                            <input
+                                              type="date"
+                                              value={editFormData.date || ''}
+                                              onChange={(e) => setEditFormData(prev => ({
+                                                ...prev,
+                                                date: e.target.value
+                                              }))}
+                                              className="modern-edit-input"
+                                            />
+                                          </div>
+
+                                          <div className="modern-edit-field-row">
+                                            <div className="modern-edit-field">
+                                              <label className="modern-edit-label">
+                                                🕐 Start Time:
+                                              </label>
+                                              <input
+                                                type="time"
+                                                value={editFormData.startTime || ''}
+                                                onChange={(e) => setEditFormData(prev => ({
+                                                  ...prev,
+                                                  startTime: e.target.value
+                                                }))}
+                                                className="modern-edit-input"
+                                              />
+                                            </div>
+
+                                            <div className="modern-edit-field">
+                                              <label className="modern-edit-label">
+                                                🕑 End Time:
+                                              </label>
+                                              <input
+                                                type="time"
+                                                value={editFormData.endTime || ''}
+                                                onChange={(e) => setEditFormData(prev => ({
+                                                  ...prev,
+                                                  endTime: e.target.value
+                                                }))}
+                                                className="modern-edit-input"
+                                              />
+                                            </div>
+                                          </div>
+
                                           <div className="modern-edit-field">
                                             <label className="modern-edit-label">
                                               👥 Volunteers Needed:
@@ -444,7 +501,7 @@ export default function AdminShiftOverview() {
                                         <div className="modern-shift-header">
                                           <div className="modern-shift-time-info">
                                             <div className="modern-shift-date">
-                                              {formatDateDisplay(shift.date)}  
+                                              {formatDateDisplay(shift.date)}  {/* <-- CHANGED: Use formatDateDisplay */}
                                             </div>
                                             <div className="modern-shift-time">
                                               🕒 {formatTime(shift.startTime)} - {formatTime(shift.endTime)}
