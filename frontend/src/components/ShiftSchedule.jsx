@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { localDateToUTC, getDatePortion } from "../utils/dateUtils";
 import "../styles/shiftForm.css";
 
 export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftUpdated, onShiftDeleted }) {
   const [editingId, setEditingId] = useState(null);
   const [viewingVolunteers, setViewingVolunteers] = useState(null);
   const [editData, setEditData] = useState({
+    date: "",
     startTime: "",
     endTime: "",
     volunteersNeeded: 1,
@@ -15,10 +17,11 @@ export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftU
   const handleEditClick = (shift) => {
     setEditingId(shift._id);
     setEditData({
+      date: getDatePortion(shift.date), // Extract date in YYYY-MM-DD format
       startTime: shift.startTime,
       endTime: shift.endTime,
       volunteersNeeded: shift.volunteersNeeded,
-      taskDescription: shift.taskDescription,
+      taskDescription: shift.taskDescription || "",
       notes: shift.notes || ""
     });
   };
@@ -30,10 +33,16 @@ export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftU
 
   const handleEditSubmit = async (id) => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/shifts/${id}`, {
+      // Prepare the data with proper date conversion
+      const updateData = {
+        ...editData,
+        date: localDateToUTC(editData.date) // Convert date properly for backend
+      };
+
+      const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/shifts/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editData)
+        body: JSON.stringify(updateData)
       });
 
       if (res.ok) {
@@ -42,9 +51,11 @@ export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftU
         setEditingId(null);
       } else {
         console.error("Failed to update shift");
+        alert("Failed to update shift. Please try again.");
       }
     } catch (err) {
       console.error("Error updating shift:", err);
+      alert("Error updating shift. Please try again.");
     }
   };
 
@@ -53,7 +64,7 @@ export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftU
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/shifts/${id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/${id}`, {
         method: "DELETE"
       });
 
@@ -61,13 +72,42 @@ export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftU
         onShiftDeleted?.(id);
       } else {
         console.error("Failed to delete shift");
+        alert("Failed to delete shift. Please try again.");
       }
     } catch (err) {
       console.error("Error deleting shift:", err);
+      alert("Error deleting shift. Please try again.");
     }
   };
 
-  const sortedShifts = [...shifts].sort((a, b) => a.startTime.localeCompare(b.startTime));
+  const formatTime = (timeStr) => {
+    if (!timeStr) return "";
+    const [hour, min] = timeStr.split(":").map(Number);
+    const suffix = hour >= 12 ? "PM" : "AM";
+    const displayHour = ((hour + 11) % 12) + 1;
+    return `${displayHour}:${min.toString().padStart(2, "0")} ${suffix}`;
+  };
+
+  const formatDateForDisplay = (dateStr) => {
+    if (!dateStr) return "";
+    const datePart = getDatePortion(dateStr);
+    const [year, month, day] = datePart.split('-').map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString(undefined, {
+      weekday: "short",
+      month: "short",
+      day: "numeric"
+    });
+  };
+
+  const sortedShifts = [...shifts].sort((a, b) => {
+    // Sort by date first, then by start time
+    const dateCompare = a.date.localeCompare(b.date);
+    if (dateCompare !== 0) return dateCompare;
+    return a.startTime.localeCompare(b.startTime);
+  });
+
+  // Get today's date for min date validation
+  const today = new Date().toISOString().split('T')[0];
 
   return (
     <div className="shift-schedule">
@@ -80,32 +120,91 @@ export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftU
         return (
           <div key={shift._id} className="shift-card">
             <h3>{shift.role}</h3>
+            <p className="shift-date">{formatDateForDisplay(shift.date)}</p>
 
             {isEditing ? (
-              <>
-                <label>Start Time:</label>
-                <input name="startTime" value={editData.startTime} onChange={handleEditChange} />
+              <div className="shift-edit-form">
+                <div className="form-group">
+                  <label>Date:</label>
+                  <input 
+                    type="date" 
+                    name="date" 
+                    value={editData.date} 
+                    onChange={handleEditChange}
+                    min={today}
+                    required
+                  />
+                </div>
 
-                <label>End Time:</label>
-                <input name="endTime" value={editData.endTime} onChange={handleEditChange} />
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Start Time:</label>
+                    <input 
+                      type="time" 
+                      name="startTime" 
+                      value={editData.startTime} 
+                      onChange={handleEditChange}
+                      required
+                    />
+                  </div>
 
-                <label>Volunteers Needed:</label>
-                <input type="number" name="volunteersNeeded" value={editData.volunteersNeeded} onChange={handleEditChange} />
+                  <div className="form-group">
+                    <label>End Time:</label>
+                    <input 
+                      type="time" 
+                      name="endTime" 
+                      value={editData.endTime} 
+                      onChange={handleEditChange}
+                      required
+                    />
+                  </div>
+                </div>
 
-                <label>Task Description:</label>
-                <textarea name="taskDescription" value={editData.taskDescription} onChange={handleEditChange} />
+                <div className="form-group">
+                  <label>Volunteers Needed:</label>
+                  <input 
+                    type="number" 
+                    name="volunteersNeeded" 
+                    value={editData.volunteersNeeded} 
+                    onChange={handleEditChange}
+                    min="1"
+                    required
+                  />
+                </div>
 
-                <label>Notes (Admin only):</label>
-                <textarea name="notes" value={editData.notes} onChange={handleEditChange} />
+                <div className="form-group">
+                  <label>Task Description:</label>
+                  <textarea 
+                    name="taskDescription" 
+                    value={editData.taskDescription} 
+                    onChange={handleEditChange}
+                    rows="3"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Admin Notes:</label>
+                  <textarea 
+                    name="notes" 
+                    value={editData.notes} 
+                    onChange={handleEditChange}
+                    rows="2"
+                    placeholder="Internal notes (not visible to volunteers)"
+                  />
+                </div>
 
                 <div className="shift-card-buttons">
-                  <button type="button" onClick={() => handleEditSubmit(shift._id)}>💾 Save</button>
-                  <button type="button" onClick={() => setEditingId(null)}>❌ Cancel</button>
+                  <button type="button" className="save-button" onClick={() => handleEditSubmit(shift._id)}>
+                    💾 Save Changes
+                  </button>
+                  <button type="button" className="cancel-button" onClick={() => setEditingId(null)}>
+                    ❌ Cancel
+                  </button>
                 </div>
-              </>
+              </div>
             ) : (
               <>
-                <p><strong>Time:</strong> {shift.startTime}–{shift.endTime}</p>
+                <p><strong>Time:</strong> {formatTime(shift.startTime)} – {formatTime(shift.endTime)}</p>
                 <p><strong>Needed:</strong> {shift.volunteersNeeded}</p>
                 <p><strong>Signed Up:</strong> {filled}</p>
                 <p><strong>Status:</strong> 
@@ -116,15 +215,22 @@ export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftU
                   )}
                 </p>
 
+                {shift.taskDescription && (
+                  <p><strong>Description:</strong> {shift.taskDescription}</p>
+                )}
+
                 {viewMode === "admin" && (
                   <>
-                    <p><strong>Description:</strong> {shift.taskDescription}</p>
-                    {shift.notes && <p><strong>Notes:</strong> {shift.notes}</p>}
+                    {shift.notes && (
+                      <p className="admin-notes"><strong>Notes:</strong> {shift.notes}</p>
+                    )}
 
                     <div className="shift-card-buttons">
                       <button type="button" onClick={() => handleEditClick(shift)}>✏️ Edit</button>
-                      <button type="button" onClick={() => setViewingVolunteers(shift)}>👥 View</button>
-                      <button type="button" onClick={() => handleDelete(shift._id)}>❌ Delete</button>
+                      <button type="button" onClick={() => setViewingVolunteers(shift)}>👥 View Volunteers</button>
+                      <button type="button" className="delete-button" onClick={() => handleDelete(shift._id)}>
+                        🗑️ Delete
+                      </button>
                     </div>
                   </>
                 )}
@@ -139,16 +245,21 @@ export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftU
         <div className="modal-backdrop" onClick={() => setViewingVolunteers(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Volunteers for {viewingVolunteers.role}</h2>
+            <p className="modal-shift-info">
+              {formatDateForDisplay(viewingVolunteers.date)} • {formatTime(viewingVolunteers.startTime)} – {formatTime(viewingVolunteers.endTime)}
+            </p>
             {viewingVolunteers.volunteersRegistered?.length > 0 ? (
-              <ul>
-                {viewingVolunteers.volunteersRegistered.map((v) => (
-                  <li key={v}>{v}</li>
+              <ul className="volunteer-list">
+                {viewingVolunteers.volunteersRegistered.map((v, index) => (
+                  <li key={index}>{v}</li>
                 ))}
               </ul>
             ) : (
-              <p>No volunteers signed up yet.</p>
+              <p className="no-volunteers">No volunteers signed up yet.</p>
             )}
-            <button type="button" onClick={() => setViewingVolunteers(null)}>Close</button>
+            <button type="button" className="modal-close-button" onClick={() => setViewingVolunteers(null)}>
+              Close
+            </button>
           </div>
         </div>
       )}
