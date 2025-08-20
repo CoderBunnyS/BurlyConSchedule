@@ -3,6 +3,7 @@ import Header from "./Header";
 import ShiftForm from "./ShiftForm";
 import "../styles/admin.css";
 import { hasRole } from "../utils/authUtils";
+import { getDatePortion, formatDateDisplay } from "../utils/dateUtils";  
 
 export default function AdminShiftOverview() {
   const [allShifts, setAllShifts] = useState([]);
@@ -34,16 +35,18 @@ export default function AdminShiftOverview() {
 
   const roles = Array.from(new Set(allShifts.map((s) => s.role))).sort();
 
+  // getDatePortion for consistent date extraction
   const availableDates = Array.from(
     new Set(
       allShifts
         .filter((s) => !!s.date)
-        .map((s) => s.date.split("T")[0])
+        .map((s) => getDatePortion(s.date))  
     )
   ).sort();
 
+  // getDatePortion for consistent date comparison
   const filteredShifts = allShifts.filter((shift) => {
-    const normalizedShiftDate = shift.date.split("T")[0];
+    const normalizedShiftDate = getDatePortion(shift.date);  
     const matchesDate = !selectedDate || normalizedShiftDate === selectedDate;
     return matchesDate;
   });
@@ -162,12 +165,16 @@ export default function AdminShiftOverview() {
     return filled === 0;
   }).length;
 
+  // Create date object for display
   const selectedDateLabel = selectedDate 
-    ? new Date(selectedDate).toLocaleDateString(undefined, {
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-      })
+    ? (() => {
+        const [year, month, day] = selectedDate.split('-').map(Number);
+        return new Date(year, month - 1, day).toLocaleDateString(undefined, {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+        });
+      })()
     : "All Dates";
 
   return (
@@ -263,15 +270,18 @@ export default function AdminShiftOverview() {
                 className="modern-date-select"
               >
                 <option value="">All Dates</option>
-                {availableDates.map((date) => (
-                  <option key={date} value={date}>
-                    {new Date(date).toLocaleDateString(undefined, {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </option>
-                ))}
+                {availableDates.map((date) => {
+                  const [year, month, day] = date.split('-').map(Number);
+                  return (
+                    <option key={date} value={date}>
+                      {new Date(year, month - 1, day).toLocaleDateString(undefined, {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </option>
+                  );
+                })}
               </select>
               
               <button
@@ -370,11 +380,7 @@ export default function AdminShiftOverview() {
                                         <div className="modern-edit-header">
                                           <div className="modern-shift-time-info">
                                             <div className="modern-shift-date">
-                                              {new Date(shift.date).toLocaleDateString(undefined, {
-                                                weekday: "short",
-                                                month: "short",
-                                                day: "numeric",
-                                              })}
+                                              {formatDateDisplay(shift.date)}  
                                             </div>
                                             <div className="modern-shift-time">
                                               🕒 {formatTime(shift.startTime)} - {formatTime(shift.endTime)}
@@ -438,11 +444,7 @@ export default function AdminShiftOverview() {
                                         <div className="modern-shift-header">
                                           <div className="modern-shift-time-info">
                                             <div className="modern-shift-date">
-                                              {new Date(shift.date).toLocaleDateString(undefined, {
-                                                weekday: "short",
-                                                month: "short",
-                                                day: "numeric",
-                                              })}
+                                              {formatDateDisplay(shift.date)}  
                                             </div>
                                             <div className="modern-shift-time">
                                               🕒 {formatTime(shift.startTime)} - {formatTime(shift.endTime)}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { localDateToUTC } from '../utils/dateUtils';
 
 export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
   const [roles, setRoles] = useState([]);
@@ -52,6 +53,7 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
 
     const payload = {
       ...formData,
+      date: localDateToUTC(formData.date),
       startTime: formatTime(formData.startTime),
       endTime: formatTime(formData.endTime)
     };
