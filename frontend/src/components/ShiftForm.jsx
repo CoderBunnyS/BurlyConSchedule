@@ -4,8 +4,8 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
   const [roles, setRoles] = useState([]);
   const [formData, setFormData] = useState({
     date: "2025-11-05",
-    startTime: "",
-    endTime: "",
+    startTime: "",   // will be "HH:MM"
+    endTime: "",     // will be "HH:MM"
     role: "",
     volunteersNeeded: 1,
     notes: ""
@@ -23,14 +23,9 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const formatTime = (milStr) => {
-    if (!/^\d{4}$/.test(milStr)) return milStr;
-    const hour = milStr.slice(0, 2);
-    const min = milStr.slice(2);
-    return `${hour}:${min}`;
-  };
-
+  // "HH:MM" -> minutes since midnight
   const toMinutes = (timeStr) => {
+    if (!timeStr) return 0;
     const [h, m] = timeStr.split(":").map(Number);
     return h * 60 + m;
   };
@@ -38,7 +33,6 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
   const hasConflict = (newShift, shifts) => {
     const newStart = toMinutes(newShift.startTime);
     const newEnd = toMinutes(newShift.endTime);
-
     return shifts.some((shift) => {
       if (shift.date !== newShift.date) return false;
       const start = toMinutes(shift.startTime);
@@ -50,11 +44,12 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Send the time picker values as-is: "HH:MM"
     const payload = {
       ...formData,
       date: formData.date,
-      startTime: formatTime(formData.startTime),
-      endTime: formatTime(formData.endTime)
+      startTime: formData.startTime,
+      endTime: formData.endTime
     };
 
     if (hasConflict(payload, existingShifts)) {
@@ -104,25 +99,25 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
         <option value="2025-11-09">Sunday 11/9</option>
       </select>
 
-      <label htmlFor="startTime">Start Time (e.g. 0700):</label>
+      <label htmlFor="startTime">Start Time:</label>
       <input
         id="startTime"
-        type="text"
+        type="time"
         name="startTime"
         value={formData.startTime}
         onChange={handleChange}
-        placeholder="e.g. 0700"
+        step="60"   // minutes precision; adjust if you want 15-min: 900
         required
       />
 
-      <label htmlFor="endTime">End Time (e.g. 1100):</label>
+      <label htmlFor="endTime">End Time:</label>
       <input
         id="endTime"
-        type="text"
+        type="time"
         name="endTime"
         value={formData.endTime}
         onChange={handleChange}
-        placeholder="e.g. 1100"
+        step="60"
         required
       />
 
