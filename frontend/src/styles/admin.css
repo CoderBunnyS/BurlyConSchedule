@@ -404,6 +404,44 @@
   background: #eef2ff;
 }
 
+/* default clamp to 3 lines */
+.clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3; /* number of lines */
+  overflow: hidden;
+}
+
+/* no clamp when expanded */
+.clamp-off {
+  display: block;
+}
+
+/* header of each expandable section: title + button aligned */
+.modern-card-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* “Read more / Show less” button styling */
+.modern-readmore-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+  padding: 0;
+}
+
+/* Hover and focus refinements */
+.modern-readmore-btn:hover,
+.modern-readmore-btn:focus {
+  text-decoration-thickness: 2px;
+  outline: none;
+}
+
 
 /* Empty State */
 .modern-empty-state {
@@ -550,16 +588,7 @@
   margin: 0;
 }
 
-.modern-card-text {
-  font-size: 0.875rem;
-  color: #4b5563;
-  line-height: 1.5;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+
 
 .modern-card-contact {
   padding-top: 1rem;
@@ -641,9 +670,6 @@
     color: #e5e7eb;
   }
 
-  .modern-card-text {
-    color: #d1d5db;
-  }
 
   .modern-contact-phone {
     color: #ec4899;
