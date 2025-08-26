@@ -8,7 +8,7 @@ export default function ShiftCard({ shift }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: "6811617f46ed53b3155162c3" // TEMP: replace with real userId when auth is in place
+          userId: "6811617f46ed53b3155162c3" // TEMP
         }),
       });
 
