@@ -9,7 +9,7 @@ const {
 
 router.get("/", getRoles);
 router.post("/", createRole);
-router.patch("/:id", updateRole); // ✅ NEW
-router.delete("/:id", deleteRole); // ✅ NEW
+router.patch("/:id", updateRole); 
+router.delete("/:id", deleteRole); 
 
 module.exports = router;

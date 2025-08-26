@@ -44,9 +44,9 @@ export default function AdminShiftOverview() {
     )
   ).sort();
 
-  // FIX: Use getDatePortion for consistent date comparison
+  // getDatePortion for date comparison
   const filteredShifts = allShifts.filter((shift) => {
-    const normalizedShiftDate = getDatePortion(shift.date);  // <-- CHANGED: Use getDatePortion
+    const normalizedShiftDate = getDatePortion(shift.date);  
     const matchesDate = !selectedDate || normalizedShiftDate === selectedDate;
     return matchesDate;
   });
