@@ -7,8 +7,7 @@ const {
   cancelShift,
   getUserShifts,
   createShift,
-  deleteShift,
-  updateShift
+  deleteShift
 } = require("../controllers/volunteerController"); // still using volunteerController
 
 // Specific route first to avoid conflict with "/:id"
@@ -24,7 +23,6 @@ router.post("/:id/cancel", cancelShift);
 
 // Admin Actions
 router.post("/", createShift);
-router.patch("/:id", updateShift);
 router.delete("/:id", deleteShift);
 
 module.exports = router;
