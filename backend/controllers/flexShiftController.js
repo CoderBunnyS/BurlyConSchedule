@@ -73,6 +73,27 @@ const createFlexShift = async (req, res) => {
   }
 };
 
+// PATCH /api/volunteer/:id admin only
+const updateFlexShift = async (req, res) => {
+  try {
+    const updated = await FlexibleShift.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true, runValidators: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Shift not found" });
+    }
+
+    res.json(updated);
+  } catch (err) {
+    console.error("updateFlexShift error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 // POST /api/volunteer/:id/signup
 const signUpForFlexShift = async (req, res) => {
   const { userId } = req.body;
@@ -170,5 +191,6 @@ module.exports = {
   createFlexShift,
   signUpForFlexShift,
   cancelFlexShift,
-  deleteFlexShift
+  deleteFlexShift,
+  updateFlexShift
 };

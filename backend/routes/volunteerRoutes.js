@@ -10,7 +10,8 @@ const {
   createFlexShift,
   signUpForFlexShift,
   cancelFlexShift,
-  deleteFlexShift
+  deleteFlexShift,
+  updateFlexShift
 } = require("../controllers/flexShiftController");
 
 // Specific route first
@@ -28,6 +29,7 @@ router.post("/:id/cancel", cancelFlexShift);
 
 // Admin Actions
 router.post("/", createFlexShift);
+router.patch("/:id", updateFlexShift);
 router.delete("/:id", deleteFlexShift);
 
 router.post("/seed", async (req, res) => {
