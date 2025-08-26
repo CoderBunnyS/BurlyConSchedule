@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useId } from "react";
 import Header from "./Header";
 import "../styles/admin.css";
 import "../styles/shiftForm.css";
@@ -16,11 +16,11 @@ export default function AdminRoles() {
     contactPhone: ""
   });
 
-  // search/sort/filter state (location filter removed)
+  // search/sort/filter state 
   const [searchRaw, setSearchRaw] = useState("");
-  const [search, setSearch] = useState(""); // debounced
-  const [sortBy, setSortBy] = useState("name"); // "name" | "location"
-  const [sortDir, setSortDir] = useState("asc"); // "asc" | "desc"
+  const [search, setSearch] = useState(""); 
+  const [sortBy, setSortBy] = useState("name"); 
+  const [sortDir, setSortDir] = useState("asc"); 
   const [hasContact, setHasContact] = useState(false);
   const [hasPhysicalReqs, setHasPhysicalReqs] = useState(false);
 
@@ -110,7 +110,7 @@ export default function AdminRoles() {
     }
   };
 
-  // filtered + sorted roles (no locationFilter anymore)
+  // filtered + sorted roles
   const filteredSortedRoles = useMemo(() => {
     const q = search;
     const by = sortBy;
@@ -183,7 +183,7 @@ export default function AdminRoles() {
           </button>
         </div>
 
-        {/* Controls row (location dropdown removed) */}
+        {/* Controls row */}
         <div className="roles-controls">
           <div className="roles-controls-left">
             <div className="roles-control">
@@ -298,16 +298,14 @@ export default function AdminRoles() {
 
                   {/* Card Content */}
                   <div className="modern-card-content">
-                    <div className="modern-card-section">
-                      <h4 className="modern-card-section-title">📝 Responsibilities</h4>
+                    <Expandable title="📝 Responsibilities">
                       <p className="modern-card-text">{role.responsibilities}</p>
-                    </div>
+                    </Expandable>
 
                     {role.physicalRequirements && (
-                      <div className="modern-card-section">
-                        <h4 className="modern-card-section-title">👤 Physical Requirements</h4>
+                      <Expandable title="👤 Physical Requirements">
                         <p className="modern-card-text">{role.physicalRequirements}</p>
-                      </div>
+                      </Expandable>
                     )}
 
                     {(role.pointOfContact || role.contactPhone) && (
@@ -434,6 +432,34 @@ export default function AdminRoles() {
           </div>
         )}
 
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Expandable section */
+function Expandable({ title, children, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const id = useId();
+
+  return (
+    <div className="modern-card-section">
+      <div className="modern-card-section-header">
+        <h4 className="modern-card-section-title">{title}</h4>
+        <button
+          type="button"
+          className="modern-readmore-btn"
+          aria-expanded={open}
+          aria-controls={id}
+          onClick={() => setOpen(o => !o)}
+        >
+          {open ? "Show less" : "Read more"}
+        </button>
+      </div>
+
+      <div id={id} className={open ? "clamp-off" : "clamp-3"}>
+        {children}
       </div>
     </div>
   );
