@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { localDateToUTC, getDatePortion } from "../utils/dateUtils";
+import { getDatePortion } from "../utils/dateUtils";
 import "../styles/shiftForm.css";
 
 export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftUpdated, onShiftDeleted }) {
@@ -33,10 +33,9 @@ export default function ShiftSchedule({ shifts, viewMode = "volunteer", onShiftU
 
   const handleEditSubmit = async (id) => {
     try {
-      // Prepare the data with proper date conversion
       const updateData = {
         ...editData,
-        date: localDateToUTC(editData.date) // Convert date properly for backend
+        date: editData.date
       };
 
       const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/shifts/${id}`, {

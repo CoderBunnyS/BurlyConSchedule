@@ -3,7 +3,7 @@ import Header from "./Header";
 import ShiftForm from "./ShiftForm";
 import "../styles/admin.css";
 import { hasRole } from "../utils/authUtils";
-import { getDatePortion, formatDateDisplay, localDateToUTC } from "../utils/dateUtils";  
+import { getDatePortion, formatDateDisplay } from "../utils/dateUtils";  
 
 export default function AdminShiftOverview() {
   const [allShifts, setAllShifts] = useState([]);
@@ -93,7 +93,7 @@ export default function AdminShiftOverview() {
       // Prepare data with proper date conversion
       const updateData = {
         ...editFormData,
-        date: localDateToUTC(editFormData.date)
+        date: editFormData.date
       };
 
       // Use the correct endpoint - just /api/volunteer/{id}
