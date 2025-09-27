@@ -180,11 +180,11 @@ export default function VolunteerShifts() {
               rel="noopener noreferrer"
               className="modern-schedule-link"
             >
-              <img 
+              {/* <img 
                 src={scheduleImages[selectedDate]} 
                 alt={`Schedule for ${selectedDateOption?.day}`}
                 className="modern-schedule-img"
-              />
+              /> */}
               <div className="modern-schedule-overlay">
                 <span className="modern-schedule-text">🔍 Click to view full schedule</span>
               </div>

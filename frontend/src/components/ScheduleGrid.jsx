@@ -1,3 +1,4 @@
+
 import React from "react";
 import "../styles/scheduleGrid.css";
 
@@ -5,6 +6,14 @@ export default function ScheduleGrid({ shifts, selectedDate, selectedRole }) {
   if (!Array.isArray(shifts)) {
     return <div className="schedule-grid-error">⚠️ Invalid shift data.</div>;
   }
+
+  // Build a local Date from "YYYY-MM-DD" and "HH:mm" safely
+  const toLocalDate = (ymd, hhmm = "00:00") => {
+    if (!ymd) return null;
+    const [y, m, d] = ymd.split("-").map(Number);
+    const [h, min] = (hhmm || "00:00").split(":").map(Number);
+    return new Date(y, m - 1, d, h, min);
+  };
 
   const filteredShifts = shifts.filter((shift) => {
     const matchesDate = !selectedDate || shift.date === selectedDate;
@@ -15,10 +24,11 @@ export default function ScheduleGrid({ shifts, selectedDate, selectedRole }) {
   const shiftsByHour = {};
 
   filteredShifts.forEach((shift) => {
-    if (!shift.date || !shift.startTime) return;
-    const key = `${shift.date}T${shift.startTime}`;
-    const parsed = new Date(key);
-    if (isNaN(parsed)) return;
+    if (!shift?.date || !shift?.startTime) return;
+
+    // Use local-time construction (avoid "YYYY-MM-DDTHH:mm" → UTC parsing)
+    const parsed = toLocalDate(shift.date, shift.startTime);
+    if (!(parsed instanceof Date) || isNaN(parsed)) return;
 
     const hourLabel = parsed.toLocaleTimeString([], {
       hour: "2-digit",
@@ -29,12 +39,12 @@ export default function ScheduleGrid({ shifts, selectedDate, selectedRole }) {
     shiftsByHour[hourLabel].push(shift);
   });
 
-  const hours = Array.from({ length: 24 }, (_, i) => {
-    return new Date(0, 0, 0, i).toLocaleTimeString([], {
+  const hours = Array.from({ length: 24 }, (_, i) =>
+    new Date(0, 0, 0, i).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
-    });
-  });
+    })
+  );
 
   return (
     <div className="schedule-grid-container">
@@ -77,4 +87,5 @@ export default function ScheduleGrid({ shifts, selectedDate, selectedRole }) {
       </div>
     </div>
   );
-} 
+}
+
