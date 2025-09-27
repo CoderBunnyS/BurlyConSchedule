@@ -12,51 +12,24 @@ export default function UserProfile() {
   // Build URLs safely (handles /api prefix from .env)
   const API = (p) => `${process.env.REACT_APP_API_BASE || ""}${p}`;
 
-  // Centralized fetch so list + totalHours always stay in sync
-  const refreshProfile = React.useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(API(`/api/volunteer/user/${userId}`));
-      const data = await res.json();
-      setVolunteerShifts(data.shifts || []);
-      setTotalHours(data.totalHours || 0);
-    } catch (err) {
-      console.error("Error fetching volunteer info:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []); // userId is defined below; we'll call refreshProfile after userId is set
-
-  // Check if we navigated from login
-  useEffect(() => {
-    const justLoggedIn = location.state?.justLoggedIn;
-    console.log("🔁 Navigated from login?", justLoggedIn);
-  }, [location]);
-
   // Get userId safely from JWT
   let userId = null;
   try {
     const token = localStorage.getItem("access_token");
     if (token) {
       const payload = JSON.parse(atob(token.split(".")[1]));
-      userId = payload.sub; // FusionAuth user id (UUID)
+      userId = payload.sub;
     }
   } catch (error) {
     console.error("Error parsing JWT:", error);
   }
 
-  // Get user info
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const userName =
-    user?.given_name || user?.email?.split("@")[0] || "Volunteer";
-
-  // Fetch user shifts (initial + whenever userId changes)
+  // Fetch user shifts when userId changes
   useEffect(() => {
     if (!userId) {
       setLoading(false);
       return;
     }
-    // call with current userId
     (async () => {
       try {
         setLoading(true);
@@ -70,7 +43,6 @@ export default function UserProfile() {
         setLoading(false);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const handleCancelShift = async (shiftId) => {
@@ -80,33 +52,21 @@ export default function UserProfile() {
     if (!confirmed) return;
 
     try {
-      const response = await fetch(
-        API(`/api/volunteer/${shiftId}/cancel`),
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId })
-        }
-      );
+      const response = await fetch(API(`/api/volunteer/${shiftId}/cancel`), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
 
       if (response.ok) {
-        // Re-fetch to keep both the list and totalHours in sync
-        await (async () => {
-          try {
-            setLoading(true);
-            const res = await fetch(API(`/api/volunteer/user/${userId}`));
-            const data = await res.json();
-            setVolunteerShifts(data.shifts || []);
-            setTotalHours(data.totalHours || 0);
-          } catch (err) {
-            console.error("Error refreshing after cancel:", err);
-          } finally {
-            setLoading(false);
-          }
-        })();
+        // Refresh
+        const res2 = await fetch(API(`/api/volunteer/user/${userId}`));
+        const data2 = await res2.json();
+        setVolunteerShifts(data2.shifts || []);
+        setTotalHours(data2.totalHours || 0);
       } else {
-        const error = await response.json();
-        console.error("Cancel failed:", error.message);
+        const err = await response.json();
+        console.error("Cancel failed:", err.message);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -116,26 +76,23 @@ export default function UserProfile() {
   function formatTime(timeStr) {
     if (!timeStr || typeof timeStr !== "string" || !timeStr.includes(":"))
       return "Invalid time";
-    const [hour, minute] = timeStr.split(":");
-    const h = parseInt(hour, 10);
+    const [hour, minute] = timeStr.split(":").map(Number);
+    const h = hour % 24;
     const ampm = h >= 12 ? "PM" : "AM";
     const adjustedHour = h % 12 || 12;
-    return `${adjustedHour}:${minute} ${ampm}`;
+    return `${adjustedHour}:${String(minute).padStart(2, "0")} ${ampm}`;
   }
 
-  const getDiscountCode = () => {
-    if (totalHours >= 16) return "100VOLUNTEER2025";
-    if (totalHours >= 8) return "50VOLUNTEER2025";
-    return null;
-  };
+  function formatLocalDateYMD(ymd) {
+    if (!ymd) return "";
+    const [y, m, d] = ymd.split("-").map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString(undefined, {
+      weekday: "long",
+      month: "short",
+      day: "numeric",
+    });
+  }
 
-  const getDiscountType = () => {
-    if (totalHours >= 8) return "full";
-    if (totalHours >= 4) return "half";
-    return null;
-  };
-
-  // Group shifts by role and date
   const grouped = volunteerShifts.reduce((acc, shift) => {
     const key = `${shift.role}|${shift.date}`;
     if (!acc[key]) acc[key] = [];
@@ -143,17 +100,20 @@ export default function UserProfile() {
     return acc;
   }, {});
 
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userName =
+    user?.given_name || user?.email?.split("@")[0] || "Volunteer";
+
   return (
     <div className="modern-page-container">
       <Header />
 
-      {/* Hero Section */}
       <div className="modern-profile-hero">
         <div className="modern-profile-hero-content">
           <div className="modern-profile-avatar">
             {userName.charAt(0).toUpperCase()}
           </div>
-        <div className="modern-profile-info">
+          <div className="modern-profile-info">
             <h1 className="modern-profile-title">
               Welcome back, {userName}!
             </h1>
@@ -165,7 +125,6 @@ export default function UserProfile() {
       </div>
 
       <div className="modern-content-wrapper">
-        {/* Stats Section */}
         <div className="modern-stats-section">
           <div className="modern-stats-grid">
             <div className="modern-stat-card hours">
@@ -175,9 +134,8 @@ export default function UserProfile() {
                 <div className="modern-stat-label">Hours Volunteered</div>
               </div>
             </div>
-
             <div className="modern-stat-card shifts">
-              <div className="modern-stat-icon">📅</div>
+              <div class="modern-stat-icon">📅</div>
               <div className="modern-stat-content">
                 <div className="modern-stat-number">
                   {volunteerShifts.length}
@@ -185,7 +143,6 @@ export default function UserProfile() {
                 <div className="modern-stat-label">Active Shifts</div>
               </div>
             </div>
-
             <div className="modern-stat-card status">
               <div className="modern-stat-icon">⭐</div>
               <div className="modern-stat-content">
@@ -202,41 +159,6 @@ export default function UserProfile() {
           </div>
         </div>
 
-{/* Discount Alert */}
-{totalHours >= 8 && (
-  <div className={`modern-discount-alert ${getDiscountType()}`}>
-    <div className="modern-discount-icon">
-      {totalHours >= 16 ? "🎉" : "✨"}
-    </div>
-    <div className="modern-discount-content">
-      <h3 className="modern-discount-title">
-        {totalHours >= 16
-          ? "FREE FULL PASS EARNED!"
-          : "HALF PRICE PASS EARNED!"}
-      </h3>
-      <p className="modern-discount-description">
-        Amazing work! You've earned a{" "}
-        {totalHours >= 16 ? "free full pass" : "half price pass"} to
-        BurlyCon.
-      </p>
-      <div className="modern-discount-code">
-        <span className="modern-code-label">Your discount code:</span>
-        <span className="modern-code-value">{getDiscountCode()}</span>
-        <button
-          className="modern-copy-button"
-          onClick={() =>
-            navigator.clipboard.writeText(getDiscountCode())
-          }
-          title="Copy code"
-        >
-          📋
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-        {/* Shifts Section */}
         <div className="modern-shifts-section">
           <div className="modern-section-header">
             <h2 className="modern-section-title">My Volunteer Shifts</h2>
@@ -279,11 +201,7 @@ export default function UserProfile() {
                       <div className="modern-shift-role">
                         <h3 className="modern-shift-title">{role}</h3>
                         <p className="modern-shift-date">
-                          {new Date(date).toLocaleDateString(undefined, {
-                            weekday: "long",
-                            month: "short",
-                            day: "numeric"
-                          })}
+                          {formatLocalDateYMD(date)}
                         </p>
                       </div>
                       <div className="modern-shift-badge">
