@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-const authenticateUser = require("../middleware/authenticateUser");  // your auth middleware
+const authenticateUser = require("../middleware/authMiddleware");  // your auth middleware
 const {
   getShifts,
   getShiftById,
