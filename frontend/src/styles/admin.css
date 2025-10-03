@@ -588,6 +588,8 @@
   .modern-shifts-list {
     grid-template-columns: 1fr;
   }
+
+}
   /* Schedule Image Section */
 .modern-schedule-section {
   margin-bottom: 2rem;
@@ -673,5 +675,4 @@
     transform: translateY(0);
     opacity: 0.95;
   }
-}
 }
