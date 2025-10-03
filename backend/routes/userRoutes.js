@@ -10,7 +10,7 @@ const {
 const User = require("../models/User");
 
 // auth middleware sets req.user (+roles)
-const authenticateUser = require("../middleware/authenticateUser");
+const authenticateUser = require("../middleware/authMiddleware");
 
 // minimal role gate (server-side authZ)
 const requireLeadOrAdmin = (req, res, next) => {

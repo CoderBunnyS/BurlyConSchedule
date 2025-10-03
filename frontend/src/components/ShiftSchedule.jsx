@@ -96,7 +96,6 @@ export default function AdminShiftOverview() {
         date: editFormData.date
       };
 
-      // Use the correct endpoint - just /api/volunteer/{id}
       const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/${editingShift}`, {
         method: 'PATCH',
         headers: {
