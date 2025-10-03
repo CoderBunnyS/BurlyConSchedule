@@ -19,13 +19,13 @@ export default function VolunteerShifts() {
     { label: "Sun 11/9", value: "2025-11-09", day: "Sunday" }
   ];
 
-  const scheduleImages = {
-    "2025-11-05": "https://i.ibb.co/spkQFTwf/Thursday.png",
-    "2025-11-06": "https://burlycon.org/wp-content/uploads/2024/10/friday-2024.png",
-    "2025-11-07": "https://burlycon.org/wp-content/uploads/2024/10/saturday-2024.png",
-    "2025-11-08": "https://burlycon.org/wp-content/uploads/2024/10/sunday-2024.png",
-    "2025-11-09": "https://burlycon.org/wp-content/uploads/2024/10/sunday-2024.png"
-  };
+const scheduleImages = {
+  "2025-11-05": "https://i.ibb.co/spkQFTwf/Thursday.png",
+  "2025-11-06": "https://i.ibb.co/vCnLYxqb/Screenshot-2025-10-03-at-4-21-21-PM.png",
+  "2025-11-07": "https://i.ibb.co/pBjPM5yc/Screenshot-2025-10-03-at-4-22-51-PM.png",
+  "2025-11-08": "https://i.ibb.co/QvtCJ62x/Screenshot-2025-10-03-at-4-24-31-PM.png",
+  "2025-11-09": "https://i.ibb.co/7LGyBmJ/Screenshot-2025-10-03-at-4-25-31-PM.png"
+};
 
   useEffect(() => {
     const id = getUserId();
@@ -180,11 +180,11 @@ export default function VolunteerShifts() {
               rel="noopener noreferrer"
               className="modern-schedule-link"
             >
-              {/* <img 
+              <img 
                 src={scheduleImages[selectedDate]} 
                 alt={`Schedule for ${selectedDateOption?.day}`}
                 className="modern-schedule-img"
-              /> */}
+              />
               <div className="modern-schedule-overlay">
                 <span className="modern-schedule-text">🔍 Click to view full schedule</span>
               </div>
