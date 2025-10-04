@@ -550,8 +550,9 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex: 1;
+  flex: 0 1 auto; /* Changed from flex: 1 */
   min-width: 0;
+  max-width: 200px; 
 }
 
 .modern-time-icon {
@@ -563,10 +564,13 @@
   font-weight: 500;
   color: var(--gray-700);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; 
 }
 
 .modern-shift-availability {
   flex-shrink: 0;
+  margin-left: auto; 
 }
 
 .modern-availability-badge {
@@ -599,6 +603,7 @@
 
 .modern-shift-action {
   flex-shrink: 0;
+  margin-left: 0.5rem; 
 }
 
 .modern-login-prompt {
