@@ -533,13 +533,11 @@
 .modern-shift-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 1rem;
   padding: 1rem;
   background: rgba(124, 58, 237, 0.05);
   border-radius: 0.75rem;
   border: 1px solid rgba(124, 58, 237, 0.1);
-  width: 202%;
   transition: all 0.2s ease;
 }
 
@@ -551,8 +549,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 auto;
+  margin-right: auto;
 }
 
 .modern-time-icon {
