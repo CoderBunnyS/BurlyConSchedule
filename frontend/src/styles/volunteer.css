@@ -1,50 +1,4 @@
-.modern-role-details-content {
-    background: rgba(236, 72, 153, 0.08);
-    border-color: rgba(236, 72, 153, 0.2);
-  }
-
-  .modern-detail-title {
-    color: var(--rose);
-  }
-
-  .modern-detail-text {
-    color: #e2e8f0;
-  }
-
-  .modern-contact-name {
-    color: #e2e8f0;
-  }
-
-  .modern-contact-phone {
-    color: var(--rose);
-  }
-
-  .modern-contact-phone:hover {
-    color: #f472b6;
-  }  .modern-role-header.clickable {
-    padding: 0.25rem;
-    margin: -0.25rem -0.25rem 1rem -0.25rem;
-  }
-
-  .modern-role-details-content {
-    padding: 1rem;
-  }
-
-  .modern-contact-info {
-    align-items: flex-start;
-  }
-
-  .modern-detail-section {
-    margin-bottom: 1rem;
-  }
-
-  .modern-detail-title {
-    font-size: 0.875rem;
-  }
-
-  .modern-detail-text {
-    font-size: 0.875rem;
-  }/* Modern Volunteer Page Styles */
+/* Modern Volunteer Page Styles */
 
 /* CSS Variables */
 :root {
@@ -370,6 +324,11 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
+.modern-role-card.expanded {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.15), 0 6px 12px -5px rgba(0, 0, 0, 0.08);
+}
+
 .modern-role-header {
   display: flex;
   align-items: flex-start;
@@ -390,10 +349,32 @@
   background: rgba(124, 58, 237, 0.05);
 }
 
+.modern-role-info {
+  flex: 1;
+}
+
+.modern-role-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--plum);
+  margin: 0 0 0.25rem 0;
+}
+
+.modern-role-count {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  margin: 0;
+}
+
 .modern-role-actions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.modern-role-icon {
+  font-size: 2rem;
+  opacity: 0.7;
 }
 
 .modern-expand-icon {
@@ -497,33 +478,7 @@
   transform: translateX(2px);
 }
 
-.modern-role-card.expanded {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.15), 0 6px 12px -5px rgba(0, 0, 0, 0.08);
-}
-
-.modern-role-info {
-  flex: 1;
-}
-
-.modern-role-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--plum);
-  margin: 0 0 0.25rem 0;
-}
-
-.modern-role-count {
-  font-size: 0.875rem;
-  color: var(--gray-600);
-  margin: 0;
-}
-
-.modern-role-icon {
-  font-size: 2rem;
-  opacity: 0.7;
-}
-
+/* Shifts List */
 .modern-shifts-list {
   display: flex;
   flex-direction: column;
@@ -532,14 +487,14 @@
 
 .modern-shift-item {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 1rem;
   padding: 1rem;
   background: rgba(124, 58, 237, 0.05);
   border-radius: 0.75rem;
   border: 1px solid rgba(124, 58, 237, 0.1);
   transition: all 0.2s ease;
+  width: 100%;
 }
 
 .modern-shift-item:hover {
@@ -550,7 +505,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  justify-content: space-between;
+  margin-right: auto;
 }
 
 .modern-time-icon {
@@ -565,7 +520,7 @@
 }
 
 .modern-shift-availability {
-  text-align: center;
+  flex-shrink: 0;
 }
 
 .modern-availability-badge {
@@ -741,6 +696,31 @@
   .modern-login-prompt {
     color: #d1d5db;
   }
+
+  .modern-role-details-content {
+    background: rgba(236, 72, 153, 0.08);
+    border-color: rgba(236, 72, 153, 0.2);
+  }
+
+  .modern-detail-title {
+    color: var(--rose);
+  }
+
+  .modern-detail-text {
+    color: #e2e8f0;
+  }
+
+  .modern-contact-name {
+    color: #e2e8f0;
+  }
+
+  .modern-contact-phone {
+    color: var(--rose);
+  }
+
+  .modern-contact-phone:hover {
+    color: #f472b6;
+  }
 }
 
 /* Responsive Design */
@@ -786,11 +766,8 @@
     gap: 0.75rem;
   }
 
-  .modern-shift-time,
-  .modern-shift-availability,
-  .modern-shift-action {
-    flex: none;
-    width: 100%;
+  .modern-shift-time {
+    margin-right: 0;
   }
 
   .modern-shift-availability {
@@ -801,6 +778,31 @@
   .modern-cancel-button {
     width: 100%;
     justify-content: center;
+  }
+
+  .modern-role-header.clickable {
+    padding: 0.25rem;
+    margin: -0.25rem -0.25rem 1rem -0.25rem;
+  }
+
+  .modern-role-details-content {
+    padding: 1rem;
+  }
+
+  .modern-contact-info {
+    align-items: flex-start;
+  }
+
+  .modern-detail-section {
+    margin-bottom: 1rem;
+  }
+
+  .modern-detail-title {
+    font-size: 0.875rem;
+  }
+
+  .modern-detail-text {
+    font-size: 0.875rem;
   }
 }
 
