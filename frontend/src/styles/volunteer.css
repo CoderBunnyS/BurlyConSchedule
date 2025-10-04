@@ -1,3 +1,4 @@
+
 .modern-role-details-content {
     background: rgba(236, 72, 153, 0.08);
     border-color: rgba(236, 72, 153, 0.2);
@@ -21,7 +22,9 @@
 
   .modern-contact-phone:hover {
     color: #f472b6;
-  }  .modern-role-header.clickable {
+  }  
+
+  .modern-role-header.clickable {
     padding: 0.25rem;
     margin: -0.25rem -0.25rem 1rem -0.25rem;
   }
@@ -44,7 +47,9 @@
 
   .modern-detail-text {
     font-size: 0.875rem;
-  }/* Modern Volunteer Page Styles */
+  }
+
+/* Modern Volunteer Page Styles */
 
 /* CSS Variables */
 :root {
@@ -533,7 +538,7 @@
 .modern-shift-item {
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* Change this */
+  justify-content: space-between;
   gap: 1rem;
   padding: 1rem;
   background: rgba(124, 58, 237, 0.05);
@@ -551,7 +556,6 @@
   align-items: center;
   gap: 0.5rem;
   flex: 0 0 auto;
-  min-width: fit-content;
 }
 
 .modern-time-icon {
@@ -561,13 +565,12 @@
 
 .modern-time-range {
   font-weight: 500;
-  color: #e2e8f0;
+  color: var(--gray-700);
   white-space: nowrap;
 }
 
 .modern-shift-availability {
   flex-shrink: 0;
-  margin-left: auto; 
 }
 
 .modern-availability-badge {
@@ -721,6 +724,10 @@
 
   .modern-shift-item:hover {
     background: rgba(236, 72, 153, 0.15);
+  }
+
+  .modern-time-range {
+    color: #e2e8f0;
   }
 
   .modern-empty-state {
