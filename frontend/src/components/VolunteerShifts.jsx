@@ -3,6 +3,18 @@ import "../styles/volunteer.css";
 import Header from "./Header";
 import { getUserId } from "../utils/authUtils";
 
+  const scheduleImages = {
+    "2025-11-05": "https://i.ibb.co/spkQFTwf/Thursday.png",
+    "2025-11-06":
+      "https://i.ibb.co/vCnLYxqb/Screenshot-2025-10-03-at-4-21-21-PM.png",
+    "2025-11-07":
+      "https://i.ibb.co/pBjPM5yc/Screenshot-2025-10-03-at-4-22-51-PM.png",
+    "2025-11-08":
+      "https://i.ibb.co/QvtCJ62x/Screenshot-2025-10-03-at-4-24-31-PM.png",
+    "2025-11-09":
+      "https://i.ibb.co/7LGyBmJ/Screenshot-2025-10-03-at-4-25-31-PM.png",
+  };
+  
 export default function VolunteerShifts() {
   const [selectedDate, setSelectedDate] = useState("2025-11-07");
   const [shifts, setShifts] = useState([]);
@@ -19,22 +31,20 @@ export default function VolunteerShifts() {
     { label: "Sun 11/9", value: "2025-11-09", day: "Sunday" },
   ];
 
-  const scheduleImages = {
-    "2025-11-05": "https://i.ibb.co/spkQFTwf/Thursday.png",
-    "2025-11-06":
-      "https://i.ibb.co/vCnLYxqb/Screenshot-2025-10-03-at-4-21-21-PM.png",
-    "2025-11-07":
-      "https://i.ibb.co/pBjPM5yc/Screenshot-2025-10-03-at-4-22-51-PM.png",
-    "2025-11-08":
-      "https://i.ibb.co/QvtCJ62x/Screenshot-2025-10-03-at-4-24-31-PM.png",
-    "2025-11-09":
-      "https://i.ibb.co/7LGyBmJ/Screenshot-2025-10-03-at-4-25-31-PM.png",
-  };
+
 
   useEffect(() => {
     const id = getUserId();
     if (id) setUserId(id);
   }, []);
+
+  // Preload schedule images
+useEffect(() => {
+  Object.values(scheduleImages).forEach((url) => {
+    const img = new Image();
+    img.src = url;
+  });
+}, []);
 
   // Fetch role details
   useEffect(() => {
