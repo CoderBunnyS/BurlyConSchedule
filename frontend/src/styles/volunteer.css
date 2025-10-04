@@ -1,4 +1,3 @@
-
 .modern-role-details-content {
     background: rgba(236, 72, 153, 0.08);
     border-color: rgba(236, 72, 153, 0.2);
@@ -22,9 +21,7 @@
 
   .modern-contact-phone:hover {
     color: #f472b6;
-  }  
-
-  .modern-role-header.clickable {
+  }  .modern-role-header.clickable {
     padding: 0.25rem;
     margin: -0.25rem -0.25rem 1rem -0.25rem;
   }
@@ -47,9 +44,7 @@
 
   .modern-detail-text {
     font-size: 0.875rem;
-  }
-
-/* Modern Volunteer Page Styles */
+  }/* Modern Volunteer Page Styles */
 
 /* CSS Variables */
 :root {
@@ -555,7 +550,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex: 0 0 auto;
+  flex: 1;
+  min-width: 0;
 }
 
 .modern-time-icon {
