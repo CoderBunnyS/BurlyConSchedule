@@ -533,7 +533,7 @@
 .modern-shift-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start; /* Change this */
   gap: 1rem;
   padding: 1rem;
   background: rgba(124, 58, 237, 0.05);
@@ -550,9 +550,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex: 0 1 auto; /* Changed from flex: 1 */
-  min-width: 0;
-  max-width: 200px; 
+  flex: 0 0 auto;
+  min-width: fit-content;
 }
 
 .modern-time-icon {
@@ -562,10 +561,8 @@
 
 .modern-time-range {
   font-weight: 500;
-  color: var(--gray-700);
+  color: #e2e8f0;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis; 
 }
 
 .modern-shift-availability {
@@ -603,7 +600,6 @@
 
 .modern-shift-action {
   flex-shrink: 0;
-  margin-left: 0.5rem; 
 }
 
 .modern-login-prompt {
@@ -725,10 +721,6 @@
 
   .modern-shift-item:hover {
     background: rgba(236, 72, 153, 0.15);
-  }
-
-  .modern-time-range {
-    color: #e2e8f0;
   }
 
   .modern-empty-state {
