@@ -664,6 +664,16 @@
   font-size: 1rem;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
+.modern-schedule-img {
+  max-width: 100%;
+  max-height: 300px;
+  width: auto;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
+  transition: opacity 0.3s ease;
+}
 
 /* Responsive */
 @media (max-width: 768px) {
