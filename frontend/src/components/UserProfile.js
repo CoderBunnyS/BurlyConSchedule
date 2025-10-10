@@ -225,9 +225,6 @@ export default function UserProfile() {
                 
                 // Get role details for emergency contact
                 const roleDetails = getRoleDetails(role);
-                console.log('Current totalHours:', totalHours);
-console.log('Should show 100%?', totalHours >= 16);
-console.log('Should show 50%?', totalHours >= 8 && totalHours < 16);
 
                 return (
                   <div key={key} className="modern-shift-card">
@@ -237,9 +234,6 @@ console.log('Should show 50%?', totalHours >= 8 && totalHours < 16);
                         <p className="modern-shift-date">
                           {formatLocalDateYMD(date)}
                         </p>
-                      </div>
-                      <div className="modern-shift-badge">
-                        {sorted.length} {sorted.length === 1 ? "shift" : "shifts"}
                       </div>
                     </div>
 
@@ -288,8 +282,7 @@ console.log('Should show 50%?', totalHours >= 8 && totalHours < 16);
                               onClick={() => handleCancelShift(shift._id)}
                               title="Cancel this shift"
                             >
-                              <span className="modern-cancel-icon">❌</span>
-                              <span className="modern-cancel-text">Cancel</span>
+                              ❌
                             </button>
                           </div>
                         );
