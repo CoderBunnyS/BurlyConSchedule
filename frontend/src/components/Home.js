@@ -79,7 +79,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="modern-feature-glow"></div>
+         
         </section>
 
         {/* Help Section */}
