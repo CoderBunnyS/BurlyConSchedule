@@ -155,16 +155,33 @@ export default function UserProfile() {
               </div>
             </div>
             <div className="modern-stat-card status">
-              <div className="modern-stat-icon">⭐</div>
+              <div className="modern-stat-icon">🎟️</div>
               <div className="modern-stat-content">
-                <div className="modern-stat-number">
-                  {totalHours >= 8
-                    ? "Superstar"
-                    : totalHours >= 4
-                    ? "All-Star"
-                    : "Rising Star"}
-                </div>
-                <div className="modern-stat-label">Volunteer Status</div>
+                {totalHours >= 16 ? (
+                  <>
+                    <div className="modern-stat-number" style={{ fontSize: '1.5rem' }}>100VOLUNTEER2025</div>
+                    <div className="modern-stat-label">100% Off Ticket Code!</div>
+                    <div style={{ fontSize: '0.75rem', color: '#10b981', marginTop: '0.5rem' }}>
+                      ✨ Amazing! You've earned a free ticket!
+                    </div>
+                  </>
+                ) : totalHours >= 8 ? (
+                  <>
+                    <div className="modern-stat-number" style={{ fontSize: '1.5rem' }}>50VOLUNTEER2025</div>
+                    <div className="modern-stat-label">50% Off Ticket Code!</div>
+                    <div style={{ fontSize: '0.75rem', color: '#fbbf24', marginTop: '0.5rem' }}>
+                      {16 - totalHours} more hours for 100% off!
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="modern-stat-number">{totalHours}/8</div>
+                    <div className="modern-stat-label">Hours to 50% Off</div>
+                    <div style={{ fontSize: '0.75rem', color: '#d1d5db', marginTop: '0.5rem' }}>
+                      Sign up for {8 - totalHours} more hours to unlock your discount code!
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
