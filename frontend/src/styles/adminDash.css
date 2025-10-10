@@ -59,7 +59,7 @@
 }
 
 .modern-summary-card {
-  background: rgba(236, 72, 153, 0.08);
+  background: rgba(255, 255, 255, 0.7); 
   backdrop-filter: blur(10px);
   border-radius: 1.25rem;
   padding: 2rem;
@@ -126,18 +126,19 @@
 }
 
 .modern-summary-title {
-  font-size: 0.875rem;
+  font-size: 0.95rem; /* Increase from 0.875rem */
   font-weight: 600;
-  color: #e5e7eb;
+  color: #4b5563; /* Darker gray */
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  opacity: 0.9;
+  opacity: 1; /* Remove the 0.9 opacity */
 }
 
 .modern-summary-subtitle {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem; 
+  color: #6b7280; 
   margin-top: 0.25rem;
+  font-weight: 500; 
 }
 
 /* Alert/Section Cards */
