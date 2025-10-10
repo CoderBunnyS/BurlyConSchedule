@@ -414,7 +414,7 @@ useEffect(() => {
                                 </span>
                               </div>
 
-                              <div className="modern-shift-availability">
+                              {/* <div className="modern-shift-availability">
                                 <span
                                   className={`modern-availability-badge ${
                                     available <= 0
@@ -424,10 +424,10 @@ useEffect(() => {
                                       : "available"
                                   }`}
                                 >
-                                  {/* {available} spot{available !== 1 ? "s" : ""}{" "}
-                                  left */}
+                                  {available} spot{available !== 1 ? "s" : ""}{" "}
+                                  left
                                 </span>
-                              </div>
+                              </div> */}
 
                               <div className="modern-shift-action">
                                 {!userId ? (
