@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import Header from "./Header";
 import { hasRole } from "../utils/authUtils";
 import "../styles/adminDash.css";
+import "../styles/admin.css";
 
 export default function AdminDashboard() {
   const [needsByDate, setNeedsByDate] = useState({});
@@ -452,8 +453,6 @@ export default function AdminDashboard() {
                                   <div key={n._id} className="modern-shift-item">
                                     <a
                                       href="https://www.burlyconvolunteers.com/admin/shifts"
-                                      target="_blank"
-                                      rel="noopener noreferrer"
                                       className={`modern-shift-pill ${(n.volunteersNeeded || 0) >= 2 ? "critical" : "minor"}`}
                                     >
                                       <span className="modern-shift-icon">
