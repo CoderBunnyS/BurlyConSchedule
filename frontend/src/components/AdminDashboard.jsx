@@ -139,7 +139,7 @@ export default function AdminDashboard() {
       deptMap[deptName].totalFilled += filled;
       deptMap[deptName].totalUnfilled += needed;
       
-      if (needed > 0 && filled === 0) {
+      if (needed > 0 && registered === 0) {
         deptMap[deptName].criticalShifts++;
       }
     });
@@ -450,15 +450,25 @@ export default function AdminDashboard() {
                                 .sort((a, b) => (b.volunteersNeeded || 0) - (a.volunteersNeeded || 0))
                                 .map((n) => (
                                   <div key={n._id} className="modern-shift-item">
-                                    <div className={`modern-shift-pill ${(n.volunteersNeeded || 0) >= 2 ? "critical" : "minor"}`}>
+                                    <a
+                                      href="https://www.burlyconvolunteers.com/admin/shifts"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className={`modern-shift-pill ${(n.volunteersNeeded || 0) >= 2 ? "critical" : "minor"}`}
+                                    >
                                       <span className="modern-shift-icon">
                                         {(n.volunteersNeeded || 0) >= 2 ? "🚨" : "📉"}
                                       </span>
-                                      <span className="modern-shift-time">
-                                        {formatTime(n.startTime)}–{formatTime(n.endTime)}
-                                      </span>
+                                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                        <span className="modern-shift-time">
+                                          {formatTime(n.startTime)}–{formatTime(n.endTime)}
+                                        </span>
+                                        <span style={{ fontSize: '0.75rem', color: '#f9a8d4', fontWeight: 500 }}>
+                                          {n.role || 'Role not specified'}
+                                        </span>
+                                      </div>
                                       <span className="modern-shift-count">({n.volunteersNeeded || 0})</span>
-                                    </div>
+                                    </a>
                                   </div>
                                 ))}
                           </div>
