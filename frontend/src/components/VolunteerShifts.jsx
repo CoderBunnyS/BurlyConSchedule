@@ -424,8 +424,8 @@ useEffect(() => {
                                       : "available"
                                   }`}
                                 >
-                                  {available} spot{available !== 1 ? "s" : ""}{" "}
-                                  left
+                                  {/* {available} spot{available !== 1 ? "s" : ""}{" "}
+                                  left */}
                                 </span>
                               </div>
 
