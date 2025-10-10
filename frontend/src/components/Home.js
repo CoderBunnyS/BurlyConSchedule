@@ -3,6 +3,24 @@ import "../styles/Home.css";
 import Header from "./Header";
 
 export default function Home() {
+  const handleProfileClick = () => {
+    const isLoggedIn = !!localStorage.getItem("access_token");
+    
+    if (isLoggedIn) {
+      window.location.href = "/profile";
+    } else {
+      // Trigger FusionAuth login
+      const clientId = process.env.REACT_APP_FUSIONAUTH_CLIENT_ID;
+      const redirectUri = process.env.REACT_APP_FUSIONAUTH_REDIRECT_URI;
+      const domain = process.env.REACT_APP_FUSIONAUTH_DOMAIN;
+      const scope = encodeURIComponent("openid email profile");
+      const authorizationUrl = `${domain}/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
+        redirectUri
+      )}&response_type=code&scope=${scope}`;
+      window.location.href = authorizationUrl;
+    }
+  };
+
   return (
     <div className="modern-page-container">
       <Header />
@@ -27,35 +45,52 @@ export default function Home() {
         {/* Features Section */}
         <section className="modern-features-section">
           <div className="modern-section-header">
-                    {/* Action Buttons */}
-        <div className="modern-home-actions">
-          <h3 className="modern-actions-title">Ready to Get Started?</h3>
-          <div className="modern-action-buttons">
-            <a href="/volunteer" className="modern-home-button primary">
-              <span className="modern-button-icon">📅</span>
-              <span className="modern-button-content">
-                <span className="modern-button-title">View Shifts</span>
-                <span className="modern-button-subtitle">Browse available opportunities</span>
-              </span>
-            </a>
             
-            <a href="/profile" className="modern-home-button secondary">
-              <span className="modern-button-icon">👤</span>
-              <span className="modern-button-content">
-                <span className="modern-button-title">My Profile</span>
-                <span className="modern-button-subtitle">Manage your volunteer info</span>
-              </span>
-            </a>
-          </div>
-        </div>
-          </div>
-          
-
-              <div className="modern-feature-glow">
+            <div className="modern-home-actions">
+              <h3 className="modern-actions-title">Ready to Get Started?</h3>
+              <div className="modern-action-buttons">
+                <a 
+                  href="https://www.burlyconvolunteers.com/volunteer" 
+                  className="modern-home-button primary"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="modern-button-icon">📅</span>
+                  <span className="modern-button-content">
+                    <span className="modern-button-title">View Shifts</span>
+                    <span className="modern-button-subtitle">Browse available opportunities</span>
+                  </span>
+                </a>
                 
+                <button 
+                  onClick={handleProfileClick}
+                  className="modern-home-button secondary"
+                  style={{ cursor: 'pointer', border: 'none', textAlign: 'left', width: '100%' }}
+                >
+                  <span className="modern-button-icon">👤</span>
+                  <span className="modern-button-content">
+                    <span className="modern-button-title">My Profile</span>
+                    <span className="modern-button-subtitle">Manage your volunteer info</span>
+                  </span>
+                </button>
+
+                <a 
+                  href="https://www.burlyconvolunteers.com/volunteer" 
+                  className="modern-home-button tertiary"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <span className="modern-button-icon">🌐</span>
+                  <span className="modern-button-content">
+                    <span className="modern-button-title">External Volunteer Site</span>
+                    <span className="modern-button-subtitle">Sign up or learn more</span>
+                  </span>
+                </a>
               </div>
+            </div>
+          </div>
 
-
+          <div className="modern-feature-glow"></div>
         </section>
 
         {/* Help Section */}
@@ -76,8 +111,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-
       </div>
     </div>
   );
