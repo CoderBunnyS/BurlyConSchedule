@@ -59,7 +59,11 @@ export default function AdminDashboard() {
           const filtered = json.filter((n) => n.volunteersNeeded > 0);
           if (filtered.length) allNeeds[date] = filtered;
           total += json.length;
-          
+              if (date === "2025-11-09") {
+      console.log("Nov 9 raw data:", json);
+      console.log("Nov 9 filtered:", filtered);
+      console.log("Will add to needsByDate?", filtered.length > 0);
+    }
           // Collect all shifts for department aggregation
           json.forEach((shift) => {
             allShifts.push({ ...shift, date });
