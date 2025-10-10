@@ -23,7 +23,7 @@ const flexibleShiftSchema = new mongoose.Schema({
     required: true
   },
   volunteersRegistered: [{
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,  // CHANGED from String
     ref: "User"
   }],
   notes: {
