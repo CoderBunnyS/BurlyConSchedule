@@ -225,6 +225,9 @@ export default function UserProfile() {
                 
                 // Get role details for emergency contact
                 const roleDetails = getRoleDetails(role);
+                console.log('Current totalHours:', totalHours);
+console.log('Should show 100%?', totalHours >= 16);
+console.log('Should show 50%?', totalHours >= 8 && totalHours < 16);
 
                 return (
                   <div key={key} className="modern-shift-card">
