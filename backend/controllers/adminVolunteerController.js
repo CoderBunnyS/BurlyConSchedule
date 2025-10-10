@@ -7,9 +7,11 @@ exports.getVolunteers = async (req, res) => {
     const shifts = await Shift.find({}).lean();
 
     const volunteerData = users.map((user) => {
+      // Match by MongoDB ObjectId instead of fusionAuthId
       const userShifts = shifts.filter((shift) =>
-        shift.volunteersRegistered?.includes(user.fusionAuthId)
-
+        shift.volunteersRegistered?.some(
+          (id) => id.toString() === user._id.toString()
+        )
       );
     
       const totalHours = userShifts.reduce((sum, shift) => {
@@ -36,6 +38,8 @@ exports.getVolunteers = async (req, res) => {
         id: user._id,
         name: user.preferredName || user.name || "Unnamed Volunteer",
         email: user.email,
+        noShow: user.noShow,
+        isRestricted: user.isRestricted,
         shifts: userShifts.map((shift) => ({
           id: shift._id,
           role: shift.role,
