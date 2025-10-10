@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Header from "./Header";
-import "../styles/adminVolunteers.css";
+import "../styles/AdminVolunteers.css";
 import { hasRole } from "../utils/authUtils";
 
 export default function AdminVolunteers() {
