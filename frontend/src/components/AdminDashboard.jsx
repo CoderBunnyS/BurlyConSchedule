@@ -1,8 +1,8 @@
-// AdminDashboard.js — plain JS (no TypeScript)
+// AdminDashboard.js — enhanced with department breakdown
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "./Header";
-import "../styles/admin.css";
+import "../styles/adminDash.css";
 
 export default function AdminDashboard() {
   const [needsByDate, setNeedsByDate] = useState({});
@@ -10,6 +10,11 @@ export default function AdminDashboard() {
   const [error, setError] = useState(null);
   const [totalShifts, setTotalShifts] = useState(0);
   const [volunteerCount, setVolunteerCount] = useState(0);
+  const [allShiftsData, setAllShiftsData] = useState([]);
+  
+  // New state for department view
+  const [expandedDepts, setExpandedDepts] = useState({});
+  const [filterView, setFilterView] = useState("all"); // "all", "unfilled", "critical"
 
   const user = useMemo(() => {
     try { return JSON.parse(localStorage.getItem("user") || "null"); } catch { return null; }
@@ -49,6 +54,7 @@ export default function AdminDashboard() {
       const allNeeds = {};
       let total = 0;
       const volunteers = new Set();
+      const allShifts = [];
 
       results.forEach((res) => {
         if (res.status === "fulfilled") {
@@ -56,7 +62,14 @@ export default function AdminDashboard() {
           const filtered = json.filter((n) => n.volunteersNeeded > 0);
           if (filtered.length) allNeeds[date] = filtered;
           total += json.length;
-          json.forEach((n) => n.volunteersRegistered && n.volunteersRegistered.forEach((v) => volunteers.add(v)));
+          
+          // Collect all shifts for department aggregation
+          json.forEach((shift) => {
+            allShifts.push({ ...shift, date });
+            if (shift.volunteersRegistered) {
+              shift.volunteersRegistered.forEach((v) => volunteers.add(v));
+            }
+          });
         } else {
           console.warn(res.reason);
           if (!error) setError("Some data failed to load. Retrying on focus.");
@@ -68,6 +81,7 @@ export default function AdminDashboard() {
       setNeedsByDate(allNeeds);
       setTotalShifts(total);
       setVolunteerCount(volunteers.size);
+      setAllShiftsData(allShifts);
     } catch (e) {
       if (opts && opts.signal && opts.signal.aborted) return;
       console.error(e);
@@ -75,7 +89,7 @@ export default function AdminDashboard() {
     } finally {
       if (mountedRef.current) setLoading(false);
     }
-  }, [API_BASE, dates]);
+  }, [API_BASE, dates, error]);
 
   useEffect(() => {
     const c = new AbortController();
@@ -94,6 +108,67 @@ export default function AdminDashboard() {
     };
   }, [loadData]);
 
+  // Aggregate shifts by department/role
+  const departmentStats = useMemo(() => {
+    const deptMap = {};
+    
+    allShiftsData.forEach((shift) => {
+      const deptName = shift.role || "Unassigned";
+      
+      if (!deptMap[deptName]) {
+        deptMap[deptName] = {
+          name: deptName,
+          shifts: [],
+          totalShifts: 0,
+          totalFilled: 0,
+          totalUnfilled: 0,
+          criticalShifts: 0
+        };
+      }
+      
+      const registered = shift.volunteersRegistered?.length || 0;
+      const capacity = shift.capacity || 0;
+      const needed = shift.volunteersNeeded || 0;
+      const filled = capacity - needed;
+      
+      deptMap[deptName].shifts.push({
+        ...shift,
+        filled,
+        needed,
+        capacity
+      });
+      
+      deptMap[deptName].totalShifts++;
+      deptMap[deptName].totalFilled += filled;
+      deptMap[deptName].totalUnfilled += needed;
+      
+      if (needed > 0 && registered === 0) {
+        deptMap[deptName].criticalShifts++;
+      }
+    });
+    
+    return Object.values(deptMap).sort((a, b) => b.totalUnfilled - a.totalUnfilled);
+  }, [allShiftsData]);
+
+  const totalUnfilled = useMemo(() => 
+    departmentStats.reduce((sum, dept) => sum + dept.totalUnfilled, 0),
+    [departmentStats]
+  );
+
+  const totalFilled = useMemo(() => 
+    departmentStats.reduce((sum, dept) => sum + dept.totalFilled, 0),
+    [departmentStats]
+  );
+
+  const criticalGaps = useMemo(() => 
+    departmentStats.reduce((sum, dept) => sum + dept.criticalShifts, 0),
+    [departmentStats]
+  );
+
+  const coveragePercentage = totalShifts > 0 
+    ? Math.round((totalFilled / totalShifts) * 100) 
+    : 0;
+
   const formatDateLabel = (date) =>
     new Date(date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
 
@@ -104,9 +179,29 @@ export default function AdminDashboard() {
     return `${display}:${String(m).padStart(2, "0")} ${suffix}`;
   };
 
-  const totalUnfilled = Object.values(needsByDate)
-    .flat()
-    .reduce((sum, n) => sum + (n.volunteersNeeded || 0), 0);
+  const toggleDepartment = (deptName) => {
+    setExpandedDepts(prev => ({
+      ...prev,
+      [deptName]: !prev[deptName]
+    }));
+  };
+
+  const filteredDepartments = useMemo(() => {
+    if (filterView === "critical") {
+      return departmentStats.filter(d => d.criticalShifts > 0);
+    }
+    if (filterView === "unfilled") {
+      return departmentStats.filter(d => d.totalUnfilled > 0);
+    }
+    return departmentStats;
+  }, [departmentStats, filterView]);
+
+  const scrollToDepartments = () => {
+    const element = document.getElementById("department-breakdown");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   return (
     <div className="modern-page-container">
@@ -117,7 +212,7 @@ export default function AdminDashboard() {
           <h1 className="modern-page-title">Admin Dashboard</h1>
           {isAdmin && (
             <p className="modern-page-subtitle">
-              Get a pulse on volunteer coverage and shift activity. Here’s what’s live and what needs attention.
+              Get a pulse on volunteer coverage and shift activity. Here's what's live and what needs attention.
             </p>
           )}
         </div>
@@ -127,37 +222,68 @@ export default function AdminDashboard() {
         {isAdmin && (
           <>
             <div className="modern-summary-dashboard">
-              <div className="modern-summary-card gradient-purple">
-                <div className="modern-summary-icon">●</div>
+              <button 
+                className="modern-summary-card gradient-purple clickable"
+                onClick={() => {
+                  setFilterView("all");
+                  scrollToDepartments();
+                }}
+                style={{ cursor: 'pointer', border: 'none', textAlign: 'left', width: '100%' }}
+              >
+                <div className="modern-summary-icon">📊</div>
                 <div className="modern-summary-content">
-                  <h3 className="modern-summary-title">Volunteers Still Needed</h3>
-                  <p className="modern-summary-number">{totalUnfilled}</p>
+                  <h3 className="modern-summary-title">Coverage</h3>
+                  <p className="modern-summary-number">{coveragePercentage}%</p>
+                  <p className="modern-summary-subtitle">{totalFilled} of {totalShifts} shifts filled</p>
                 </div>
-              </div>
+              </button>
 
-              <div className="modern-summary-card gradient-blue">
+              <button 
+                className="modern-summary-card gradient-blue clickable"
+                onClick={() => {
+                  setFilterView("unfilled");
+                  scrollToDepartments();
+                }}
+                style={{ cursor: 'pointer', border: 'none', textAlign: 'left', width: '100%' }}
+              >
                 <div className="modern-summary-icon">📋</div>
                 <div className="modern-summary-content">
-                  <h3 className="modern-summary-title">Total Shifts</h3>
-                  <p className="modern-summary-number">{totalShifts}</p>
+                  <h3 className="modern-summary-title">Unfilled Shifts</h3>
+                  <p className="modern-summary-number">{totalUnfilled}</p>
+                  <p className="modern-summary-subtitle">Across all departments</p>
                 </div>
-              </div>
+              </button>
 
-              <div className="modern-summary-card gradient-green">
-                <div className="modern-summary-icon">🧍‍♀️</div>
+              <button 
+                className="modern-summary-card gradient-green clickable"
+                onClick={() => {
+                  setFilterView("critical");
+                  scrollToDepartments();
+                }}
+                style={{ cursor: 'pointer', border: 'none', textAlign: 'left', width: '100%' }}
+              >
+                <div className="modern-summary-icon">🚨</div>
                 <div className="modern-summary-content">
-                  <h3 className="modern-summary-title">Total Volunteers</h3>
-                  <p className="modern-summary-number">{volunteerCount}</p>
+                  <h3 className="modern-summary-title">Critical Gaps</h3>
+                  <p className="modern-summary-number">{criticalGaps}</p>
+                  <p className="modern-summary-subtitle">Shifts with 0 volunteers</p>
                 </div>
-              </div>
+              </button>
             </div>
 
-            <div className="modern-alert-section">
+            {/* Department Breakdown Section */}
+            <div className="modern-alert-section" id="department-breakdown">
               <div className="modern-alert-card">
                 <div className="modern-alert-header">
-                  <h3 className="modern-alert-title">Gaps by Role</h3>
-                  {totalUnfilled > 0 && (
-                    <div className="modern-alert-badge">{totalUnfilled} positions needed</div>
+                  <h3 className="modern-alert-title">Department Breakdown</h3>
+                  {filterView !== "all" && (
+                    <button
+                      onClick={() => setFilterView("all")}
+                      className="modern-filter-badge"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {filterView === "critical" ? "Showing Critical Only" : "Showing Unfilled Only"} - Clear Filter
+                    </button>
                   )}
                 </div>
 
@@ -169,12 +295,131 @@ export default function AdminDashboard() {
                     </div>
                   ) : error ? (
                     <div className="modern-error-state">
-                      <h4 className="modern-error-title">Couldn’t load everything</h4>
-                      <p className="modern-error-description">
-                        {error} Try switching tabs or clicking back into the window to retry.
+                      <h4 className="modern-error-title">Couldn't load everything</h4>
+                      <p className="modern-error-description">{error}</p>
+                    </div>
+                  ) : filteredDepartments.length === 0 ? (
+                    <div className="modern-success-state">
+                      <div className="modern-success-icon">✅</div>
+                      <h4 className="modern-success-title">
+                        {filterView === "critical" ? "No critical gaps!" : "All shifts are filled!"}
+                      </h4>
+                      <p className="modern-success-description">
+                        {filterView === "critical" 
+                          ? "Great job! No shifts are completely empty."
+                          : "All volunteer positions are currently covered."}
                       </p>
                     </div>
-                  ) : Object.keys(needsByDate).length === 0 ? (
+                  ) : (
+                    <div className="modern-department-grid">
+                      {filteredDepartments.map((dept) => {
+                        const isExpanded = expandedDepts[dept.name];
+                        const percentage = dept.totalShifts > 0 
+                          ? Math.round((dept.totalFilled / dept.totalShifts) * 100) 
+                          : 0;
+                        
+                        return (
+                          <div key={dept.name} className="modern-department-card">
+                            <button
+                              onClick={() => toggleDepartment(dept.name)}
+                              className="modern-department-header"
+                              style={{ cursor: 'pointer', border: 'none', textAlign: 'left', width: '100%', background: 'transparent' }}
+                            >
+                              <div className="modern-department-title-row">
+                                <div className="modern-department-name">
+                                  <span className="modern-expand-icon">{isExpanded ? "▼" : "▶"}</span>
+                                  <span>{dept.name}</span>
+                                  {dept.criticalShifts > 0 && (
+                                    <span className="modern-critical-badge">
+                                      {dept.criticalShifts} critical
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="modern-department-stats">
+                                  <span className={`modern-status-badge ${
+                                    dept.totalUnfilled === 0 ? 'filled' :
+                                    dept.totalUnfilled <= 3 ? 'minor' : 'critical'
+                                  }`}>
+                                    {dept.totalUnfilled} open
+                                  </span>
+                                </div>
+                              </div>
+                              
+                              <div className="modern-department-progress">
+                                <div className="modern-progress-bar">
+                                  <div 
+                                    className="modern-progress-fill"
+                                    style={{ width: `${percentage}%` }}
+                                  />
+                                </div>
+                                <span className="modern-progress-text">
+                                  {dept.totalFilled} of {dept.totalShifts} shifts filled
+                                </span>
+                              </div>
+                            </button>
+
+                            {isExpanded && (
+                              <div className="modern-department-details">
+                                <h4 className="modern-details-title">Unfilled Shifts</h4>
+                                {dept.shifts
+                                  .filter(shift => shift.needed > 0)
+                                  .sort((a, b) => b.needed - a.needed)
+                                  .map((shift, idx) => {
+                                    const shiftPercentage = shift.capacity > 0 
+                                      ? Math.round((shift.filled / shift.capacity) * 100) 
+                                      : 0;
+                                    
+                                    return (
+                                      <div key={idx} className="modern-shift-detail">
+                                        <div className="modern-shift-info">
+                                          <div className="modern-shift-label">
+                                            <strong>{formatDateLabel(shift.date)}</strong>
+                                            <span> • {formatTime(shift.startTime)} – {formatTime(shift.endTime)}</span>
+                                          </div>
+                                          <span className={`modern-shift-badge ${
+                                            shift.filled === 0 ? 'critical' : 
+                                            shift.needed <= 2 ? 'minor' : 'warning'
+                                          }`}>
+                                            {shift.needed} needed
+                                          </span>
+                                        </div>
+                                        <div className="modern-shift-progress">
+                                          <div className="modern-progress-bar small">
+                                            <div 
+                                              className="modern-progress-fill"
+                                              style={{ width: `${shiftPercentage}%` }}
+                                            />
+                                          </div>
+                                          <span className="modern-progress-text small">
+                                            {shift.filled}/{shift.capacity}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Original Gaps by Date view - kept for reference */}
+            <div className="modern-alert-section">
+              <div className="modern-alert-card">
+                <div className="modern-alert-header">
+                  <h3 className="modern-alert-title">Gaps by Date</h3>
+                  {totalUnfilled > 0 && (
+                    <div className="modern-alert-badge">{totalUnfilled} positions needed</div>
+                  )}
+                </div>
+
+                <div className="modern-alert-content">
+                  {Object.keys(needsByDate).length === 0 ? (
                     <div className="modern-success-state">
                       <div className="modern-success-icon">✅</div>
                       <h4 className="modern-success-title">All shifts are filled!</h4>
@@ -254,9 +499,9 @@ export default function AdminDashboard() {
               </div>
               <div className="modern-nav-arrow">→</div>
             </Link>
+            </div>
           </div>
         </div>
       </div>
-    </div>
   );
 }
