@@ -1,4 +1,3 @@
-// AdminDashboard.js — enhanced with department breakdown
 import React, {
   useCallback,
   useEffect,
@@ -8,6 +7,7 @@ import React, {
 } from "react";
 import { Link } from "react-router-dom";
 import Header from "./Header";
+import { hasRole } from "../utils/authUtils";
 import "../styles/adminDash.css";
 
 export default function AdminDashboard() {
@@ -22,15 +22,7 @@ export default function AdminDashboard() {
   const [expandedDepts, setExpandedDepts] = useState({});
   const [filterView, setFilterView] = useState("all"); // "all", "unfilled", "critical"
 
-  const user = useMemo(() => {
-    try {
-      return JSON.parse(localStorage.getItem("user") || "null");
-    } catch {
-      return null;
-    }
-  }, []);
-  const roles = (user && user.roles) || [];
-  const isAdmin = roles.includes("admin");
+const isAdmin = hasRole("Admin"); 
 
   const dates = useMemo(
     () => [
