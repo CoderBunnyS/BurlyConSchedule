@@ -6,13 +6,13 @@ import { getUserId } from "../utils/authUtils";
   const scheduleImages = {
     "2025-11-05": "https://i.ibb.co/Dg6y6nXV/Wednesday-1.png",
     "2025-11-06":
-      "https://i.ibb.co/vCnLYxqb/Screenshot-2025-10-03-at-4-21-21-PM.png",
+      "https://i.ibb.co/B29v03Vz/sched-nov6.jpg",
     "2025-11-07":
-      "https://i.ibb.co/pBjPM5yc/Screenshot-2025-10-03-at-4-22-51-PM.png",
+      "https://i.ibb.co/7xZ8m23C/sched-nov7.jpg",
     "2025-11-08":
-      "https://i.ibb.co/QvtCJ62x/Screenshot-2025-10-03-at-4-24-31-PM.png",
+      "https://i.ibb.co/Q7S2dWsY/sched-nov8.jpg",
     "2025-11-09":
-      "https://i.ibb.co/7LGyBmJ/Screenshot-2025-10-03-at-4-25-31-PM.png",
+      "https://i.ibb.co/7JNdbZ44/sched-nov9.jpg",
   };
 
 export default function VolunteerShifts() {
