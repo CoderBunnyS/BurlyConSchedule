@@ -148,11 +148,7 @@ export default function AdminDashboard() {
   }, [allShiftsData]);
 
 
-// Add these console logs:
-console.log('Sample shift data:', allShiftsData[0]);
-console.log('Total Capacity:', totalCapacity);
-console.log('Total Filled:', totalFilled);
-console.log('Department Stats:', departmentStats);
+
   const totalUnfilled = useMemo(() => 
     departmentStats.reduce((sum, dept) => sum + dept.totalUnfilled, 0),
     [departmentStats]
@@ -210,7 +206,11 @@ console.log('Department Stats:', departmentStats);
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
-
+// Add these console logs:
+console.log('Sample shift data:', allShiftsData[0]);
+console.log('Total Capacity:', totalCapacity);
+console.log('Total Filled:', totalFilled);
+console.log('Department Stats:', departmentStats);
   return (
     <div className="modern-page-container">
       <Header />
