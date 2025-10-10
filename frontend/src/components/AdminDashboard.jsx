@@ -1,5 +1,11 @@
 // AdminDashboard.js — enhanced with department breakdown
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
 import Header from "./Header";
 import "../styles/adminDash.css";
@@ -11,85 +17,105 @@ export default function AdminDashboard() {
   const [totalShifts, setTotalShifts] = useState(0);
   const [volunteerCount, setVolunteerCount] = useState(0);
   const [allShiftsData, setAllShiftsData] = useState([]);
-  
+
   // New state for department view
   const [expandedDepts, setExpandedDepts] = useState({});
   const [filterView, setFilterView] = useState("all"); // "all", "unfilled", "critical"
 
   const user = useMemo(() => {
-    try { return JSON.parse(localStorage.getItem("user") || "null"); } catch { return null; }
+    try {
+      return JSON.parse(localStorage.getItem("user") || "null");
+    } catch {
+      return null;
+    }
   }, []);
   const roles = (user && user.roles) || [];
   const isAdmin = roles.includes("admin");
 
   const dates = useMemo(
-    () => ["2025-11-05", "2025-11-06", "2025-11-07", "2025-11-08", "2025-11-09"],
+    () => [
+      "2025-11-05",
+      "2025-11-06",
+      "2025-11-07",
+      "2025-11-08",
+      "2025-11-09",
+    ],
     []
   );
   const API_BASE = process.env.REACT_APP_API_BASE;
 
   const mountedRef = useRef(true);
-  useEffect(() => () => { mountedRef.current = false; }, []);
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+    },
+    []
+  );
 
-  const loadData = useCallback(async (opts) => {
-    setLoading(true);
-    setError(null);
+  const loadData = useCallback(
+    async (opts) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const requests = dates.map((date) =>
-        fetch(`${API_BASE}/api/volunteer/${date}`, {
-          signal: opts && opts.signal,
-          credentials: "include",
-          cache: "no-store",
-        })
-          .then(async (r) => {
-            if (!r.ok) throw new Error(`GET /api/volunteer/${date} -> ${r.status}`);
+      try {
+        const requests = dates.map((date) =>
+          fetch(`${API_BASE}/api/volunteer/${date}`, {
+            signal: opts && opts.signal,
+            credentials: "include",
+            cache: "no-store",
+          }).then(async (r) => {
+            if (!r.ok)
+              throw new Error(`GET /api/volunteer/${date} -> ${r.status}`);
             const json = await r.json();
             return { date, json };
           })
-      );
+        );
 
-      const results = await Promise.allSettled(requests);
+        const results = await Promise.allSettled(requests);
 
-      const allNeeds = {};
-      let total = 0;
-      const volunteers = new Set();
-      const allShifts = [];
+        const allNeeds = {};
+        let total = 0;
+        const volunteers = new Set();
+        const allShifts = [];
 
-      results.forEach((res) => {
-        if (res.status === "fulfilled") {
-          const { date, json } = res.value;
-          const filtered = json.filter((n) => n.volunteersNeeded > 0);
-          if (filtered.length) allNeeds[date] = filtered;
-          total += json.length;
-          
-          // Collect all shifts for department aggregation
-          json.forEach((shift) => {
-            allShifts.push({ ...shift, date });
-            if (shift.volunteersRegistered) {
-              shift.volunteersRegistered.forEach((v) => volunteers.add(v));
-            }
-          });
-        } else {
-          console.warn(res.reason);
-          if (!error) setError("Some data failed to load. Retrying on focus.");
-        }
-      });
+        results.forEach((res) => {
+          if (res.status === "fulfilled") {
+            const { date, json } = res.value;
+            const filtered = json.filter((n) => n.volunteersNeeded > 0);
+            if (filtered.length) allNeeds[date] = filtered;
+            total += json.length;
 
-      if (!mountedRef.current) return;
+            // Collect all shifts for department aggregation
+            json.forEach((shift) => {
+              allShifts.push({ ...shift, date });
+              if (shift.volunteersRegistered) {
+                shift.volunteersRegistered.forEach((v) => volunteers.add(v));
+              }
+            });
+          } else {
+            console.warn(res.reason);
+            if (!error)
+              setError("Some data failed to load. Retrying on focus.");
+          }
+        });
 
-      setNeedsByDate(allNeeds);
-      setTotalShifts(total);
-      setVolunteerCount(volunteers.size);
-      setAllShiftsData(allShifts);
-    } catch (e) {
-      if (opts && opts.signal && opts.signal.aborted) return;
-      console.error(e);
-      if (mountedRef.current) setError((e && e.message) || "Failed to load data.");
-    } finally {
-      if (mountedRef.current) setLoading(false);
-    }
-  }, [API_BASE, dates, error]);
+        if (!mountedRef.current) return;
+
+        setNeedsByDate(allNeeds);
+        setTotalShifts(total);
+        setVolunteerCount(volunteers.size);
+        setAllShiftsData(allShifts);
+      } catch (e) {
+        if (opts && opts.signal && opts.signal.aborted) return;
+        console.error(e);
+        if (mountedRef.current)
+          setError((e && e.message) || "Failed to load data.");
+      } finally {
+        if (mountedRef.current) setLoading(false);
+      }
+    },
+    [API_BASE, dates, error]
+  );
 
   useEffect(() => {
     const c = new AbortController();
@@ -99,7 +125,9 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const onFocus = () => loadData();
-    const onVis = () => { if (!document.hidden) loadData(); };
+    const onVis = () => {
+      if (!document.hidden) loadData();
+    };
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVis);
     return () => {
@@ -108,13 +136,15 @@ export default function AdminDashboard() {
     };
   }, [loadData]);
 
+
+  
   // Aggregate shifts by department/role
   const departmentStats = useMemo(() => {
     const deptMap = {};
-    
+
     allShiftsData.forEach((shift) => {
       const deptName = shift.role || "Unassigned";
-      
+
       if (!deptMap[deptName]) {
         deptMap[deptName] = {
           name: deptName,
@@ -122,60 +152,65 @@ export default function AdminDashboard() {
           totalShifts: 0,
           totalFilled: 0,
           totalUnfilled: 0,
-          criticalShifts: 0
+          criticalShifts: 0,
         };
       }
-      
+
       const registered = shift.volunteersRegistered?.length || 0;
       const capacity = shift.capacity || 0;
       const needed = shift.volunteersNeeded || 0;
       const filled = capacity - needed;
-      
+
       deptMap[deptName].shifts.push({
         ...shift,
         filled,
         needed,
-        capacity
+        capacity,
       });
-      // checking for data
-console.log('Department Stats:', departmentStats);
-console.log('Total Unfilled:', totalUnfilled);
-console.log('Is Admin:', isAdmin);
-console.log('All Shifts Data:', allShiftsData);
+
 
       deptMap[deptName].totalShifts++;
       deptMap[deptName].totalFilled += filled;
       deptMap[deptName].totalUnfilled += needed;
-      
+
       if (needed > 0 && registered === 0) {
         deptMap[deptName].criticalShifts++;
       }
     });
-    
-    return Object.values(deptMap).sort((a, b) => b.totalUnfilled - a.totalUnfilled);
+
+    return Object.values(deptMap).sort(
+      (a, b) => b.totalUnfilled - a.totalUnfilled
+    );
   }, [allShiftsData]);
 
-  const totalUnfilled = useMemo(() => 
-    departmentStats.reduce((sum, dept) => sum + dept.totalUnfilled, 0),
+  const totalUnfilled = useMemo(
+    () => departmentStats.reduce((sum, dept) => sum + dept.totalUnfilled, 0),
+    [departmentStats]
+  );
+      // checking for data
+      console.log("Department Stats:", departmentStats);
+      console.log("Total Unfilled:", totalUnfilled);
+      console.log("Is Admin:", isAdmin);
+      console.log("All Shifts Data:", allShiftsData);
+  const totalFilled = useMemo(
+    () => departmentStats.reduce((sum, dept) => sum + dept.totalFilled, 0),
     [departmentStats]
   );
 
-  const totalFilled = useMemo(() => 
-    departmentStats.reduce((sum, dept) => sum + dept.totalFilled, 0),
+  const criticalGaps = useMemo(
+    () => departmentStats.reduce((sum, dept) => sum + dept.criticalShifts, 0),
     [departmentStats]
   );
 
-  const criticalGaps = useMemo(() => 
-    departmentStats.reduce((sum, dept) => sum + dept.criticalShifts, 0),
-    [departmentStats]
-  );
-
-  const coveragePercentage = totalShifts > 0 
-    ? Math.round((totalFilled / totalShifts) * 100) 
-    : 0;
+  const coveragePercentage =
+    totalShifts > 0 ? Math.round((totalFilled / totalShifts) * 100) : 0;
 
   const formatDateLabel = (date) =>
-    new Date(date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+    new Date(date).toLocaleDateString(undefined, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
 
   const formatTime = (timeStr) => {
     const [h, m] = (timeStr || "0:00").split(":").map(Number);
@@ -185,18 +220,18 @@ console.log('All Shifts Data:', allShiftsData);
   };
 
   const toggleDepartment = (deptName) => {
-    setExpandedDepts(prev => ({
+    setExpandedDepts((prev) => ({
       ...prev,
-      [deptName]: !prev[deptName]
+      [deptName]: !prev[deptName],
     }));
   };
 
   const filteredDepartments = useMemo(() => {
     if (filterView === "critical") {
-      return departmentStats.filter(d => d.criticalShifts > 0);
+      return departmentStats.filter((d) => d.criticalShifts > 0);
     }
     if (filterView === "unfilled") {
-      return departmentStats.filter(d => d.totalUnfilled > 0);
+      return departmentStats.filter((d) => d.totalUnfilled > 0);
     }
     return departmentStats;
   }, [departmentStats, filterView]);
@@ -217,7 +252,8 @@ console.log('All Shifts Data:', allShiftsData);
           <h1 className="modern-page-title">Admin Dashboard</h1>
           {isAdmin && (
             <p className="modern-page-subtitle">
-              Get a pulse on volunteer coverage and shift activity. Here's what's live and what needs attention.
+              Get a pulse on volunteer coverage and shift activity. Here's
+              what's live and what needs attention.
             </p>
           )}
         </div>
@@ -227,51 +263,72 @@ console.log('All Shifts Data:', allShiftsData);
         {isAdmin && (
           <>
             <div className="modern-summary-dashboard">
-              <button 
+              <button
                 className="modern-summary-card gradient-purple clickable"
                 onClick={() => {
                   setFilterView("all");
                   scrollToDepartments();
                 }}
-                style={{ cursor: 'pointer', border: 'none', textAlign: 'left', width: '100%' }}
+                style={{
+                  cursor: "pointer",
+                  border: "none",
+                  textAlign: "left",
+                  width: "100%",
+                }}
               >
                 <div className="modern-summary-icon">📊</div>
                 <div className="modern-summary-content">
                   <h3 className="modern-summary-title">Coverage</h3>
                   <p className="modern-summary-number">{coveragePercentage}%</p>
-                  <p className="modern-summary-subtitle">{totalFilled} of {totalShifts} shifts filled</p>
+                  <p className="modern-summary-subtitle">
+                    {totalFilled} of {totalShifts} shifts filled
+                  </p>
                 </div>
               </button>
 
-              <button 
+              <button
                 className="modern-summary-card gradient-blue clickable"
                 onClick={() => {
                   setFilterView("unfilled");
                   scrollToDepartments();
                 }}
-                style={{ cursor: 'pointer', border: 'none', textAlign: 'left', width: '100%' }}
+                style={{
+                  cursor: "pointer",
+                  border: "none",
+                  textAlign: "left",
+                  width: "100%",
+                }}
               >
                 <div className="modern-summary-icon">📋</div>
                 <div className="modern-summary-content">
                   <h3 className="modern-summary-title">Unfilled Shifts</h3>
                   <p className="modern-summary-number">{totalUnfilled}</p>
-                  <p className="modern-summary-subtitle">Across all departments</p>
+                  <p className="modern-summary-subtitle">
+                    Across all departments
+                  </p>
                 </div>
               </button>
 
-              <button 
+              <button
                 className="modern-summary-card gradient-green clickable"
                 onClick={() => {
                   setFilterView("critical");
                   scrollToDepartments();
                 }}
-                style={{ cursor: 'pointer', border: 'none', textAlign: 'left', width: '100%' }}
+                style={{
+                  cursor: "pointer",
+                  border: "none",
+                  textAlign: "left",
+                  width: "100%",
+                }}
               >
                 <div className="modern-summary-icon">🚨</div>
                 <div className="modern-summary-content">
                   <h3 className="modern-summary-title">Critical Gaps</h3>
                   <p className="modern-summary-number">{criticalGaps}</p>
-                  <p className="modern-summary-subtitle">Shifts with 0 volunteers</p>
+                  <p className="modern-summary-subtitle">
+                    Shifts with 0 volunteers
+                  </p>
                 </div>
               </button>
             </div>
@@ -285,9 +342,12 @@ console.log('All Shifts Data:', allShiftsData);
                     <button
                       onClick={() => setFilterView("all")}
                       className="modern-filter-badge"
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                     >
-                      {filterView === "critical" ? "Showing Critical Only" : "Showing Unfilled Only"} - Clear Filter
+                      {filterView === "critical"
+                        ? "Showing Critical Only"
+                        : "Showing Unfilled Only"}{" "}
+                      - Clear Filter
                     </button>
                   )}
                 </div>
@@ -300,17 +360,21 @@ console.log('All Shifts Data:', allShiftsData);
                     </div>
                   ) : error ? (
                     <div className="modern-error-state">
-                      <h4 className="modern-error-title">Couldn't load everything</h4>
+                      <h4 className="modern-error-title">
+                        Couldn't load everything
+                      </h4>
                       <p className="modern-error-description">{error}</p>
                     </div>
                   ) : filteredDepartments.length === 0 ? (
                     <div className="modern-success-state">
                       <div className="modern-success-icon">✅</div>
                       <h4 className="modern-success-title">
-                        {filterView === "critical" ? "No critical gaps!" : "All shifts are filled!"}
+                        {filterView === "critical"
+                          ? "No critical gaps!"
+                          : "All shifts are filled!"}
                       </h4>
                       <p className="modern-success-description">
-                        {filterView === "critical" 
+                        {filterView === "critical"
                           ? "Great job! No shifts are completely empty."
                           : "All volunteer positions are currently covered."}
                       </p>
@@ -319,20 +383,34 @@ console.log('All Shifts Data:', allShiftsData);
                     <div className="modern-department-grid">
                       {filteredDepartments.map((dept) => {
                         const isExpanded = expandedDepts[dept.name];
-                        const percentage = dept.totalShifts > 0 
-                          ? Math.round((dept.totalFilled / dept.totalShifts) * 100) 
-                          : 0;
-                        
+                        const percentage =
+                          dept.totalShifts > 0
+                            ? Math.round(
+                                (dept.totalFilled / dept.totalShifts) * 100
+                              )
+                            : 0;
+
                         return (
-                          <div key={dept.name} className="modern-department-card">
+                          <div
+                            key={dept.name}
+                            className="modern-department-card"
+                          >
                             <button
                               onClick={() => toggleDepartment(dept.name)}
                               className="modern-department-header"
-                              style={{ cursor: 'pointer', border: 'none', textAlign: 'left', width: '100%', background: 'transparent' }}
+                              style={{
+                                cursor: "pointer",
+                                border: "none",
+                                textAlign: "left",
+                                width: "100%",
+                                background: "transparent",
+                              }}
                             >
                               <div className="modern-department-title-row">
                                 <div className="modern-department-name">
-                                  <span className="modern-expand-icon">{isExpanded ? "▼" : "▶"}</span>
+                                  <span className="modern-expand-icon">
+                                    {isExpanded ? "▼" : "▶"}
+                                  </span>
                                   <span>{dept.name}</span>
                                   {dept.criticalShifts > 0 && (
                                     <span className="modern-critical-badge">
@@ -341,58 +419,87 @@ console.log('All Shifts Data:', allShiftsData);
                                   )}
                                 </div>
                                 <div className="modern-department-stats">
-                                  <span className={`modern-status-badge ${
-                                    dept.totalUnfilled === 0 ? 'filled' :
-                                    dept.totalUnfilled <= 3 ? 'minor' : 'critical'
-                                  }`}>
+                                  <span
+                                    className={`modern-status-badge ${
+                                      dept.totalUnfilled === 0
+                                        ? "filled"
+                                        : dept.totalUnfilled <= 3
+                                        ? "minor"
+                                        : "critical"
+                                    }`}
+                                  >
                                     {dept.totalUnfilled} open
                                   </span>
                                 </div>
                               </div>
-                              
+
                               <div className="modern-department-progress">
                                 <div className="modern-progress-bar">
-                                  <div 
+                                  <div
                                     className="modern-progress-fill"
                                     style={{ width: `${percentage}%` }}
                                   />
                                 </div>
                                 <span className="modern-progress-text">
-                                  {dept.totalFilled} of {dept.totalShifts} shifts filled
+                                  {dept.totalFilled} of {dept.totalShifts}{" "}
+                                  shifts filled
                                 </span>
                               </div>
                             </button>
 
                             {isExpanded && (
                               <div className="modern-department-details">
-                                <h4 className="modern-details-title">Unfilled Shifts</h4>
+                                <h4 className="modern-details-title">
+                                  Unfilled Shifts
+                                </h4>
                                 {dept.shifts
-                                  .filter(shift => shift.needed > 0)
+                                  .filter((shift) => shift.needed > 0)
                                   .sort((a, b) => b.needed - a.needed)
                                   .map((shift, idx) => {
-                                    const shiftPercentage = shift.capacity > 0 
-                                      ? Math.round((shift.filled / shift.capacity) * 100) 
-                                      : 0;
-                                    
+                                    const shiftPercentage =
+                                      shift.capacity > 0
+                                        ? Math.round(
+                                            (shift.filled / shift.capacity) *
+                                              100
+                                          )
+                                        : 0;
+
                                     return (
-                                      <div key={idx} className="modern-shift-detail">
+                                      <div
+                                        key={idx}
+                                        className="modern-shift-detail"
+                                      >
                                         <div className="modern-shift-info">
                                           <div className="modern-shift-label">
-                                            <strong>{formatDateLabel(shift.date)}</strong>
-                                            <span> • {formatTime(shift.startTime)} – {formatTime(shift.endTime)}</span>
+                                            <strong>
+                                              {formatDateLabel(shift.date)}
+                                            </strong>
+                                            <span>
+                                              {" "}
+                                              • {formatTime(
+                                                shift.startTime
+                                              )} – {formatTime(shift.endTime)}
+                                            </span>
                                           </div>
-                                          <span className={`modern-shift-badge ${
-                                            shift.filled === 0 ? 'critical' : 
-                                            shift.needed <= 2 ? 'minor' : 'warning'
-                                          }`}>
+                                          <span
+                                            className={`modern-shift-badge ${
+                                              shift.filled === 0
+                                                ? "critical"
+                                                : shift.needed <= 2
+                                                ? "minor"
+                                                : "warning"
+                                            }`}
+                                          >
                                             {shift.needed} needed
                                           </span>
                                         </div>
                                         <div className="modern-shift-progress">
                                           <div className="modern-progress-bar small">
-                                            <div 
+                                            <div
                                               className="modern-progress-fill"
-                                              style={{ width: `${shiftPercentage}%` }}
+                                              style={{
+                                                width: `${shiftPercentage}%`,
+                                              }}
                                             />
                                           </div>
                                           <span className="modern-progress-text small">
@@ -419,7 +526,9 @@ console.log('All Shifts Data:', allShiftsData);
                 <div className="modern-alert-header">
                   <h3 className="modern-alert-title">Gaps by Date</h3>
                   {totalUnfilled > 0 && (
-                    <div className="modern-alert-badge">{totalUnfilled} positions needed</div>
+                    <div className="modern-alert-badge">
+                      {totalUnfilled} positions needed
+                    </div>
                   )}
                 </div>
 
@@ -427,9 +536,12 @@ console.log('All Shifts Data:', allShiftsData);
                   {Object.keys(needsByDate).length === 0 ? (
                     <div className="modern-success-state">
                       <div className="modern-success-icon">✅</div>
-                      <h4 className="modern-success-title">All shifts are filled!</h4>
+                      <h4 className="modern-success-title">
+                        All shifts are filled!
+                      </h4>
                       <p className="modern-success-description">
-                        Great job! All volunteer positions are currently covered.
+                        Great job! All volunteer positions are currently
+                        covered.
                       </p>
                     </div>
                   ) : (
@@ -437,10 +549,15 @@ console.log('All Shifts Data:', allShiftsData);
                       {Object.entries(needsByDate).map(([date, needs]) => (
                         <div key={date} className="modern-gap-card">
                           <div className="modern-gap-header">
-                            <h4 className="modern-gap-date">{formatDateLabel(date)}</h4>
+                            <h4 className="modern-gap-date">
+                              {formatDateLabel(date)}
+                            </h4>
                             <div className="modern-gap-count">
                               {Array.isArray(needs)
-                                ? needs.reduce((sum, n) => sum + (n.volunteersNeeded || 0), 0)
+                                ? needs.reduce(
+                                    (sum, n) => sum + (n.volunteersNeeded || 0),
+                                    0
+                                  )
                                 : 0}{" "}
                               needed
                             </div>
@@ -450,17 +567,35 @@ console.log('All Shifts Data:', allShiftsData);
                             {Array.isArray(needs) &&
                               needs
                                 .slice()
-                                .sort((a, b) => (b.volunteersNeeded || 0) - (a.volunteersNeeded || 0))
+                                .sort(
+                                  (a, b) =>
+                                    (b.volunteersNeeded || 0) -
+                                    (a.volunteersNeeded || 0)
+                                )
                                 .map((n) => (
-                                  <div key={n._id} className="modern-shift-item">
-                                    <div className={`modern-shift-pill ${(n.volunteersNeeded || 0) >= 2 ? "critical" : "minor"}`}>
+                                  <div
+                                    key={n._id}
+                                    className="modern-shift-item"
+                                  >
+                                    <div
+                                      className={`modern-shift-pill ${
+                                        (n.volunteersNeeded || 0) >= 2
+                                          ? "critical"
+                                          : "minor"
+                                      }`}
+                                    >
                                       <span className="modern-shift-icon">
-                                        {(n.volunteersNeeded || 0) >= 2 ? "🚨" : "📉"}
+                                        {(n.volunteersNeeded || 0) >= 2
+                                          ? "🚨"
+                                          : "📉"}
                                       </span>
                                       <span className="modern-shift-time">
-                                        {formatTime(n.startTime)}–{formatTime(n.endTime)}
+                                        {formatTime(n.startTime)}–
+                                        {formatTime(n.endTime)}
                                       </span>
-                                      <span className="modern-shift-count">({n.volunteersNeeded || 0})</span>
+                                      <span className="modern-shift-count">
+                                        ({n.volunteersNeeded || 0})
+                                      </span>
                                     </div>
                                   </div>
                                 ))}
@@ -482,7 +617,9 @@ console.log('All Shifts Data:', allShiftsData);
               <div className="modern-nav-icon">📅</div>
               <div className="modern-nav-content">
                 <h3 className="modern-nav-title">Manage Shifts</h3>
-                <p className="modern-nav-description">Create and edit volunteer shifts</p>
+                <p className="modern-nav-description">
+                  Create and edit volunteer shifts
+                </p>
               </div>
               <div className="modern-nav-arrow">→</div>
             </Link>
@@ -491,7 +628,9 @@ console.log('All Shifts Data:', allShiftsData);
               <div className="modern-nav-icon">🛠️</div>
               <div className="modern-nav-content">
                 <h3 className="modern-nav-title">Manage Volunteer Roles</h3>
-                <p className="modern-nav-description">Define volunteer positions and requirements</p>
+                <p className="modern-nav-description">
+                  Define volunteer positions and requirements
+                </p>
               </div>
               <div className="modern-nav-arrow">→</div>
             </Link>
@@ -500,13 +639,15 @@ console.log('All Shifts Data:', allShiftsData);
               <div className="modern-nav-icon">👥</div>
               <div className="modern-nav-content">
                 <h3 className="modern-nav-title">View Volunteers</h3>
-                <p className="modern-nav-description">See registered volunteers and assignments</p>
+                <p className="modern-nav-description">
+                  See registered volunteers and assignments
+                </p>
               </div>
               <div className="modern-nav-arrow">→</div>
             </Link>
-            </div>
           </div>
         </div>
       </div>
+    </div>
   );
 }
