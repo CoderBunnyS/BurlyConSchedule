@@ -1,5 +1,5 @@
 // migrations/migrateVolunteerReferences.js
-// Run this once to convert fusionAuthId strings to ObjectId references
+// Rebuild volunteersRegistered arrays from User.volunteerShifts data
 
 const mongoose = require('mongoose');
 const FlexibleShift = require('../models/FlexibleShift');
@@ -7,61 +7,75 @@ const User = require('../models/User');
 
 async function migrateVolunteerReferences() {
   try {
-    console.log('Starting migration: converting fusionAuthId strings to ObjectId references...');
+    console.log('Starting migration: rebuilding shift registrations from user data...');
 
-    // Get all shifts
-    const shifts = await FlexibleShift.find({});
-    console.log(`Found ${shifts.length} shifts to migrate`);
+    // First, clear all volunteersRegistered arrays
+    await FlexibleShift.updateMany({}, { $set: { volunteersRegistered: [] } });
+    console.log('Cleared all existing volunteersRegistered arrays');
 
-    let migratedCount = 0;
+    // Get all users with shifts
+    const users = await User.find({ 'volunteerShifts.0': { $exists: true } });
+    console.log(`Found ${users.length} users with shifts`);
+
+    let updatedShifts = 0;
     let errorCount = 0;
 
-    for (const shift of shifts) {
-      try {
-        // Skip if already using ObjectIds
-        if (shift.volunteersRegistered.length === 0) {
-          console.log(`Shift ${shift._id}: No volunteers, skipping`);
-          continue;
-        }
+    // Also ensure all shifts have the volunteersRegistered array
+    await FlexibleShift.updateMany(
+      { volunteersRegistered: { $exists: false } },
+      { $set: { volunteersRegistered: [] } }
+    );
+    console.log('Ensured all shifts have volunteersRegistered array');
 
-        // Check if first entry is already an ObjectId
-        const firstEntry = shift.volunteersRegistered[0];
-        if (mongoose.Types.ObjectId.isValid(firstEntry) && String(firstEntry).length === 24) {
-          console.log(`Shift ${shift._id}: Already using ObjectIds, skipping`);
-          continue;
-        }
-
-        // Convert fusionAuthIds to ObjectIds
-        const fusionAuthIds = shift.volunteersRegistered;
-        const objectIds = [];
-
-        for (const fusionAuthId of fusionAuthIds) {
-          const user = await User.findOne({ fusionAuthId: fusionAuthId });
-          if (user) {
-            objectIds.push(user._id);
-            console.log(`  Mapped ${fusionAuthId} -> ${user._id} (${user.preferredName || user.email})`);
-          } else {
-            console.warn(`  WARNING: No user found for fusionAuthId: ${fusionAuthId}`);
+    for (const user of users) {
+      console.log(`\nProcessing user: ${user.preferredName || user.email}`);
+      
+      for (const userShift of user.volunteerShifts) {
+        try {
+          // Only process FlexibleShift references
+          if (userShift.refModel !== 'FlexibleShift') {
+            continue;
           }
+
+          const shiftId = userShift.shift;
+          
+          // Add this user to the shift's volunteersRegistered array
+          const result = await FlexibleShift.findByIdAndUpdate(
+            shiftId,
+            { $addToSet: { volunteersRegistered: user._id } }, // addToSet prevents duplicates
+            { new: true }
+          );
+
+          if (result) {
+            console.log(`  ✓ Added user to shift ${shiftId}`);
+            updatedShifts++;
+          } else {
+            console.warn(`  ⚠ Shift ${shiftId} not found - user has orphaned reference`);
+          }
+
+        } catch (err) {
+          errorCount++;
+          console.error(`  ✗ Error processing shift ${userShift.shift}:`, err.message);
         }
-
-        // Update the shift with ObjectIds
-        shift.volunteersRegistered = objectIds;
-        await shift.save();
-        
-        migratedCount++;
-        console.log(`✓ Migrated shift ${shift._id} (${shift.role} on ${shift.date})`);
-
-      } catch (err) {
-        errorCount++;
-        console.error(`✗ Error migrating shift ${shift._id}:`, err.message);
       }
     }
 
     console.log('\n=== Migration Complete ===');
-    console.log(`Successfully migrated: ${migratedCount} shifts`);
-    console.log(`Errors: ${errorCount} shifts`);
-    console.log(`Skipped: ${shifts.length - migratedCount - errorCount} shifts`);
+    console.log(`Successfully updated: ${updatedShifts} shift registrations`);
+    console.log(`Errors: ${errorCount}`);
+
+    // Verify the results
+    const shiftsWithVolunteers = await FlexibleShift.find({
+      volunteersRegistered: { $ne: [] }
+    }).populate('volunteersRegistered', 'preferredName email');
+
+    console.log(`\n=== Verification ===`);
+    console.log(`Shifts with volunteers: ${shiftsWithVolunteers.length}`);
+    
+    shiftsWithVolunteers.slice(0, 5).forEach(shift => {
+      console.log(`\nShift: ${shift.role} on ${shift.date} at ${shift.startTime}`);
+      console.log(`Volunteers: ${shift.volunteersRegistered.map(v => v.preferredName || v.email).join(', ')}`);
+    });
 
   } catch (err) {
     console.error('Migration failed:', err);
@@ -79,7 +93,7 @@ if (require.main === module) {
       return migrateVolunteerReferences();
     })
     .then(() => {
-      console.log('Migration script completed');
+      console.log('\nMigration script completed successfully');
       process.exit(0);
     })
     .catch(err => {
