@@ -1,13 +1,17 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/Home.css";  
 import Header from "./Header";
 
 export default function Home() {
-  const handleProfileClick = () => {
+  const navigate = useNavigate();
+
+  const handleProfileClick = (e) => {
+    e.preventDefault();
     const isLoggedIn = !!localStorage.getItem("access_token");
     
     if (isLoggedIn) {
-      window.location.href = "/profile";
+      navigate("/profile");
     } else {
       // Trigger FusionAuth login
       const clientId = process.env.REACT_APP_FUSIONAUTH_CLIENT_ID;
@@ -45,7 +49,6 @@ export default function Home() {
         {/* Features Section */}
         <section className="modern-features-section">
           <div className="modern-section-header">
-            
             <div className="modern-home-actions">
               <h3 className="modern-actions-title">Ready to Get Started?</h3>
               <div className="modern-action-buttons">
@@ -65,7 +68,6 @@ export default function Home() {
                 <button 
                   onClick={handleProfileClick}
                   className="modern-home-button secondary"
-                  style={{ cursor: 'pointer', border: 'none', textAlign: 'left', width: '100%' }}
                 >
                   <span className="modern-button-icon">👤</span>
                   <span className="modern-button-content">
@@ -73,19 +75,6 @@ export default function Home() {
                     <span className="modern-button-subtitle">Manage your volunteer info</span>
                   </span>
                 </button>
-
-                <a 
-                  href="https://www.burlyconvolunteers.com/volunteer" 
-                  className="modern-home-button tertiary"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span className="modern-button-icon">🌐</span>
-                  <span className="modern-button-content">
-                    <span className="modern-button-title">External Volunteer Site</span>
-                    <span className="modern-button-subtitle">Sign up or learn more</span>
-                  </span>
-                </a>
               </div>
             </div>
           </div>
