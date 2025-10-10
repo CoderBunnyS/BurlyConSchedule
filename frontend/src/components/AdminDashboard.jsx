@@ -137,7 +137,12 @@ export default function AdminDashboard() {
         needed,
         capacity
       });
-      
+      // checking for data
+console.log('Department Stats:', departmentStats);
+console.log('Total Unfilled:', totalUnfilled);
+console.log('Is Admin:', isAdmin);
+console.log('All Shifts Data:', allShiftsData);
+
       deptMap[deptName].totalShifts++;
       deptMap[deptName].totalFilled += filled;
       deptMap[deptName].totalUnfilled += needed;
