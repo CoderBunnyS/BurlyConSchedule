@@ -126,7 +126,7 @@ export default function AdminDashboard() {
       const registered = shift.volunteersRegistered?.length || 0;
       const capacity = shift.capacity || 0;
       const needed = shift.volunteersNeeded || 0;
-      const filled = registered; // Use actual registrations
+      const filled = Math.max(0, capacity - needed); // Prevent negative numbers
       
       deptMap[deptName].shifts.push({
         ...shift,
@@ -139,7 +139,7 @@ export default function AdminDashboard() {
       deptMap[deptName].totalFilled += filled;
       deptMap[deptName].totalUnfilled += needed;
       
-      if (needed > 0 && registered === 0) {
+      if (needed > 0 && filled === 0) {
         deptMap[deptName].criticalShifts++;
       }
     });
