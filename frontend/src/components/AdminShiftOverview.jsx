@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import ShiftForm from "./ShiftForm";
 import "../styles/admin.css";
+import "../styles/adminShifts.css";
 import { hasRole } from "../utils/authUtils";
 import { getDatePortion, formatDateDisplay } from "../utils/dateUtils";  
 

@@ -440,8 +440,9 @@
 }
 
 .modern-shift-time {
-  font-size: 0.8125rem;
-  color: #9ca3af;
+  flex: 1;
+  color: #f3f4f6; /* Brighter white */
+  font-weight: 500;
 }
 
 /* No Shifts State */
