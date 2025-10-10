@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "../styles/profile.css";
 import Header from "./Header";
-import { useLocation } from "react-router-dom";
 
 export default function UserProfile() {
-  const location = useLocation();
   const [volunteerShifts, setVolunteerShifts] = useState([]);
   const [totalHours, setTotalHours] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [roles, setRoles] = useState([]);
 
-  // Build URLs safely (handles /api prefix from .env)
+  // Build URLs safely
   const API = (p) => `${process.env.REACT_APP_API_BASE || ""}${p}`;
 
   // Get userId safely from JWT
@@ -24,7 +23,15 @@ export default function UserProfile() {
     console.error("Error parsing JWT:", error);
   }
 
-  // Fetch user shifts when userId changes
+  // Fetch roles
+  useEffect(() => {
+    fetch(API("/api/shiftroles"))
+      .then(res => res.json())
+      .then(data => setRoles(Array.isArray(data) ? data : []))
+      .catch(err => console.error("Error loading roles:", err));
+  }, []);
+
+  // Fetch user shifts
   useEffect(() => {
     if (!userId) {
       setLoading(false);
@@ -44,6 +51,11 @@ export default function UserProfile() {
       }
     })();
   }, [userId]);
+
+  // Helper to get role details
+  const getRoleDetails = (roleName) => {
+    return roles.find(r => r.name === roleName) || {};
+  };
 
   const handleCancelShift = async (shiftId) => {
     const confirmed = window.confirm(
@@ -101,8 +113,7 @@ export default function UserProfile() {
   }, {});
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const userName =
-    user?.given_name || user?.email?.split("@")[0] || "Volunteer";
+  const userName = user?.preferredName || user?.given_name || user?.email?.split("@")[0] || "Volunteer";
 
   return (
     <div className="modern-page-container">
@@ -135,7 +146,7 @@ export default function UserProfile() {
               </div>
             </div>
             <div className="modern-stat-card shifts">
-              <div class="modern-stat-icon">📅</div>
+              <div className="modern-stat-icon">📅</div>
               <div className="modern-stat-content">
                 <div className="modern-stat-number">
                   {volunteerShifts.length}
@@ -194,6 +205,9 @@ export default function UserProfile() {
                 const sorted = shifts
                   .slice()
                   .sort((a, b) => a.startTime.localeCompare(b.startTime));
+                
+                // Get role details for emergency contact
+                const roleDetails = getRoleDetails(role);
 
                 return (
                   <div key={key} className="modern-shift-card">
@@ -208,6 +222,33 @@ export default function UserProfile() {
                         {sorted.length} {sorted.length === 1 ? "shift" : "shifts"}
                       </div>
                     </div>
+
+                    {/* Location and Emergency Contact */}
+                    {(roleDetails.location || roleDetails.pointOfContact || roleDetails.contactPhone) && (
+                      <div className="modern-shift-details">
+                        {roleDetails.location && (
+                          <div className="modern-detail-item">
+                            <span className="modern-detail-icon">📍</span>
+                            <span className="modern-detail-text">{roleDetails.location}</span>
+                          </div>
+                        )}
+                        {roleDetails.pointOfContact && (
+                          <div className="modern-detail-item">
+                            <span className="modern-detail-icon">👤</span>
+                            <span className="modern-detail-label">Lead: </span>
+                            <span className="modern-detail-text">{roleDetails.pointOfContact}</span>
+                          </div>
+                        )}
+                        {roleDetails.contactPhone && (
+                          <div className="modern-detail-item">
+                            <span className="modern-detail-icon">📞</span>
+                            <a href={`tel:${roleDetails.contactPhone}`} className="modern-detail-link">
+                              {roleDetails.contactPhone}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     <div className="modern-shift-times">
                       {sorted.map((shift) => {
