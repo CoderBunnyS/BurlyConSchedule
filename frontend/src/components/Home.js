@@ -55,8 +55,6 @@ export default function Home() {
                 <a 
                   href="https://www.burlyconvolunteers.com/volunteer" 
                   className="modern-home-button primary"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
                   <span className="modern-button-icon">📅</span>
                   <span className="modern-button-content">
