@@ -44,7 +44,9 @@ const getUserFlexShifts = async (req, res) => {
 // GET /api/volunteer/
 const getAllFlexShifts = async (req, res) => {
   try {
-    const shifts = await FlexibleShift.find().sort({ date: 1, startTime: 1 });
+    const shifts = await FlexibleShift.find()
+      .populate('volunteersRegistered', 'preferredName email')
+      .sort({ date: 1, startTime: 1 });
     res.json(shifts);
   } catch (err) {
     res.status(500).json({ message: "Error fetching shifts", error: err.message });
@@ -53,14 +55,16 @@ const getAllFlexShifts = async (req, res) => {
 
 // GET /api/volunteer/:date
 const getShiftsByDate = async (req, res) => {
-    const { date } = req.params;
-    try {
-      const shifts = await FlexibleShift.find({ date }).sort({ startTime: 1 });
-      res.json(shifts);
-    } catch (err) {
-      res.status(500).json({ message: "Error fetching shifts for date", error: err.message });
-    }
-  };
+  const { date } = req.params;
+  try {
+    const shifts = await FlexibleShift.find({ date })
+      .populate('volunteersRegistered', 'preferredName email')
+      .sort({ startTime: 1 });
+    res.json(shifts);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching shifts for date", error: err.message });
+  }
+};
 
 // POST /api/volunteer/ (admin only)
 const createFlexShift = async (req, res) => {
@@ -92,7 +96,6 @@ const updateFlexShift = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 // POST /api/volunteer/:id/signup
 const signUpForFlexShift = async (req, res) => {
@@ -126,7 +129,6 @@ const signUpForFlexShift = async (req, res) => {
           }
         }
       );
-      
 
     res.json({ message: "Signed up successfully" });
   } catch (err) {
@@ -158,7 +160,6 @@ const cancelFlexShift = async (req, res) => {
           }
         }
       );
-      
 
     res.json({ message: "Shift canceled" });
   } catch (err) {
