@@ -124,9 +124,9 @@ export default function AdminDashboard() {
       }
       
       const registered = shift.volunteersRegistered?.length || 0;
-      const capacity = shift.capacity || 0;
       const needed = shift.volunteersNeeded || 0;
-      const filled = Math.max(0, capacity - needed); // Prevent negative numbers
+      const capacity = shift.capacity || (registered + needed); // Calculate capacity if missing
+      const filled = registered; // Filled = registered volunteers
       
       deptMap[deptName].shifts.push({
         ...shift,
@@ -146,8 +146,6 @@ export default function AdminDashboard() {
     
     return Object.values(deptMap).sort((a, b) => b.totalUnfilled - a.totalUnfilled);
   }, [allShiftsData]);
-
-
 
   const totalUnfilled = useMemo(() => 
     departmentStats.reduce((sum, dept) => sum + dept.totalUnfilled, 0),
@@ -206,11 +204,7 @@ export default function AdminDashboard() {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
-// Add these console logs:
-console.log('Sample shift data:', allShiftsData[0]);
-console.log('Total Capacity:', totalCapacity);
-console.log('Total Filled:', totalFilled);
-console.log('Department Stats:', departmentStats);
+
   return (
     <div className="modern-page-container">
       <Header />
