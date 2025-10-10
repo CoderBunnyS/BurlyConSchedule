@@ -70,7 +70,7 @@ export default function AdminDashboard() {
           });
         } else {
           console.warn(res.reason);
-          if (!error) setError("Some data failed to load. Retrying on focus.");
+          setError("Some data failed to load. Retrying on focus.");
         }
       });
 
@@ -87,7 +87,7 @@ export default function AdminDashboard() {
     } finally {
       if (mountedRef.current) setLoading(false);
     }
-  }, [API_BASE, dates, error]);
+  }, [API_BASE, dates]);
 
   useEffect(() => {
     const c = new AbortController();

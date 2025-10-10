@@ -347,7 +347,7 @@ html, body {
 .modern-actions-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--gray-800);
+  color: #f1e1ec;
   margin: 0 0 2rem 0;
   text-align: center;
 }
