@@ -147,6 +147,12 @@ export default function AdminDashboard() {
     return Object.values(deptMap).sort((a, b) => b.totalUnfilled - a.totalUnfilled);
   }, [allShiftsData]);
 
+
+// Add these console logs:
+console.log('Sample shift data:', allShiftsData[0]);
+console.log('Total Capacity:', totalCapacity);
+console.log('Total Filled:', totalFilled);
+console.log('Department Stats:', departmentStats);
   const totalUnfilled = useMemo(() => 
     departmentStats.reduce((sum, dept) => sum + dept.totalUnfilled, 0),
     [departmentStats]
