@@ -3,7 +3,7 @@ const axios = require('axios');
 
 class FusionAuthService {
   constructor() {
-    this.baseURL = process.env.REACT_APP_FUSIONAUTH_DOMAIN;
+    this.baseURL = process.env.FUSIONAUTH_DOMAIN;
     this.apiKey = process.env.FUSIONAUTH_API_KEY;
   }
 
