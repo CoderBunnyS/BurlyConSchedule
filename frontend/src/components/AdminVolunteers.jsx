@@ -1,18 +1,28 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import "../styles/AdminVolunteers.css";
 import { hasRole } from "../utils/authUtils";
 
 export default function AdminVolunteers() {
+  const navigate = useNavigate();
   const [volunteers, setVolunteers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("hours"); // "hours", "name", "shifts"
+  const [phoneNumbers, setPhoneNumbers] = useState({}); // Store phone numbers by userId
 
   // Check user roles
   const isAdmin = hasRole("Admin");
   const isLead = hasRole("Lead");
   const canAccessPage = isAdmin || isLead;
+
+  // Redirect if no access
+  useEffect(() => {
+    if (!canAccessPage) {
+      navigate("/");
+    }
+  }, [canAccessPage, navigate]);
 
   // ---- helpers for API calls ----
   const API = (p) => `${process.env.REACT_APP_API_BASE || ""}${p}`;
@@ -33,6 +43,30 @@ export default function AdminVolunteers() {
         setLoading(false);
       });
   }, []);
+
+  // Fetch phone numbers from FusionAuth
+  useEffect(() => {
+    if (volunteers.length === 0) return;
+
+    volunteers.forEach(async (vol) => {
+      try {
+        const res = await fetch(API(`/api/users/${vol._id || vol.id}/fusionauth`), {
+          headers: authHeader()
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.mobilePhone) {
+            setPhoneNumbers(prev => ({
+              ...prev,
+              [vol._id || vol.id]: data.mobilePhone
+            }));
+          }
+        }
+      } catch (err) {
+        console.error(`Error fetching phone for ${vol._id || vol.id}:`, err);
+      }
+    });
+  }, [volunteers]);
 
   useEffect(() => {
     // Only fetch data if user has access
@@ -110,38 +144,6 @@ export default function AdminVolunteers() {
   const totalHours = volunteers.reduce((sum, vol) => sum + (vol.totalHours || 0), 0);
   const activeVolunteers = volunteers.filter((vol) => (vol.shifts?.length || 0) > 0).length;
 
-  // ---- unauthorized view ----
-  if (!canAccessPage) {
-    return (
-      <div className="modern-page-container">
-        <Header />
-        <div className="modern-header-section">
-          <div className="modern-header-content">
-            <h1 className="modern-page-title">🔒 Access Restricted</h1>
-            <p className="modern-page-subtitle">
-              You don't have permission to view the volunteer roster
-            </p>
-          </div>
-        </div>
-        <div className="modern-content-wrapper">
-          <div className="modern-empty-state">
-            <div className="modern-empty-icon">🚫</div>
-            <h3 className="modern-empty-title">Access Denied</h3>
-            <p className="modern-empty-description">
-              Only administrators and leads can access the volunteer roster.
-              Please contact an admin if you need access to this page.
-            </p>
-            <a href="/" className="modern-empty-action">
-              <span className="modern-button-icon">🏠</span>
-              Return Home
-            </a>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ---- authorized view ----
   return (
     <div className="modern-page-container">
       <Header />
@@ -250,94 +252,104 @@ export default function AdminVolunteers() {
             </div>
           ) : (
             <div className="modern-volunteers-grid">
-              {sortedVolunteers.map((vol) => (
-                <div key={vol._id || vol.id} className="modern-volunteer-card">
-                  <div className="modern-volunteer-header">
-                    <div className="modern-volunteer-avatar">
-                      {(vol.preferredName || vol.name || "?").charAt(0).toUpperCase()}
-                    </div>
-                    <div className="modern-volunteer-info">
-                      <h3 className="modern-volunteer-name">
-                        {vol.preferredName || vol.name || vol.email}
-                        {vol.isRestricted && <span title="Restricted"> {" "}🚫</span>}
-                        {vol.noShow && <span title="No-show on record"> {" "}⚠️</span>}
-                      </h3>
-                      <p className="modern-volunteer-email">📧 {vol.email}</p>
-                    </div>
-                    <div className="modern-volunteer-stats">
-                      <div className="modern-stat-item">
-                        <span className="modern-stat-number">{vol.totalHours || 0}</span>
-                        <span className="modern-stat-label">hours</span>
+              {sortedVolunteers.map((vol) => {
+                const userId = vol._id || vol.id;
+                const phone = phoneNumbers[userId];
+
+                return (
+                  <div key={userId} className="modern-volunteer-card">
+                    <div className="modern-volunteer-header">
+                      <div className="modern-volunteer-avatar">
+                        {(vol.preferredName || vol.name || "?").charAt(0).toUpperCase()}
                       </div>
-                      <div className="modern-stat-item">
-                        <span className="modern-stat-number">{vol.shifts?.length || 0}</span>
-                        <span className="modern-stat-label">shifts</span>
+                      <div className="modern-volunteer-info">
+                        <h3 className="modern-volunteer-name">
+                          {vol.preferredName || vol.name || vol.email}
+                          {vol.isRestricted && <span title="Restricted"> {" "}🚫</span>}
+                          {vol.noShow && <span title="No-show on record"> {" "}⚠️</span>}
+                        </h3>
+                        <p className="modern-volunteer-email">📧 {vol.email}</p>
+                        {phone && (
+                          <a href={`tel:${phone}`} className="modern-volunteer-phone">
+                            📞 {phone}
+                          </a>
+                        )}
+                      </div>
+                      <div className="modern-volunteer-stats">
+                        <div className="modern-stat-item">
+                          <span className="modern-stat-number">{vol.totalHours || 0}</span>
+                          <span className="modern-stat-label">hours</span>
+                        </div>
+                        <div className="modern-stat-item">
+                          <span className="modern-stat-number">{vol.shifts?.length || 0}</span>
+                          <span className="modern-stat-label">shifts</span>
+                        </div>
                       </div>
                     </div>
+
+                    {(isAdmin || isLead) && (
+                      <div className="modern-restriction-panel" style={{ marginTop: 8 }}>
+                        <div
+                          className="modern-restriction-grid"
+                          style={{ display: "grid", gap: 8, gridTemplateColumns: "1fr 1fr" }}
+                        >
+                          <label className="modern-field">
+                            <span className="modern-field-label">No-show on record</span>
+                            <input
+                              type="checkbox"
+                              checked={!!vol.noShow}
+                              onChange={(e) => toggleNoShow(userId, e.target.checked)}
+                            />
+                          </label>
+
+                          <label className="modern-field">
+                            <span className="modern-field-label">Restrict from signups</span>
+                            <input
+                              type="checkbox"
+                              checked={!!vol.isRestricted}
+                              onChange={(e) => toggleRestrict(userId, e.target.checked)}
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    )}
+
+                    {vol.shifts && vol.shifts.length > 0 ? (
+                      <div className="modern-volunteer-shifts">
+                        <h4 className="modern-shifts-title">📅 Upcoming Shifts ({vol.shifts.length})</h4>
+                        <div className="modern-shifts-list">
+                          {vol.shifts
+                            .sort((a, b) => new Date(a.date) - new Date(b.date))
+                            .map((shift) => (
+                              <div key={shift.id} className="modern-shift-item">
+                                <div className="modern-shift-role">
+                                  <span className="modern-role-name">{shift.role}</span>
+                                </div>
+                                <div className="modern-shift-details">
+                                  <span className="modern-shift-date">
+                                    {new Date(shift.date).toLocaleDateString(undefined, {
+                                      weekday: "short",
+                                      month: "short",
+                                      day: "numeric",
+                                    })}
+                                  </span>
+                                  <span className="modern-shift-time">
+                                    🕒 {formatTime(shift.startTime)}–{formatTime(shift.endTime)}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="modern-no-shifts">
+                        <span className="modern-no-shifts-icon">📅</span>
+                        <span className="modern-no-shifts-text">No upcoming shifts</span>
+                      </div>
+                    )}
                   </div>
-
-                  {(isAdmin || isLead) && (
-                    <div className="modern-restriction-panel" style={{ marginTop: 8 }}>
-                      <div
-                        className="modern-restriction-grid"
-                        style={{ display: "grid", gap: 8, gridTemplateColumns: "1fr 1fr" }}
-                      >
-                        <label className="modern-field">
-                          <span className="modern-field-label">No-show on record</span>
-                          <input
-                            type="checkbox"
-                            checked={!!vol.noShow}
-                            onChange={(e) => toggleNoShow(vol._id || vol.id, e.target.checked)}
-                          />
-                        </label>
-
-                        <label className="modern-field">
-                          <span className="modern-field-label">Restrict from signups</span>
-                          <input
-                            type="checkbox"
-                            checked={!!vol.isRestricted}
-                            onChange={(e) => toggleRestrict(vol._id || vol.id, e.target.checked)}
-                          />
-                        </label>
-                      </div>
-                    </div>
-                  )}
-
-                  {vol.shifts && vol.shifts.length > 0 ? (
-                    <div className="modern-volunteer-shifts">
-                      <h4 className="modern-shifts-title">📅 Upcoming Shifts ({vol.shifts.length})</h4>
-                      <div className="modern-shifts-list">
-                        {vol.shifts
-                          .sort((a, b) => new Date(a.date) - new Date(b.date))
-                          .map((shift) => (
-                            <div key={shift.id} className="modern-shift-item">
-                              <div className="modern-shift-role">
-                                <span className="modern-role-name">{shift.role}</span>
-                              </div>
-                              <div className="modern-shift-details">
-                                <span className="modern-shift-date">
-                                  {new Date(shift.date).toLocaleDateString(undefined, {
-                                    weekday: "short",
-                                    month: "short",
-                                    day: "numeric",
-                                  })}
-                                </span>
-                                <span className="modern-shift-time">
-                                  🕒 {formatTime(shift.startTime)}–{formatTime(shift.endTime)}
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="modern-no-shifts">
-                      <span className="modern-no-shifts-icon">📅</span>
-                      <span className="modern-no-shifts-text">No upcoming shifts</span>
-                    </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

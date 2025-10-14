@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const FusionAuthClient = require('@fusionauth/node-client');
 
 const {
   getUserProfile,
@@ -18,6 +19,13 @@ const requireLeadOrAdmin = (req, res, next) => {
   if (roles.includes("Admin") || roles.includes("Lead")) return next();
   return res.status(403).json({ error: "forbidden" });
 };
+
+// Initialize FusionAuth client 
+const client = new FusionAuthClient(
+  process.env.FUSIONAUTH_API_KEY,
+  process.env.FUSIONAUTH_URL
+);
+
 
 // ----- user endpoints -----
 router.get("/:id", authenticateUser, getUserProfile);
@@ -104,6 +112,24 @@ router.delete("/:id/notes/:noteId", authenticateUser, requireLeadOrAdmin, async 
     await user.save();
     res.json({ ok: true });
   } catch (e) { next(e); }
+});
+
+// ----- FusionAuth user data (Lead/Admin only) -----
+router.get("/:id/fusionauth", authenticateUser, requireLeadOrAdmin, async (req, res, next) => {
+  try {
+    const response = await client.retrieveUser(req.params.id);
+    const user = response.response.user;
+    
+    res.json({ 
+      mobilePhone: user.mobilePhone || null,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName
+    });
+  } catch (error) {
+    console.error('Error fetching user from FusionAuth:', error);
+    res.status(500).json({ error: 'Failed to retrieve user from FusionAuth' });
+  }
 });
 
 module.exports = router;
