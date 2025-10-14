@@ -67,7 +67,14 @@ exports.getVolunteers = async (req, res) => {
 };
 exports.getUserPhone = async (req, res) => {
   try {
-    const response = await client.retrieveUser(req.params.id);
+    // First get the user from MongoDB to get their fusionAuthId
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Then use the fusionAuthId to call FusionAuth
+    const response = await client.retrieveUser(user.fusionAuthId);
     res.json({ 
       mobilePhone: response.response.user.mobilePhone || null
     });
