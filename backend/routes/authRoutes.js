@@ -20,7 +20,7 @@ router.post("/callback", async (req, res) => {
   }
 
   try {
-    // 1) Exchange code for tokens
+    // Exchange code for tokens
     const tokenResponse = await fetch(`${FUSIONAUTH_DOMAIN}/oauth2/token`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -45,7 +45,7 @@ router.post("/callback", async (req, res) => {
       });
     }
 
-    // 2) Pull claims from /userinfo (your lambda adds preferred_username)
+    // Pull claims from /userinfo 
     const userResponse = await fetch(`${FUSIONAUTH_DOMAIN}/oauth2/userinfo`, {
       headers: { Authorization: `Bearer ${tokenData.access_token}` }
     });
@@ -53,7 +53,7 @@ router.post("/callback", async (req, res) => {
     const faUser = profile.user || profile;
 
     // Required identifiers
-    const fusionAuthId = faUser.sub; // stable OIDC subject
+    const fusionAuthId = faUser.sub; 
     const email = faUser.email;
 
     if (!fusionAuthId || !email) {
@@ -64,11 +64,11 @@ router.post("/callback", async (req, res) => {
       });
     }
 
-    // 3) Pick a display name: prefer your FA lambda’s claim, then standard ones, then email
+    //  Pick a display name: prefer your FA lambda’s claim, then standard ones, then email
     const preferredName =
       faUser.preferred_username || faUser.name || faUser.given_name || faUser.nickname || email;
 
-    // 4) Single upsert so Mongo is always in sync
+    //  Single upsert so Mongo is always in sync
     const user = await User.findOneAndUpdate(
       { $or: [{ fusionAuthId }, { email }] },
       {
@@ -81,7 +81,7 @@ router.post("/callback", async (req, res) => {
       { new: true, upsert: true }
     );
 
-    // 5) Return user + access token (frontend stores both)
+    // Return user + access token (frontend stores both)
     res.json({ user, access_token: tokenData.access_token });
   } catch (err) {
     console.error("FusionAuth login failed", err);
