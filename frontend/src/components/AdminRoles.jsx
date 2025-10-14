@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useId } from "react";
 import Header from "./Header";
-import "../styles/admin.css";
+import "../styles/adminRoles.css";
 import "../styles/shiftForm.css";
 
 export default function AdminRoles() {
