@@ -23,7 +23,7 @@ const requireLeadOrAdmin = (req, res, next) => {
 // Initialize FusionAuth client 
 const client = new FusionAuthClient(
   process.env.FUSIONAUTH_API_KEY,
-  process.env.FUSIONAUTH_URL
+  process.env.FUSIONAUTH_DOMAIN
 );
 
 

@@ -5,7 +5,7 @@ const { FusionAuthClient } = require('@fusionauth/node-client');
 // Initialize FusionAuth client
 const client = new FusionAuthClient(
   process.env.FUSIONAUTH_API_KEY,
-  process.env.FUSIONAUTH_URL
+  process.env.FUSIONAUTH_DOMAIN
 );
 
 exports.getVolunteers = async (req, res) => {
