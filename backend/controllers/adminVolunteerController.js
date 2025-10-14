@@ -35,11 +35,6 @@ exports.getVolunteers = async (req, res) => {
       }, 0);
       
     
-      // DEBUG LOGS
-      console.log(`User: ${user.email}`);
-      console.log(`  ➤ Matched shifts: ${userShifts.length}`);
-      console.log(`  ➤ Total hours: ${totalHours}`);
-      console.log("  ➤ Shift IDs:", userShifts.map((s) => s._id));
     
       return {
         id: user._id,
@@ -65,21 +60,32 @@ exports.getVolunteers = async (req, res) => {
     res.status(500).json({ message: "Server error fetching volunteers" });
   }
 };
+
 exports.getUserPhone = async (req, res) => {
+  console.log("getUserPhone called for ID:", req.params.id);
+  
   try {
     // First get the user from MongoDB to get their fusionAuthId
     const user = await User.findById(req.params.id);
+    console.log("Found user in MongoDB:", user ? user.email : "NOT FOUND");
+    
     if (!user) {
+      console.log("User not found in MongoDB");
       return res.status(404).json({ error: 'User not found' });
     }
 
+    console.log("FusionAuth ID:", user.fusionAuthId);
+    
     // Then use the fusionAuthId to call FusionAuth
     const response = await client.retrieveUser(user.fusionAuthId);
+    console.log("FusionAuth response received");
+    
     res.json({ 
       mobilePhone: response.response.user.mobilePhone || null
     });
   } catch (error) {
     console.error('Error fetching user from FusionAuth:', error);
+    console.error('Full error details:', error.message, error.stack);
     res.status(500).json({ error: 'Failed to retrieve user' });
   }
 };
