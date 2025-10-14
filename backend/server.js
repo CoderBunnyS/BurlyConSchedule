@@ -13,6 +13,7 @@ const adminVolunteerRoutes = require("./routes/adminVolunteerRoutes");
 const smsRoutes = require("./routes/sms");
 const reminderJob = require("./jobs/reminderJob");
 
+
 dotenv.config();
 connectDB();
 
@@ -41,7 +42,7 @@ app.use("/api/volunteer", volunteerRoutes);
 app.use("/api/shiftroles", shiftRoleRoutes);
 app.use("/api/admin", adminVolunteerRoutes);
 app.use("/api/hourlyneeds", hourlyNeedsRoutes);
-app.use("/api/sms", smsRoutes);
+
 
 // Authentication routes
 app.use("/api/auth", require("./routes/authRoutes"));

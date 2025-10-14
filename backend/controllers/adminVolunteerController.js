@@ -1,5 +1,12 @@
 const User = require("../models/User");
 const Shift = require("../models/FlexibleShift");
+const { FusionAuthClient } = require('@fusionauth/node-client');
+
+// Initialize FusionAuth client
+const client = new FusionAuthClient(
+  process.env.FUSIONAUTH_API_KEY,
+  process.env.FUSIONAUTH_URL
+);
 
 exports.getVolunteers = async (req, res) => {
   try {
@@ -56,5 +63,16 @@ exports.getVolunteers = async (req, res) => {
   } catch (err) {
     console.error("Error fetching volunteers:", err);
     res.status(500).json({ message: "Server error fetching volunteers" });
+  }
+};
+exports.getUserPhone = async (req, res) => {
+  try {
+    const response = await client.retrieveUser(req.params.id);
+    res.json({ 
+      mobilePhone: response.response.user.mobilePhone || null
+    });
+  } catch (error) {
+    console.error('Error fetching user from FusionAuth:', error);
+    res.status(500).json({ error: 'Failed to retrieve user' });
   }
 };

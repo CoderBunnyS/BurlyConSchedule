@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { getVolunteers } = require("../controllers/adminVolunteerController");
+const { getVolunteers, getUserPhone } = require("../controllers/adminVolunteerController");
 
-router.get("/volunteers", getVolunteers); // <-- Add `/volunteers` here
+router.get("/volunteers", getVolunteers); 
+router.get("/users/:id/phone", getUserPhone);
 
 module.exports = router;

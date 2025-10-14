@@ -9,8 +9,8 @@ export default function AdminVolunteers() {
   const [volunteers, setVolunteers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState("hours"); // "hours", "name", "shifts"
-  const [phoneNumbers, setPhoneNumbers] = useState({}); // Store phone numbers by userId
+  const [sortBy, setSortBy] = useState("hours");
+  const [phoneNumbers, setPhoneNumbers] = useState({});
 
   // Check user roles
   const isAdmin = hasRole("Admin");
@@ -50,7 +50,7 @@ export default function AdminVolunteers() {
 
     volunteers.forEach(async (vol) => {
       try {
-        const res = await fetch(API(`/api/users/${vol._id || vol.id}/fusionauth`), {
+        const res = await fetch(API(`/api/admin/users/${vol._id || vol.id}/phone`), {
           headers: authHeader()
         });
         if (res.ok) {
@@ -69,7 +69,6 @@ export default function AdminVolunteers() {
   }, [volunteers]);
 
   useEffect(() => {
-    // Only fetch data if user has access
     if (!canAccessPage) {
       setLoading(false);
       return;
