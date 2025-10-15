@@ -515,7 +515,7 @@
 
 .modern-time-range {
   font-weight: 500;
-  color: var(--gray-700);
+  color: linear-gradient(135deg, var(--plum), var(--rose));
   white-space: nowrap;
 }
 
@@ -677,7 +677,7 @@
   }
 
   .modern-time-range {
-    color: #e2e8f0;
+    color: linear-gradient(135deg, var(--plum), var(--rose));
   }
 
   .modern-empty-state {
