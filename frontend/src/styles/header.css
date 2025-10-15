@@ -738,6 +738,13 @@
 }
 
 /* Smooth scrolling for mobile menu */
+@media (max-width: 1755px) {
+  .modern-logo {
+    margin-left: 0;
+  }
+  
+}
+
 @media (max-width: 768px) {
   .modern-mobile-nav-content {
     scroll-behavior: smooth;
