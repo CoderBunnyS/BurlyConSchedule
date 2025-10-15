@@ -6,13 +6,13 @@ import { getUserId } from "../utils/authUtils";
   const scheduleImages = {
     "2025-11-05": "https://i.ibb.co/Dg6y6nXV/Wednesday-1.png",
     "2025-11-06":
-      "https://i.ibb.co/B29v03Vz/sched-nov6.jpg",
+      "https://burlycon.org/wp-content/uploads/2025/10/BC2025-sched-nov-6.png",
     "2025-11-07":
-      "https://i.ibb.co/7xZ8m23C/sched-nov7.jpg",
+      "https://burlycon.org/wp-content/uploads/2025/10/BC2025-sched-nov-7.png",
     "2025-11-08":
-      "https://i.ibb.co/Q7S2dWsY/sched-nov8.jpg",
+      "https://burlycon.org/wp-content/uploads/2025/10/BC2025-sched-nov-8.png",
     "2025-11-09":
-      "https://i.ibb.co/7JNdbZ44/sched-nov9.jpg",
+      "https://burlycon.org/wp-content/uploads/2025/10/BC2025-sched-nov-9.png",
   };
 
 export default function VolunteerShifts() {
