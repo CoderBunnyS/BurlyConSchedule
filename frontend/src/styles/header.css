@@ -49,6 +49,7 @@
   margin-left: -15%;
 }
 
+
 .modern-logo-link {
   display: flex;
   align-items: center;
@@ -740,5 +741,8 @@
 @media (max-width: 768px) {
   .modern-mobile-nav-content {
     scroll-behavior: smooth;
+  }
+  .modern-logo {
+    margin-left: 0;
   }
 }
