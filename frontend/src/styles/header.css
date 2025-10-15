@@ -46,6 +46,7 @@
 .modern-logo {
   flex-shrink: 0;
   min-width: fit-content;
+  margin-left: -15%;
 }
 
 .modern-logo-link {
