@@ -4,7 +4,7 @@ import Header from "./Header";
 import { getUserId } from "../utils/authUtils";
 
   const scheduleImages = {
-    "2025-11-05": "https://i.ibb.co/Dg6y6nXV/Wednesday-1.png",
+    "2025-11-05": "https://i.ibb.co/JjXqf5kM/Wedneday-Image.png",
     "2025-11-06":
       "https://burlycon.org/wp-content/uploads/2025/10/BC2025-sched-nov-6.png",
     "2025-11-07":
