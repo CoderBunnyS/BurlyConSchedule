@@ -1,6 +1,3 @@
-// migrations/migrateVolunteerReferences.js
-// Rebuild volunteersRegistered arrays from User.volunteerShifts data
-
 const mongoose = require('mongoose');
 const FlexibleShift = require('../models/FlexibleShift');
 const User = require('../models/User');
@@ -9,7 +6,7 @@ async function migrateVolunteerReferences() {
   try {
     console.log('Starting migration: rebuilding shift registrations from user data...');
 
-    // First, clear all volunteersRegistered arrays
+    // clear volunteersRegistered arrays
     await FlexibleShift.updateMany({}, { $set: { volunteersRegistered: [] } });
     console.log('Cleared all existing volunteersRegistered arrays');
 
@@ -20,7 +17,6 @@ async function migrateVolunteerReferences() {
     let updatedShifts = 0;
     let errorCount = 0;
 
-    // Also ensure all shifts have the volunteersRegistered array
     await FlexibleShift.updateMany(
       { volunteersRegistered: { $exists: false } },
       { $set: { volunteersRegistered: [] } }
@@ -32,17 +28,16 @@ async function migrateVolunteerReferences() {
       
       for (const userShift of user.volunteerShifts) {
         try {
-          // Only process FlexibleShift references
           if (userShift.refModel !== 'FlexibleShift') {
             continue;
           }
 
           const shiftId = userShift.shift;
           
-          // Add this user to the shift's volunteersRegistered array
+          // Add user to volunteersRegistered array
           const result = await FlexibleShift.findByIdAndUpdate(
             shiftId,
-            { $addToSet: { volunteersRegistered: user._id } }, // addToSet prevents duplicates
+            { $addToSet: { volunteersRegistered: user._id } },
             { new: true }
           );
 
@@ -64,7 +59,7 @@ async function migrateVolunteerReferences() {
     console.log(`Successfully updated: ${updatedShifts} shift registrations`);
     console.log(`Errors: ${errorCount}`);
 
-    // Verify the results
+    // Verify results
     const shiftsWithVolunteers = await FlexibleShift.find({
       volunteersRegistered: { $ne: [] }
     }).populate('volunteersRegistered', 'preferredName email');
@@ -82,9 +77,8 @@ async function migrateVolunteerReferences() {
   }
 }
 
-// Run if called directly
+// Call function manually
 if (require.main === module) {
-  // Load your database connection
   require('dotenv').config();
   
   mongoose.connect(process.env.MONGO_URI)

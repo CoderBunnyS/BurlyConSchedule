@@ -103,7 +103,7 @@
   box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
 }
 
-/* Modern Roles Grid - Better Contrast */
+/* Modern Roles Grid */
 .modern-roles-grid {
   display: grid;
   gap: 1.5rem;
@@ -507,7 +507,7 @@
   font-size: 1.125rem;
 }
 
-/* Responsive */
+/* Responsiveness */
 @media (max-width: 768px) {
   .modern-form-row {
     grid-template-columns: 1fr;

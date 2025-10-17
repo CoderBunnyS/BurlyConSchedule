@@ -10,7 +10,7 @@ exports.getRoles = async (req, res) => {
   }
 };
 
-// POST a new role
+// POST new role
 exports.createRole = async (req, res) => {
   const {
     name,
@@ -40,7 +40,7 @@ exports.createRole = async (req, res) => {
 };
 
 
-// PATCH update an existing role
+// PATCH update role
 exports.updateRole = async (req, res) => {
   try {
     const updated = await ShiftRole.findByIdAndUpdate(
@@ -55,7 +55,7 @@ exports.updateRole = async (req, res) => {
   }
 };
 
-// DELETE a role
+// DELETE role
 exports.deleteRole = async (req, res) => {
   try {
     const deleted = await ShiftRole.findByIdAndDelete(req.params.id);

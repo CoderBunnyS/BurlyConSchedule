@@ -8,11 +8,11 @@ const {
   getUserHourlyNeeds,
 } = require("../controllers/hourlyNeedsController");
 
-// ✅ Specific routes first!
-router.get("/user/:userId", getUserHourlyNeeds); // GET all needs for a user
-router.get("/:date", getHourlyNeedsByDate);      // GET needs for a specific date
-router.post("/bulk", saveBulkHourlyNeeds);       // POST all needs for a date
-router.post("/:id/signup", signUpForHourlyNeed); // POST sign up to volunteer
-router.post("/:id/cancel", cancelHourlyNeed);    // POST cancel a volunteer shift
+// ---- Routes ----
+router.get("/user/:userId", getUserHourlyNeeds); 
+router.get("/:date", getHourlyNeedsByDate);     
+router.post("/bulk", saveBulkHourlyNeeds);  
+router.post("/:id/signup", signUpForHourlyNeed); 
+router.post("/:id/cancel", cancelHourlyNeed); 
 
 module.exports = router;

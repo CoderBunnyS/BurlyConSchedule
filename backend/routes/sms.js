@@ -1,11 +1,10 @@
-// routes/sms.js
 const express = require('express');
 const router = express.Router();
 const smsService = require('../utils/smsService');
 const fusionAuthService = require('../utils/fusionAuthService');
 const reminderJob = require('../jobs/reminderJob');
 
-// Test SMS sending
+// Test SMS 
 router.post('/test', async (req, res) => {
   try {
     const { phoneNumber, message } = req.body;
@@ -33,7 +32,7 @@ router.post('/test', async (req, res) => {
   }
 });
 
-// Test FusionAuth user lookup
+// FusionAuth user lookup
 router.get('/user/:userId/phone', async (req, res) => {
   try {
     const { userId } = req.params;
@@ -50,12 +49,12 @@ router.get('/user/:userId/phone', async (req, res) => {
   }
 });
 
-// Manually trigger reminder check (for testing)
+// Manually trigger reminder check
 router.post('/reminders/trigger', async (req, res) => {
   try {
     console.log('🧪 Manual reminder trigger requested');
     
-    // Run the reminder check
+    // Run reminder check
     await reminderJob.sendTestReminders();
     
     res.json({
@@ -81,7 +80,7 @@ router.get('/reminders/status', (req, res) => {
   });
 });
 
-// Test shift reminder message format
+// Test shift reminder message 
 router.post('/test-reminder-message', async (req, res) => {
   try {
     const { phoneNumber } = req.body;
@@ -93,7 +92,7 @@ router.post('/test-reminder-message', async (req, res) => {
       });
     }
 
-    // Mock shift data for testing
+    // testing shift data
     const mockShiftDetails = {
       role: 'Registration Desk',
       startTime: '14:00',

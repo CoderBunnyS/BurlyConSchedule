@@ -12,12 +12,12 @@ export default function AdminVolunteers() {
   const [sortBy, setSortBy] = useState("hours");
   const [phoneNumbers, setPhoneNumbers] = useState({});
 
-  // Check user roles
+  // Check user role
   const isAdmin = hasRole("Admin");
   const isLead = hasRole("Lead");
   const canAccessPage = isAdmin || isLead;
 
-  // Redirect if no access
+  // Redirect 
   useEffect(() => {
     if (!canAccessPage) {
       navigate("/");
@@ -44,7 +44,7 @@ export default function AdminVolunteers() {
       });
   }, []);
 
-  // Fetch phone numbers from FusionAuth
+  // Fetch phone numbers 
   useEffect(() => {
     if (volunteers.length === 0) return;
 
@@ -76,7 +76,7 @@ export default function AdminVolunteers() {
     refresh();
   }, [canAccessPage, refresh]);
 
-  // ---- actions ----
+
   async function toggleNoShow(userId, checked) {
     const r = await fetch(API(`/api/users/${userId}/noShow`), {
       method: "PATCH",
@@ -106,7 +106,6 @@ export default function AdminVolunteers() {
     refresh();
   }
 
-  // ---- derived values / utils ----
   const filteredVolunteers = volunteers.filter((vol) => {
     const name = (vol.preferredName || vol.name || "").toLowerCase();
     const email = (vol.email || "").toLowerCase();
@@ -185,7 +184,7 @@ export default function AdminVolunteers() {
           </div>
         )}
 
-        {/* Search and Filter Section */}
+        {/* Search and Filter */}
         <div className="modern-filter-section">
           <div className="modern-filter-header">
             <h3 className="modern-filter-title">

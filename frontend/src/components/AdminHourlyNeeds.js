@@ -1,4 +1,3 @@
-// AdminHourlyNeeds.js
 import React, { useEffect, useState } from "react";
 import "../styles/admin.css";
 import Header from "./Header";
@@ -8,7 +7,7 @@ export default function AdminHourlyNeeds() {
   const [hourlyNeeds, setHourlyNeeds] = useState({});
   const [date, setDate] = useState("2025-11-07");
 
-  // Hour blocks from 08:00 to 02:00 the next day
+  // Hour blocks 
   const hours = [
     "08:00", "09:00", "10:00", "11:00", "12:00",
     "13:00", "14:00", "15:00", "16:00", "17:00",

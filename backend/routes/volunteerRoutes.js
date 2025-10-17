@@ -14,7 +14,7 @@ const {
   updateFlexShift
 } = require("../controllers/flexShiftController");
 
-// Specific route first
+// Get user's shifts
 router.get("/user/:userId", getUserFlexShifts);
 
 // Get shifts by date

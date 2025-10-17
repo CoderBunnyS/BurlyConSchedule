@@ -1,4 +1,3 @@
-// models/FlexibleShift.js
 const mongoose = require("mongoose");
 
 const flexibleShiftSchema = new mongoose.Schema({
@@ -23,7 +22,7 @@ const flexibleShiftSchema = new mongoose.Schema({
     required: true
   },
   volunteersRegistered: [{
-    type: mongoose.Schema.Types.ObjectId,  // CHANGED from String
+    type: mongoose.Schema.Types.ObjectId,  
     ref: "User"
   }],
   notes: {

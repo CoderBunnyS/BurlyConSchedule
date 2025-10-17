@@ -15,7 +15,7 @@ export default function AdminShiftOverview() {
   const [editingShift, setEditingShift] = useState(null);
   const [editFormData, setEditFormData] = useState({});
 
-  // Check if user is admin or lead
+  // Check user role
   const isAdmin = hasRole("Admin") || hasRole("Lead");
 
   useEffect(() => {
@@ -24,7 +24,6 @@ export default function AdminShiftOverview() {
       .then((data) => {
         setAllShifts(data);
         setLoading(false);
-        // Auto-expand all roles initially
         const roles = Array.from(new Set(data.map((s) => s.role)));
         setExpandedRoles(new Set(roles));
       })
@@ -36,16 +35,15 @@ export default function AdminShiftOverview() {
 
   const roles = Array.from(new Set(allShifts.map((s) => s.role))).sort();
 
-  // FIX: Use getDatePortion for consistent date extraction
   const availableDates = Array.from(
     new Set(
       allShifts
         .filter((s) => !!s.date)
-        .map((s) => getDatePortion(s.date))  // <-- CHANGED: Use getDatePortion
+        .map((s) => getDatePortion(s.date)) 
     )
   ).sort();
 
-  // getDatePortion for date comparison
+  // date comparison
   const filteredShifts = allShifts.filter((shift) => {
     const normalizedShiftDate = getDatePortion(shift.date);  
     const matchesDate = !selectedDate || normalizedShiftDate === selectedDate;
@@ -91,13 +89,11 @@ export default function AdminShiftOverview() {
     if (!editingShift) return;
 
     try {
-      // Prepare data with proper date conversion
       const updateData = {
         ...editFormData,
         date: editFormData.date
       };
 
-      // Use the correct endpoint - just /api/volunteer/{id}
       const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/volunteer/${editingShift}`, {
         method: 'PATCH',
         headers: {
@@ -167,7 +163,7 @@ export default function AdminShiftOverview() {
     return `${displayHour}:${min.toString().padStart(2, "0")} ${suffix}`;
   };
 
-  // Calculate summary stats
+  // Calculate stats
   const totalShifts = filteredShifts.length;
   const filledShifts = filteredShifts.filter(shift => {
     const filled = shift.volunteersRegistered?.length || 0;
@@ -179,7 +175,6 @@ export default function AdminShiftOverview() {
     return filled === 0;
   }).length;
 
-  // FIX: Create date object more carefully for display
   const selectedDateLabel = selectedDate 
     ? (() => {
         const [year, month, day] = selectedDate.split('-').map(Number);
@@ -235,7 +230,7 @@ export default function AdminShiftOverview() {
           </div>
         )}
 
-        {/* Add Shift Form - Admin Only */}
+        {/* Add Shift Form */}
         {isAdmin && (
           <div className="modern-add-shift-section">
             <button
@@ -285,7 +280,7 @@ export default function AdminShiftOverview() {
               >
                 <option value="">All Dates</option>
                 {availableDates.map((date) => {
-                  // FIX: Create date object more carefully
+
                   const [year, month, day] = date.split('-').map(Number);
                   return (
                     <option key={date} value={date}>
@@ -377,7 +372,7 @@ export default function AdminShiftOverview() {
                           <div className="modern-shifts-grid">
                             {shifts
                               .sort((a, b) => {
-                                // Sort by date first, then by start time
+                                // Sort by date then by start time
                                 const dateCompare = a.date.localeCompare(b.date);
                                 if (dateCompare !== 0) return dateCompare;
                                 return a.startTime.localeCompare(b.startTime);
@@ -395,7 +390,7 @@ export default function AdminShiftOverview() {
                                         <div className="modern-edit-header">
                                           <div className="modern-shift-time-info">
                                             <div className="modern-shift-date">
-                                              {formatDateDisplay(shift.date)}  {/* <-- CHANGED: Use formatDateDisplay */}
+                                              {formatDateDisplay(shift.date)} 
                                             </div>
                                             <div className="modern-shift-time">
                                               🕒 {formatTime(shift.startTime)} - {formatTime(shift.endTime)}
@@ -510,7 +505,7 @@ export default function AdminShiftOverview() {
                                         <div className="modern-shift-header">
                                           <div className="modern-shift-time-info">
                                             <div className="modern-shift-date">
-                                              {formatDateDisplay(shift.date)}  {/* <-- CHANGED: Use formatDateDisplay */}
+                                              {formatDateDisplay(shift.date)}  
                                             </div>
                                             <div className="modern-shift-time">
                                               🕒 {formatTime(shift.startTime)} - {formatTime(shift.endTime)}

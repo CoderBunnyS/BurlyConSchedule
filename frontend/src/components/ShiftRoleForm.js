@@ -1,4 +1,3 @@
-// components/ShiftRoleForm.js
 import React, { useState } from "react";
 
 export default function ShiftRoleForm({ onRoleCreated }) {
@@ -9,7 +8,6 @@ export default function ShiftRoleForm({ onRoleCreated }) {
     physicalRequirements: "",
     pointOfContact: "",
     contactPhone: "",
-    // Added missing fields that your form uses
     description: "",
     requirements: "",
   });
@@ -22,7 +20,6 @@ export default function ShiftRoleForm({ onRoleCreated }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Use environment variable for API base URL; fail fast if not provided
       const apiBase = process.env.REACT_APP_API_BASE;
       if (!apiBase) {
         throw new Error("REACT_APP_API_BASE is not defined");

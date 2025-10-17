@@ -1,10 +1,9 @@
-// jobs/reminderJob.js
 const cron = require('node-cron');
 const mongoose = require('mongoose');
 const smsService = require('../utils/smsService');
 const fusionAuthService = require('../utils/fusionAuthService');
 
-// Import the shift model
+// Import shift model
 const Shift = require('../models/Shift');
 
 class ReminderJob {
@@ -12,11 +11,11 @@ class ReminderJob {
     this.isRunning = false;
   }
 
-  // Start the cron job
+  // Start cron job
   start() {
     console.log('Starting SMS reminder job...');
     
-    // Run every 15 minutes: */15 * * * *
+    // Run every 15 minutes
     cron.schedule('*/15 * * * *', async () => {
       await this.checkAndSendReminders();
     });
@@ -34,7 +33,7 @@ class ReminderJob {
     console.log(`Checking for shifts needing reminders at ${new Date().toISOString()}`);
     
     try {
-      // Find shifts starting in approximately 1 hour (50-70 minutes from now)
+      // Find shifts starting in about an hour
       const shiftsNeedingReminders = await this.findShiftsNeedingReminders();
       
       if (shiftsNeedingReminders.length === 0) {
@@ -44,7 +43,7 @@ class ReminderJob {
 
       console.log(`Found ${shiftsNeedingReminders.length} shifts needing reminders`);
       
-      // Send reminders for each shift
+      // Send reminders for shifts
       for (const shift of shiftsNeedingReminders) {
         await this.sendRemindersForShift(shift);
       }
@@ -60,11 +59,11 @@ class ReminderJob {
     try {
       const now = new Date();
       
-      // Calculate time range: 50-70 minutes from now
-      const reminderStart = new Date(now.getTime() + 50 * 60 * 1000); // 50 minutes
-      const reminderEnd = new Date(now.getTime() + 70 * 60 * 1000);   // 70 minutes
+      // Calculate 50-70 minutes from now
+      const reminderStart = new Date(now.getTime() + 50 * 60 * 1000); 
+      const reminderEnd = new Date(now.getTime() + 70 * 60 * 1000); 
       
-      // Get the date 
+      // Get date 
       const today = now.toISOString().split('T')[0];
       
       // Convert times 
@@ -81,7 +80,7 @@ class ReminderJob {
         },
         // Only shifts with volunteers
         volunteersRegistered: { $exists: true, $not: { $size: 0 } },
-        // Don't send duplicate reminders 
+        // Don't send duplicates 
         reminderSent: { $ne: true }
       });
 
@@ -104,7 +103,7 @@ class ReminderJob {
         return;
       }
 
-      // Get phone numbers from FusionAuth
+      // Get phone numbers from user object
       const phoneResults = await fusionAuthService.getUsersPhones(volunteerIds);
       
       if (!phoneResults.success) {
@@ -114,7 +113,7 @@ class ReminderJob {
 
       console.log(`Phone lookup stats:`, phoneResults.stats);
       
-      // Send SMS to each volunteer with a phone number
+      // Send SMS to volunteers with a phone number
       const smsPromises = phoneResults.validUsers.map(async (userInfo) => {
         const shiftDetails = {
           role: shift.role,
@@ -147,7 +146,7 @@ class ReminderJob {
         })));
       }
 
-      // Mark shift as reminder sent to avoid duplicates
+      // Avoid duplicate reminders
       await Shift.findByIdAndUpdate(shift._id, { reminderSent: true });
       
       console.log(`Completed reminders for ${shift.role} shift`);

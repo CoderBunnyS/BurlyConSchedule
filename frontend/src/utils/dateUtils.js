@@ -1,13 +1,10 @@
-// src/utils/dateUtils.js
-// Date utility functions to handle timezone issues in shift management
-
 /**
  * Convert a date input value to a UTC date string that preserves the local date
  * @param {string} dateInputValue - The value from an HTML date input (YYYY-MM-DD)
  * @returns {string} - ISO string that represents the same date in UTC
  */
 export function localDateToUTC(dateInputValue) {
-  // Parse the date as local midnight
+  // Parse date as local midnight
   const [year, month, day] = dateInputValue.split('-').map(Number);
   const localDate = new Date(year, month - 1, day, 0, 0, 0);
   
@@ -60,12 +57,11 @@ export function formatDateDisplay(dateString) {
 export function getDatePortion(isoString) {
   if (!isoString) return '';
   
-  // If it's already just a date (YYYY-MM-DD), return as is
   if (isoString.length === 10 && isoString.includes('-')) {
     return isoString;
   }
   
-  // Otherwise extract the date portion
+  // extract the date portion
   return isoString.split('T')[0];
 }
 
@@ -77,16 +73,11 @@ export function getDatePortion(isoString) {
 export function normalizeDateForComparison(dateString) {
   if (!dateString) return '';
   
-  // If the date appears to be offset by timezone, adjust it
   const date = new Date(dateString);
   
-  // Check if the time portion suggests a timezone offset
   const hours = date.getUTCHours();
   
-  // If the UTC hours are not 0, we might have a timezone issue
-  // Adjust to get the intended date
   if (hours >= 20) {
-    // Date was likely saved as previous day due to timezone
     date.setUTCDate(date.getUTCDate() + 1);
   }
   

@@ -4,8 +4,8 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
   const [roles, setRoles] = useState([]);
   const [formData, setFormData] = useState({
     date: "2025-11-05",
-    startTime: "",   // will be "HH:MM"
-    endTime: "",     // will be "HH:MM"
+    startTime: "",   
+    endTime: "",     
     role: "",
     volunteersNeeded: 1,
     notes: ""
@@ -23,7 +23,7 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // "HH:MM" -> minutes since midnight
+  // minutes since midnight
   const toMinutes = (timeStr) => {
     if (!timeStr) return 0;
     const [h, m] = timeStr.split(":").map(Number);
@@ -37,14 +37,14 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
       if (shift.date !== newShift.date) return false;
       const start = toMinutes(shift.startTime);
       const end = toMinutes(shift.endTime);
-      return newStart < end && newEnd > start; // overlap
+      return newStart < end && newEnd > start; 
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Send the time picker values as-is: "HH:MM"
+    // Send time picker values 
     const payload = {
       ...formData,
       date: formData.date,
@@ -106,7 +106,7 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
         name="startTime"
         value={formData.startTime}
         onChange={handleChange}
-        step="60"   // minutes precision; adjust if you want 15-min: 900
+        step="60"   
         required
       />
 

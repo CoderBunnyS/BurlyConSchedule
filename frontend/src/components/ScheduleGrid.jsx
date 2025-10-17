@@ -7,7 +7,7 @@ export default function ScheduleGrid({ shifts, selectedDate, selectedRole }) {
     return <div className="schedule-grid-error">⚠️ Invalid shift data.</div>;
   }
 
-  // Build a local Date from "YYYY-MM-DD" and "HH:mm" safely
+  // Build local Date 
   const toLocalDate = (ymd, hhmm = "00:00") => {
     if (!ymd) return null;
     const [y, m, d] = ymd.split("-").map(Number);
@@ -26,7 +26,7 @@ export default function ScheduleGrid({ shifts, selectedDate, selectedRole }) {
   filteredShifts.forEach((shift) => {
     if (!shift?.date || !shift?.startTime) return;
 
-    // Use local-time construction (avoid "YYYY-MM-DDTHH:mm" → UTC parsing)
+    // Use local-time construction
     const parsed = toLocalDate(shift.date, shift.startTime);
     if (!(parsed instanceof Date) || isNaN(parsed)) return;
 

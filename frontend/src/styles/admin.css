@@ -441,7 +441,7 @@
 
 .modern-shift-time {
   flex: 1;
-  color: #f3f4f6; /* Brighter white */
+  color: #f3f4f6; 
   font-weight: 500;
 }
 
@@ -542,7 +542,7 @@
   font-size: 1.125rem;
 }
 
-/* Responsive Design */
+/* Responsiveness */
 @media (max-width: 1024px) {
   .modern-volunteers-grid {
     grid-template-columns: 1fr;
@@ -675,7 +675,7 @@
   transition: opacity 0.3s ease;
 }
 
-/* Responsive */
+/* Responsiveness */
 @media (max-width: 768px) {
   .modern-schedule-image {
     max-width: 100%;

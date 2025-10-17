@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-const authenticateUser = require("../middleware/authMiddleware");  // your auth middleware
+const authenticateUser = require("../middleware/authMiddleware"); 
 const {
   getShifts,
   getShiftById,
@@ -12,10 +12,10 @@ const {
   deleteShift
 } = require("../controllers/volunteerController");
 
-// env toggle: if true, noShow ALSO blocks signups; otherwise it's informational only
+// noshow policy flag
 const BLOCK_NOSHOW = String(process.env.BLOCK_NOSHOW_SIGNUPS || "").toLowerCase() === "true";
 
-// Middleware to block restricted users (or no-show if policy)
+// block restricted users
 async function blockRestricted(req, res, next) {
   try {
     const me = await User.findById(req.user.id).lean();
@@ -41,14 +41,14 @@ async function blockRestricted(req, res, next) {
 
 // ---- Routes ----
 
-// Get shifts for a user (public or authenticated as needed)
+// Get shifts for user 
 router.get("/user/:userId", getUserShifts);
 
 // Public routes
 router.get("/", getShifts);
 router.get("/:id", getShiftById);
 
-// Volunteer actions (authenticated + restricted gating)
+// Volunteer actions
 router.post("/:id/signup", authenticateUser, blockRestricted, signUpForShift);
 router.post("/:id/cancel", authenticateUser, cancelShift);
 

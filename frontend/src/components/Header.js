@@ -24,7 +24,7 @@ export default function Header() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user");
 
-    // Redirect to FusionAuth logout URL
+    // Redirect to logout URL
     const encodedPostLogout = encodeURIComponent(logoutRedirect);
     window.location.href = `${domain}/oauth2/logout?client_id=${clientId}&post_logout_redirect_uri=${encodedPostLogout}`;
   };
@@ -32,18 +32,16 @@ export default function Header() {
   const isLoggedIn = !!localStorage.getItem("access_token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // Prefer Mongo's saved display name; fall back to email local-part
+  // display name or email
   const displayName =
     user?.preferredName ||
     (user?.email ? user.email.split("@")[0] : "User");
 
   const initial = (displayName || "U").charAt(0).toUpperCase();
 
-  // Role label for badge
+  // Role
   const roleLabel = hasRole("Admin") ? "Admin" : hasRole("Lead") ? "Lead" : "Volunteer";
 
-  // FusionAuth self-service Account page (opens in new tab)
-  // If the user has a current FA SSO session, they'll land in their profile; otherwise FA will ask them to log in.
   const selfServiceUrl = `${domain}/account/?client_id=${clientId}`;
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -104,7 +102,6 @@ export default function Header() {
           <div className="modern-user-section">
             {isLoggedIn ? (
               <div className="modern-user-menu">
-                {/* Make the avatar+name block a link to FusionAuth Account */}
                 <a
                   href={selfServiceUrl}
                   className="modern-user-info"

@@ -1,4 +1,3 @@
-// models/User.js
 const mongoose = require("mongoose");
 
 const NoteSchema = new mongoose.Schema(
@@ -28,14 +27,11 @@ const userSchema = new mongoose.Schema(
 
     totalHours: { type: Number, default: 0 },
 
-    // the freeform “notes” you had before (if you still want it)
     notes: { type: String },
 
-    // flags
     noShow: { type: Boolean, default: false },
     isRestricted: { type: Boolean, default: false },
 
-    // structured notes (just one array)
     staffNotes: [NoteSchema],
 
   },

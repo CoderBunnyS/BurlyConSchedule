@@ -32,7 +32,7 @@ export const deleteClass = async (classId) => {
 };
 
 
-// 🔹 New function to enroll a user in a class
+// enroll a user in class
 export const enrollInClass = async (classId, userId) => {
   try {
     const response = await axios.post(`${API_URL}/classes/${classId}/enroll`, { userId });

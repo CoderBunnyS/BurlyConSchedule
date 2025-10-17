@@ -1,5 +1,3 @@
-/* Modern Header Styles - Enhanced Responsive */
-
 /* CSS Variables */
 :root {
   --header-bg: rgba(255, 255, 255, 0.9);
@@ -497,9 +495,9 @@
   z-index: 998;
 }
 
-/* Enhanced Responsive Design */
+/* Responsive Design */
 
-/* Large screens - show full text */
+/* Large screens */
 @media (min-width: 1200px) {
   .modern-header-inner {
     gap: 3rem;
@@ -514,7 +512,7 @@
   }
 }
 
-/* Medium-large screens - hide subtitle first */
+/* Medium-large screens */
 @media (max-width: 1024px) {
   .modern-logo-text {
     display: none;
@@ -529,7 +527,7 @@
   }
 }
 
-/* Medium screens - compact navigation */
+/* Medium screens */
 @media (max-width: 900px) {
   .modern-nav-text {
     display: none;
@@ -571,7 +569,7 @@
   }
 }
 
-/* Tablet - switch to mobile menu */
+/* Tablet */
 @media (max-width: 768px) {
   .modern-nav-desktop {
     display: none;
@@ -697,7 +695,7 @@
   }
 }
 
-/* Dark Mode Support */
+/* Dark Mode */
 @media (prefers-color-scheme: dark) {
   :root {
     --header-bg: rgba(45, 31, 46, 0.9);
@@ -737,7 +735,7 @@
   outline-offset: 2px;
 }
 
-/* Smooth scrolling for mobile menu */
+/* Smooth scrolling for mobile */
 @media (max-width: 1755px) {
   .modern-logo {
     margin-left: 0;

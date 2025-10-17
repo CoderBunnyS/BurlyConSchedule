@@ -1,4 +1,3 @@
-// utils/smsService.js
 const twilio = require('twilio');
 
 class SMSService {
@@ -12,7 +11,7 @@ class SMSService {
 
   async sendShiftReminder(phoneNumber, shiftDetails) {
     try {
-      // Format phone number (ensure it has country code)
+      // Format phone #
       const formattedPhone = this.formatPhoneNumber(phoneNumber);
       
       // Create reminder message
@@ -44,15 +43,15 @@ class SMSService {
   }
 
   formatPhoneNumber(phone) {
-    // Remove all non-digit characters
+    // Format phone number
     const digits = phone.replace(/\D/g, '');
     
-    // Add +1 if it's a 10-digit US number
+    // Add +1 for US number
     if (digits.length === 10) {
       return `+1${digits}`;
     }
     
-    // Add + if not present and it's 11+ digits
+    // Add + if not present and 11+ digits
     if (digits.length >= 11 && !phone.startsWith('+')) {
       return `+${digits}`;
     }
@@ -63,7 +62,7 @@ class SMSService {
   createReminderMessage(shiftDetails) {
     const { role, startTime, endTime, location, volunteerName } = shiftDetails;
     
-    // Format time for display (assumes 24hr format like "14:00")
+    // Format time
     const formatTime = (timeStr) => {
       const [hour, min] = timeStr.split(':');
       const h = parseInt(hour);

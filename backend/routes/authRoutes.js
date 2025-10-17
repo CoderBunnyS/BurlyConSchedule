@@ -1,4 +1,3 @@
-// routes/authRoutes.js
 const express = require("express");
 const fetch = require("node-fetch");
 const router = express.Router();
@@ -20,7 +19,7 @@ router.post("/callback", async (req, res) => {
   }
 
   try {
-    // Exchange code for tokens
+    // Token exchange
     const tokenResponse = await fetch(`${FUSIONAUTH_DOMAIN}/oauth2/token`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -52,7 +51,7 @@ router.post("/callback", async (req, res) => {
     const profile = await userResponse.json();
     const faUser = profile.user || profile;
 
-    // Required identifiers
+    // identifiers
     const fusionAuthId = faUser.sub; 
     const email = faUser.email;
 
@@ -64,11 +63,10 @@ router.post("/callback", async (req, res) => {
       });
     }
 
-    //  Pick a display name: prefer your FA lambda’s claim, then standard ones, then email
+    //  Display name
     const preferredName =
       faUser.preferred_username || faUser.name || faUser.given_name || faUser.nickname || email;
 
-    //  Single upsert so Mongo is always in sync
     const user = await User.findOneAndUpdate(
       { $or: [{ fusionAuthId }, { email }] },
       {
@@ -81,7 +79,7 @@ router.post("/callback", async (req, res) => {
       { new: true, upsert: true }
     );
 
-    // Return user + access token (frontend stores both)
+    // Return user + token
     res.json({ user, access_token: tokenData.access_token });
   } catch (err) {
     console.error("FusionAuth login failed", err);

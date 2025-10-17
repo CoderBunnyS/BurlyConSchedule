@@ -1,4 +1,3 @@
-// AdminDashboard.js — enhanced with department breakdown
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "./Header";
@@ -13,9 +12,9 @@ export default function AdminDashboard() {
   const [volunteerCount, setVolunteerCount] = useState(0);
   const [allShiftsData, setAllShiftsData] = useState([]);
   
-  // New state for department view
+  // New state 
   const [expandedDepts, setExpandedDepts] = useState({});
-  const [filterView, setFilterView] = useState("all"); // "all", "unfilled", "critical"
+  const [filterView, setFilterView] = useState("all"); 
 
   const isAdmin = hasRole("Admin");
 
@@ -64,7 +63,7 @@ export default function AdminDashboard() {
       console.log("Nov 9 filtered:", filtered);
       console.log("Will add to needsByDate?", filtered.length > 0);
     }
-          // Collect all shifts for department aggregation
+          // Collect all shifts
           json.forEach((shift) => {
             allShifts.push({ ...shift, date });
             if (shift.volunteersRegistered) {
@@ -109,7 +108,7 @@ export default function AdminDashboard() {
     };
   }, [loadData]);
 
-  // Aggregate shifts by department/role
+  // shifts by department/role
   const departmentStats = useMemo(() => {
     const deptMap = {};
     
@@ -447,7 +446,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Original Gaps by Date view */}
+            {/* Gaps by Date view */}
             <div className="modern-alert-section">
               <div className="modern-alert-card">
                 <div className="modern-alert-header">

@@ -1,5 +1,3 @@
-// utils/authUtils.js
-
 export function getAccessToken() {
     return localStorage.getItem("access_token") || null;
   }
@@ -34,7 +32,7 @@ export function getAccessToken() {
     try {
       const base64 = token.split('.')[1];
       const decoded = JSON.parse(atob(base64));
-      return decoded.roles || []; // adjust if stored under a different key
+      return decoded.roles || []; 
     } catch (err) {
       console.error("Error decoding token:", err);
       return [];

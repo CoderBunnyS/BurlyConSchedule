@@ -10,6 +10,7 @@ export default function AddVolunteerForm({ onVolunteerCreated }) {
 
   const [created, setCreated] = useState(false);
 
+  //handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -18,12 +19,14 @@ export default function AddVolunteerForm({ onVolunteerCreated }) {
     }));
   };
 
+  // discount code logic
   const getPassCode = (hours) => {
     if (hours >= 8) return "FULL-PASS-EXAMPLE";
     if (hours >= 4) return "HALF-PASS-EXAMPLE";
     return "NO-PASS";
   };
 
+  //submit form
   const handleSubmit = (e) => {
     e.preventDefault();
     const passCode = getPassCode(Number(formData.committedHours));

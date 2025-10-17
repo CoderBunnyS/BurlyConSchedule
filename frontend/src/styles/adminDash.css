@@ -1,5 +1,3 @@
-/* AdminDashboard.css - Styles for Admin Dashboard Only */
-
 /* Base Container */
 .modern-page-container {
   min-height: 100vh;
@@ -126,12 +124,12 @@
 }
 
 .modern-summary-title {
-  font-size: 0.95rem; /* Increase from 0.875rem */
+  font-size: 0.95rem; 
   font-weight: 600;
-  color: #4b5563; /* Darker gray */
+  color: #4b5563;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  opacity: 1; /* Remove the 0.9 opacity */
+  opacity: 1; 
 }
 
 .modern-summary-subtitle {
@@ -193,10 +191,6 @@
 .modern-filter-badge:hover {
   background: rgba(236, 72, 153, 0.3);
   border-color: rgba(236, 72, 153, 0.5);
-}
-
-.modern-alert-content {
-  /* Content container */
 }
 
 /* Loading State */
@@ -480,7 +474,7 @@
   gap: 0.5rem;
 }
 
-/* Gaps by Date (Original View) */
+/* Gaps by Date */
 .modern-gaps-grid {
   display: grid;
   gap: 1.5rem;
@@ -527,10 +521,6 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-}
-
-.modern-shift-item {
-  /* Container for shift pills */
 }
 
 .modern-shift-pill {

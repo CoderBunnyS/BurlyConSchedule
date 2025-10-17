@@ -1,5 +1,3 @@
-/* Modern Volunteer Page Styles */
-
 /* CSS Variables */
 :root {
   --plum: #7c3aed;
@@ -615,7 +613,7 @@
   font-size: 0.875rem;
 }
 
-/* Dark Mode Support */
+/* Dark Mode */
 @media (prefers-color-scheme: dark) {
   :root {
     --gray-800: #f1f5f9;

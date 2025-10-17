@@ -13,7 +13,7 @@ export default function Home() {
     if (isLoggedIn) {
       navigate("/profile");
     } else {
-      // Trigger FusionAuth login
+      // Trigger login
       const clientId = process.env.REACT_APP_FUSIONAUTH_CLIENT_ID;
       const redirectUri = process.env.REACT_APP_FUSIONAUTH_REDIRECT_URI;
       const domain = process.env.REACT_APP_FUSIONAUTH_DOMAIN;
@@ -75,9 +75,7 @@ export default function Home() {
                 </button>
               </div>
             </div>
-          </div>
-
-         
+          </div>  
         </section>
 
         {/* Help Section */}

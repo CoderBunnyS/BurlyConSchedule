@@ -1,7 +1,7 @@
 const Shift = require("../models/Shift");
 const User = require("../models/User");
 
-// CREATE a new shift
+// CREATE shift
 exports.createShift = async (req, res) => {
   const { date, startTime, endTime, role, taskDescription, volunteersNeeded, notes } = req.body;
 
@@ -23,7 +23,7 @@ exports.createShift = async (req, res) => {
   }
 };
 
-// GET all shifts (admin panel)
+// GET all shifts
 exports.getAllShifts = async (req, res) => {
   try {
     const shifts = await Shift.find().sort({ date: 1, startTime: 1 });
@@ -33,7 +33,7 @@ exports.getAllShifts = async (req, res) => {
   }
 };
 
-// PATCH: Update a shift
+// PATCH: Update shift
 exports.updateShift = async (req, res) => {
   try {
     const updated = await Shift.findByIdAndUpdate(
@@ -49,7 +49,7 @@ exports.updateShift = async (req, res) => {
 };
 
 
-// DELETE a shift
+// DELETE shift
 exports.deleteShift = async (req, res) => {
   try {
     const shift = await Shift.findByIdAndDelete(req.params.id);
@@ -60,7 +60,7 @@ exports.deleteShift = async (req, res) => {
   }
 };
 
-// GET all volunteers registered for a specific shift
+// GET all volunteers for one shift
 exports.getShiftVolunteers = async (req, res) => {
   try {
     const users = await User.find({ "volunteerShifts.shift": req.params.id })
@@ -83,7 +83,7 @@ exports.getShiftVolunteers = async (req, res) => {
   }
 };
 
-// MARK a volunteer as no-show
+// MARK no-show
 exports.markNoShow = async (req, res) => {
   const { userId, shiftId } = req.body;
 

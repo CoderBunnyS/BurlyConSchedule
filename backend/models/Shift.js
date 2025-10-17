@@ -2,23 +2,23 @@ const mongoose = require("mongoose");
 
 const shiftSchema = new mongoose.Schema({
   date: {
-    type: Date, // ISO date only: "2025-11-07"
+    type: Date, 
     required: true,
   },
   startTime: {
-    type: String, // Military time format: "0700"
+    type: String, 
     required: true,
   },
   endTime: {
-    type: String, // Military time format: "1100"
+    type: String, 
     required: true,
   },
   role: {
-    type: String, // e.g., "Hospitality Suite"
+    type: String, 
     required: true,
   },
   taskDescription: {
-    type: String, // e.g., "Stock snacks and welcome guests"
+    type: String, 
     required: true,
   },
   volunteersNeeded: {
@@ -29,15 +29,15 @@ const shiftSchema = new mongoose.Schema({
   volunteersRegistered: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User" // placeholder for FusionAuth integration
+      ref: "User" 
     }
   ],
   notes: {
-    type: String // optional admin notes
+    type: String 
   },
   reminderSent: {
     type: Boolean,
-    default: false // Track if SMS reminder has been sent
+    default: false 
   }
 }, {
   timestamps: true

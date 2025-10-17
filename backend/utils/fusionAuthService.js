@@ -1,10 +1,9 @@
-// utils/fusionAuthService.js
 const axios = require('axios');
 
 class FusionAuthService {
   constructor() {
     this.baseURL = process.env.FUSIONAUTH_DOMAIN;
-    this.apiKey = process.env.FUSIONAUTH_API_KEY;
+    this.apiKey = process.env.FUSIONAUTH_USER_API_KEY;
   }
 
   async getUserById(userId) {
@@ -42,7 +41,7 @@ class FusionAuthService {
 
       const user = result.user;
       
-      // FusionAuth stores phone in user.mobilePhone
+      // Set user phone number
       const phone = user.mobilePhone || user.phoneNumber || user.phone;
       
       if (!phone) {
@@ -85,7 +84,7 @@ class FusionAuthService {
         })
       );
 
-      // Filter out failed requests and users without phones
+      // Filter results
       const validUsers = results.filter(result => result.success);
       const failedUsers = results.filter(result => !result.success);
 

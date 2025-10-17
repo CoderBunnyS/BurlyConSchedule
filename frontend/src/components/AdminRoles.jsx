@@ -143,7 +143,7 @@ export default function AdminRoles() {
         const bVal = (b[by] || "").toString().toLowerCase();
         if (aVal < bVal) return -1 * dir;
         if (aVal > bVal) return 1 * dir;
-        // stable tie-breaker by name then _id
+  
         const aName = (a.name || "").toLowerCase();
         const bName = (b.name || "").toLowerCase();
         if (aName < bName) return -1;
@@ -166,7 +166,7 @@ export default function AdminRoles() {
     <div className="modern-page-container">
       <Header />
 
-      {/* Modern Header Section */}
+      {/* Modern Header */}
       <div className="modern-header-section">
         <div className="modern-header-content">
           <h1 className="modern-page-title">Volunteer Role Management</h1>
@@ -437,8 +437,7 @@ export default function AdminRoles() {
   );
 }
 
-/**
- * Expandable section */
+// Expandable section
 function Expandable({ title, children, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen);
   const id = useId();

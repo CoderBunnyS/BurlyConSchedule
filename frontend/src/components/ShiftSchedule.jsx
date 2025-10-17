@@ -375,7 +375,7 @@ export default function AdminShiftOverview() {
                           <div className="modern-shifts-grid">
                             {shifts
                               .sort((a, b) => {
-                                // Sort by date first, then by start time
+                                // Sort 
                                 const dateCompare = a.date.localeCompare(b.date);
                                 if (dateCompare !== 0) return dateCompare;
                                 return a.startTime.localeCompare(b.startTime);
@@ -393,7 +393,7 @@ export default function AdminShiftOverview() {
                                         <div className="modern-edit-header">
                                           <div className="modern-shift-time-info">
                                             <div className="modern-shift-date">
-                                              {formatDateDisplay(shift.date)}  {/* <-- CHANGED: Use formatDateDisplay */}
+                                              {formatDateDisplay(shift.date)}  
                                             </div>
                                             <div className="modern-shift-time">
                                               🕒 {formatTime(shift.startTime)} - {formatTime(shift.endTime)}
@@ -508,7 +508,7 @@ export default function AdminShiftOverview() {
                                         <div className="modern-shift-header">
                                           <div className="modern-shift-time-info">
                                             <div className="modern-shift-date">
-                                              {formatDateDisplay(shift.date)}  {/* <-- CHANGED: Use formatDateDisplay */}
+                                              {formatDateDisplay(shift.date)} 
                                             </div>
                                             <div className="modern-shift-time">
                                               🕒 {formatTime(shift.startTime)} - {formatTime(shift.endTime)}

@@ -1,7 +1,7 @@
 const HourlyNeed = require("../models/HourlyNeed");
 const User = require("../models/User"); // 
 
-// GET all hourly needs for a given date
+// GET all hourly needs for date
 exports.getHourlyNeedsByDate = async (req, res) => {
   try {
     const needs = await HourlyNeed.find({ date: req.params.date });
@@ -11,15 +11,15 @@ exports.getHourlyNeedsByDate = async (req, res) => {
   }
 };
 
-// POST bulk needs for a date (replace existing for that date)
+// POST bulk needs for date
 exports.saveBulkHourlyNeeds = async (req, res) => {
   const { date, needs } = req.body;
 
   console.log("💾 Incoming hourly needs:", { date, needs });
 
   try {
-    await HourlyNeed.deleteMany({ date }); // Clear old data for that date
-    await HourlyNeed.insertMany(needs.map(n => ({ ...n, date }))); // Insert new
+    await HourlyNeed.deleteMany({ date }); 
+    await HourlyNeed.insertMany(needs.map(n => ({ ...n, date }))); 
     res.status(200).json({ message: "Hourly needs saved." });
   } catch (err) {
     console.error("❌ Error saving hourly needs:", err);
@@ -27,7 +27,6 @@ exports.saveBulkHourlyNeeds = async (req, res) => {
   }
 };
 
-// Sign up for a need and update user's volunteer shifts
 exports.signUpForHourlyNeed = async (req, res) => {
   const { userId } = req.body;
   const { id } = req.params;
@@ -50,7 +49,7 @@ exports.signUpForHourlyNeed = async (req, res) => {
 
     if (alreadySignedUp) return res.status(400).json({ message: "Already signed up" });
 
-    // Save to user record
+    // Save to user
     user.volunteerShifts.push({ shift: id, status: "registered" });
     user.totalHours += 1;
     await user.save();
@@ -67,7 +66,7 @@ exports.signUpForHourlyNeed = async (req, res) => {
 };
 
 
-// Cancel a need and update user record
+// Cancel a need and update user
 exports.cancelHourlyNeed = async (req, res) => {
   const { userId } = req.body;
   const { id } = req.params;
@@ -80,12 +79,12 @@ exports.cancelHourlyNeed = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Remove the shift from the user's list
+    // Remove shift from the user
     const before = user.volunteerShifts.length;
     user.volunteerShifts = user.volunteerShifts.filter(s => s.shift.toString() !== id);
     const after = user.volunteerShifts.length;
 
-    // Only update hours if a shift was actually removed
+    // Only update hours if shift was removed
     if (after < before) {
       user.totalHours = Math.max(user.totalHours - 1, 0);
       await user.save();
@@ -99,7 +98,7 @@ exports.cancelHourlyNeed = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-// GET all shifts a user is signed up for
+// GET all shifts for user
 exports.getUserHourlyNeeds = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId).populate("volunteerShifts.shift");

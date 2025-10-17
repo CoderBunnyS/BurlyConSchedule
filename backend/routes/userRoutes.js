@@ -10,17 +10,17 @@ const {
 
 const User = require("../models/User");
 
-// auth middleware sets req.user (+roles)
+// set user and role
 const authenticateUser = require("../middleware/authMiddleware");
 
-// minimal role gate (server-side authZ)
+//  role gate
 const requireLeadOrAdmin = (req, res, next) => {
   const roles = req.user?.roles || [];
   if (roles.includes("Admin") || roles.includes("Lead")) return next();
   return res.status(403).json({ error: "forbidden" });
 };
 
-// Initialize FusionAuth client 
+// Initialize FA client 
 const client = new FusionAuthClient(
   process.env.FUSIONAUTH_API_KEY,
   process.env.FUSIONAUTH_DOMAIN

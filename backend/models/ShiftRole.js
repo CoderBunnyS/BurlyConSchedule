@@ -26,7 +26,7 @@ const shiftRoleSchema = new mongoose.Schema(
     },
     contactPhone: {
       type: String,
-      default: "", // Optional field
+      default: "", 
     },
     isActive: {
       type: Boolean,

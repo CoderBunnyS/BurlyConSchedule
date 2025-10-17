@@ -292,7 +292,7 @@ useEffect(() => {
                       </div>
                     </div>
 
-                    {/* Role Details - Expandable */}
+                    {/* Role Details */}
                     {isExpanded && (
                       <div className="modern-role-details">
                         <div className="modern-role-details-content">
@@ -347,8 +347,8 @@ useEffect(() => {
                               </p>
                             </div>
                           )}
-
-                          {/* Contact Information
+                          {/*commented out to remove contact info section from public view
+                           Contact Information
                           {(roleInfo.pointOfContact || roleInfo.contactPhone) && (
                             <div className="modern-detail-section">
                               <h4 className="modern-detail-title">
@@ -371,7 +371,7 @@ useEffect(() => {
                             </div>
                           )} */}
 
-                          {/* Admin Notes if available */}
+                          {/* Admin Notes */}
                           {roleShifts.some((shift) => shift.notes) && (
                             <div className="modern-detail-section">
                               <h4 className="modern-detail-title">

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import "../styles/admin.css"; // Make sure styling supports table & inputs
+import "../styles/admin.css"; 
 
 export default function AdminHourlyGrid() {
   const [roles, setRoles] = useState([]);
   const [selectedDate, setSelectedDate] = useState("2025-11-06");
-  const [hourlyData, setHourlyData] = useState({}); // { roleId: { hour: count } }
+  const [hourlyData, setHourlyData] = useState({}); 
 
-  const hours = Array.from({ length: 13 }, (_, i) => `${i + 8}:00`); // 8:00–20:00
+  const hours = Array.from({ length: 13 }, (_, i) => `${i + 8}:00`); 
 
   // Fetch roles
   useEffect(() => {
@@ -16,7 +16,7 @@ export default function AdminHourlyGrid() {
       .catch((err) => console.error("Error loading roles:", err));
   }, []);
 
-  // Fetch existing HourlyNeed entries for the selected date
+  // Fetch HourlyNeed by date
   useEffect(() => {
     if (!selectedDate) return;
 

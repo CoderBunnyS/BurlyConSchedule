@@ -8,10 +8,10 @@ export default function UserProfile() {
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState([]);
 
-  // Build URLs safely
+  // Build URLs 
   const API = (p) => `${process.env.REACT_APP_API_BASE || ""}${p}`;
 
-  // Get userId safely from JWT
+  // Get userId from JWT
   let userId = null;
   try {
     const token = localStorage.getItem("access_token");
@@ -52,7 +52,7 @@ export default function UserProfile() {
     })();
   }, [userId]);
 
-  // Helper to get role details
+  // get role details
   const getRoleDetails = (roleName) => {
     return roles.find(r => r.name === roleName) || {};
   };

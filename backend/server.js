@@ -1,5 +1,3 @@
-// server.js
-
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -26,17 +24,17 @@ const corsOptions = {
 };
 
 
-//Handle OPTIONS preflight before any routes or redirect logic
+//Handle OPTIONS 
 app.options("*", cors(corsOptions));
 
-//Apply CORS and JSON parsing for all other requests
+//Apply CORS and JSON parsing 
 app.use(cors(corsOptions));
 app.use(express.json());
 
 // Health-check endpoint
 app.get("/health", (req, res) => res.send("Backend is alive 🎉"));
 
-// Attach all your API routes
+// Attach API routes
 app.use("/api/shifts", shiftRoutes);
 app.use("/api/volunteer", volunteerRoutes);
 app.use("/api/shiftroles", shiftRoleRoutes);
@@ -44,17 +42,17 @@ app.use("/api/admin", adminVolunteerRoutes);
 app.use("/api/hourlyneeds", hourlyNeedsRoutes);
 
 
-// Authentication routes
+// Auth routes
 app.use("/api/auth", require("./routes/authRoutes"));
 
 
-// Serve React frontend build
+// Serve frontend build
 app.use(express.static(path.join(__dirname, "../frontend/build")));
 app.get("*", (req, res) =>
   res.sendFile(path.join(__dirname, "../frontend/build/index.html"))
 );
 
-// Graceful shutdown for your job worker
+// job worker shutdown
 process.on("SIGINT", () => {
   console.log("Gracefully shutting down...");
   reminderJob.stop();

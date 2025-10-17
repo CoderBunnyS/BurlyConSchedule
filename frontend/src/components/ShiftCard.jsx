@@ -8,13 +8,12 @@ export default function ShiftCard({ shift }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: "6811617f46ed53b3155162c3" // TEMP
+          userId: "6811617f46ed53b3155162c3" 
         }),
       });
 
       if (response.ok) {
         alert("Successfully signed up!");
-        // optionally trigger a UI update or callback here
       } else {
         const errorData = await response.json();
         alert(`Signup failed: ${errorData.message}`);

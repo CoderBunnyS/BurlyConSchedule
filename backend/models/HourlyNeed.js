@@ -1,17 +1,16 @@
-// models/HourlyNeed.js
 const mongoose = require("mongoose");
 
 const hourlyNeedSchema = new mongoose.Schema({
   date: {
-    type: String, // e.g. "2025-11-07"
+    type: String, 
     required: true,
   },
   hour: {
-    type: String, // e.g. "13:00"
+    type: String, 
     required: true,
   },
   role: {
-    type: String, // Just the role name for now
+    type: String, 
     required: true,
   },
   volunteersNeeded: {

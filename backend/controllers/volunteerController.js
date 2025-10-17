@@ -1,7 +1,7 @@
 const Shift = require("../models/Shift");
 
 
-// Get all shifts (Admin Panel)
+// Get all shifts
 exports.getShifts = async (req, res) => {
   try {
     const shifts = await Shift.find();
@@ -11,11 +11,11 @@ exports.getShifts = async (req, res) => {
   }
 };
 
-// Get a user's shifts (Profile Page)
+// Get user's shifts
 const User = require("../models/User");
 const HourlyNeed = require("../models/HourlyNeed");
 
-// Get a user's hourly shifts (Profile Page)
+// Get user's hourly shifts 
 exports.getUserShifts = async (req, res) => {
   const { userId } = req.params;
 
@@ -31,7 +31,7 @@ exports.getUserShifts = async (req, res) => {
 
     res.json({
       shifts,
-      totalHours: shifts.length, // 1 hour per shift
+      totalHours: shifts.length,
     });
   } catch (err) {
     console.error("Error loading user shifts:", err);
@@ -40,7 +40,7 @@ exports.getUserShifts = async (req, res) => {
 };
 
 
-// Sign up for a shift
+// Sign up for shift
 exports.signUpForShift = async (req, res) => {
   const { userId } = req.body;
 
@@ -63,7 +63,7 @@ exports.signUpForShift = async (req, res) => {
     shift.volunteersRegistered.push(userId);
     await shift.save();
 
-    res.json(shift); // return updated shift
+    res.json(shift);
   } catch (err) {
     console.error("Signup error:", err);
     res.status(500).json({ message: "Server error" });
@@ -89,7 +89,7 @@ exports.cancelShift = async (req, res) => {
 };
 
 
-// Get a specific shift by ID (optional but required by route)
+// Get shift by ID
 exports.getShiftById = async (req, res) => {
   try {
     const shift = await Shift.findById(req.params.id);
@@ -101,7 +101,7 @@ exports.getShiftById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-// Create a new shift (Admin only)
+// Create new shift 
 exports.createShift = async (req, res) => {
   try {
     const shift = new Shift(req.body);
@@ -112,7 +112,7 @@ exports.createShift = async (req, res) => {
   }
 };
 
-// Delete a shift (Admin only)
+// Delete shift
 exports.deleteShift = async (req, res) => {
   try {
     const shift = await Shift.findByIdAndDelete(req.params.id);

@@ -1,7 +1,7 @@
 const FlexibleShift = require("../models/FlexibleShift");
 const User = require("../models/User");
 
-// GET /api/volunteer/user/:userId
+// GET users shifts
 const getUserFlexShifts = async (req, res) => {
   try {
     const user = await User.findOne({ fusionAuthId: req.params.userId }).populate({
@@ -11,9 +11,9 @@ const getUserFlexShifts = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Filter to only flexible shifts
+    // Filter shifts
     const shifts = user.volunteerShifts
-      .filter((s) => s.shift && s.shift instanceof Object) // avoids nulls or mismatched
+      .filter((s) => s.shift && s.shift instanceof Object) 
       .map((s) => ({
         ...s.shift.toObject(),
         status: s.status
@@ -24,7 +24,7 @@ const getUserFlexShifts = async (req, res) => {
         let end = new Date(`1970-01-01T${shift.endTime}`);
         
         if (end < start) {
-          // If shift goes past midnight, add 1 day to the end time
+          // allow shift to span midnight
           end.setDate(end.getDate() + 1);
         }
         
@@ -39,7 +39,7 @@ const getUserFlexShifts = async (req, res) => {
   }
 };
 
-// GET /api/volunteer/
+// GET all shifts
 const getAllFlexShifts = async (req, res) => {
   try {
     const shifts = await FlexibleShift.find()
@@ -51,7 +51,7 @@ const getAllFlexShifts = async (req, res) => {
   }
 };
 
-// GET /api/volunteer/:date
+// GET shifts by date
 const getShiftsByDate = async (req, res) => {
   const { date } = req.params;
   try {
@@ -64,7 +64,7 @@ const getShiftsByDate = async (req, res) => {
   }
 };
 
-// POST /api/volunteer/ (admin only)
+// POST shifts
 const createFlexShift = async (req, res) => {
   try {
     const shift = new FlexibleShift(req.body);
@@ -75,7 +75,7 @@ const createFlexShift = async (req, res) => {
   }
 };
 
-// PATCH /api/volunteer/:id admin only
+// PATCH shifts
 const updateFlexShift = async (req, res) => {
   try {
     const updated = await FlexibleShift.findByIdAndUpdate(
@@ -95,13 +95,13 @@ const updateFlexShift = async (req, res) => {
   }
 };
 
-// POST /api/volunteer/:id/signup
+// POST new shift
 const signUpForFlexShift = async (req, res) => {
-  const { userId } = req.body; // This is fusionAuthId
+  const { userId } = req.body; 
   const { id: shiftId } = req.params;
 
   try {
-    // Find the user by fusionAuthId to get their MongoDB _id
+    // gotta find the user by fusionAuthId to get MongoDB _id
     const user = await User.findOne({ fusionAuthId: userId });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -110,7 +110,7 @@ const signUpForFlexShift = async (req, res) => {
     const shift = await FlexibleShift.findById(shiftId);
     if (!shift) return res.status(404).json({ message: "Shift not found" });
 
-    // Check if already signed up using MongoDB ObjectId
+    // Check MongoDB ObjectId
     if (shift.volunteersRegistered.some(id => id.equals(user._id))) {
       return res.status(400).json({ message: "Already signed up" });
     }
@@ -119,7 +119,7 @@ const signUpForFlexShift = async (req, res) => {
       return res.status(400).json({ message: "Shift full" });
     }
 
-    // Push the MongoDB ObjectId, not fusionAuthId
+    // Push MongoDB ObjectId
     shift.volunteersRegistered.push(user._id);
     await shift.save();
 
@@ -142,13 +142,13 @@ const signUpForFlexShift = async (req, res) => {
   }
 };
 
-// POST /api/volunteer/:id/cancel
+// POST shift cancellation
 const cancelFlexShift = async (req, res) => {
-  const { userId } = req.body; // This is fusionAuthId
+  const { userId } = req.body; 
   const { id: shiftId } = req.params;
 
   try {
-    // Find the user by fusionAuthId to get their MongoDB _id
+    // Find user by fusionAuthId to get MongoDB _id
     const user = await User.findOne({ fusionAuthId: userId });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -180,13 +180,12 @@ const cancelFlexShift = async (req, res) => {
   }
 };
 
-// DELETE /api/volunteer/:id (admin only)
+// DELETE shift
 const deleteFlexShift = async (req, res) => {
   try {
     const shift = await FlexibleShift.findByIdAndDelete(req.params.id);
     if (!shift) return res.status(404).json({ message: "Shift not found" });
 
-    // Optionally remove shift from users
     await User.updateMany(
       {},
       { $pull: { volunteerShifts: { shift: shift._id } } }
