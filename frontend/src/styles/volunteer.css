@@ -438,7 +438,7 @@
 }
 
 .modern-detail-text {
-  color: var(--gray-700);
+  color: #7c3aed;
   line-height: 1.6;
   margin: 0;
 }
@@ -705,7 +705,7 @@
   }
 
   .modern-detail-text {
-    color: #e2e8f0;
+    color: #7c3aed;
   }
 
   .modern-contact-name {
