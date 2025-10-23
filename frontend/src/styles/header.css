@@ -1,4 +1,3 @@
-
 :root {
   --header-bg: rgba(255, 255, 255, 0.9);
   --header-border: rgba(147, 51, 234, 0.15);
@@ -10,7 +9,6 @@
   --shadow-color: rgba(124, 58, 237, 0.1);
 }
 
-/* Header Container */
 .modern-header {
   position: sticky;
   top: 0;
@@ -40,11 +38,9 @@
   min-height: 70px;
 }
 
-/* Logo Section */
 .modern-logo {
   flex-shrink: 0;
   min-width: fit-content;
-  margin-left: -15%;
 }
 
 .modern-logo-link {
@@ -94,7 +90,6 @@
   letter-spacing: 0.05em;
 }
 
-/* Desktop Navigation */
 .modern-nav-desktop {
   display: flex;
   align-items: center;
@@ -178,7 +173,6 @@
   flex-shrink: 0;
 }
 
-/* User Section */
 .modern-user-section {
   display: flex;
   align-items: center;
@@ -280,7 +274,51 @@
   transform: translateY(-1px);
 }
 
-/* Mobile Navigation */
+.modern-mobile-menu-button {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.modern-mobile-menu-button:hover {
+  background: var(--nav-link-hover);
+}
+
+.modern-hamburger {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  width: 1.5em;
+  height: 1.1em;
+  font-size: 1rem;
+}
+
+.modern-hamburger span {
+  width: 100%;
+  height: 0.125em;
+  background: var(--nav-link-color);
+  border-radius: 0.125em;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.modern-hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translate(0.35em, 0.35em);
+}
+
+.modern-hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.modern-hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(0.35em, -0.35em);
+}
+
 .modern-nav-mobile {
   position: absolute;
   top: 100%;
@@ -311,8 +349,8 @@
   gap: 1.5rem;
   max-height: calc(100vh - 90px);
   overflow-y: auto;
-  max-width: 400px; 
-  margin: 0 auto;  
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .modern-mobile-user-info {
@@ -350,14 +388,14 @@
 .modern-mobile-user-name {
   font-size: 1rem;
   font-weight: 600;
-  color: #1f2937;  
+  color: #1f2937;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .modern-mobile-user-status {
   font-size: 0.875rem;
-  color: #4b5563;  
+  color: #4b5563;
 }
 
 .modern-mobile-nav-links {
@@ -373,9 +411,9 @@
   padding: 1rem;
   border-radius: 0.75rem;
   text-decoration: none;
-  color: #1f2937;  
-  font-weight: 600; 
-  font-size: 1rem;  
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 1rem;
   transition: all 0.3s ease;
   background: rgba(255, 255, 255, 0.5);
   border: 1px solid rgba(124, 58, 237, 0.1);
@@ -388,12 +426,12 @@
 }
 
 .modern-mobile-nav-link.admin {
-  color: #1f2937;  
+  color: #1f2937;
   border-color: rgba(236, 72, 153, 0.2);
 }
 
 .modern-mobile-nav-link .modern-nav-icon {
-  display: none;  
+  display: none;
 }
 
 .modern-mobile-nav-link .modern-nav-text {
@@ -443,5 +481,183 @@
   background: rgba(239, 68, 68, 0.1);
   color: #dc2626;
   border: 1px solid rgba(239, 68, 68, 0.2);
-  font-weight: 600;  
+  font-weight: 600;
+}
+
+.modern-mobile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(2px);
+  z-index: 998;
+}
+
+@media (max-width: 1300px) {
+  .modern-nav-desktop {
+    display: none;
+  }
+
+  .modern-mobile-menu-button {
+    display: block;
+  }
+  
+  .modern-logo {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .modern-header-inner {
+    padding: 0.75rem 1rem;
+    gap: 1rem;
+  }
+  
+  .modern-logo-image {
+    height: 44px;
+  }
+  
+  .modern-logo-text {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .modern-header-inner {
+    padding: 0.5rem 1rem;
+    min-height: 60px;
+  }
+  
+  .modern-logo-image {
+    height: 40px;
+  }
+  
+  .modern-mobile-nav-content {
+    padding: 1rem;
+  }
+  
+  .modern-mobile-nav-link {
+    padding: 0.75rem;
+    min-height: 50px;
+  }
+  
+  .modern-mobile-login-button,
+  .modern-mobile-logout-button {
+    min-height: 45px;
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modern-header-inner {
+    padding: 0.5rem 0.75rem;
+    min-height: 56px;
+  }
+  
+  .modern-logo-image {
+    height: 36px;
+  }
+  
+  .modern-mobile-nav-content {
+    padding: 0.75rem;
+    gap: 1rem;
+  }
+  
+  .modern-mobile-user-info {
+    padding: 0.75rem;
+  }
+  
+  .modern-mobile-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 0.875rem;
+  }
+  
+  .modern-mobile-user-name {
+    font-size: 0.875rem;
+  }
+  
+  .modern-mobile-user-status {
+    font-size: 0.75rem;
+  }
+  
+  .modern-mobile-nav-link {
+    padding: 0.75rem;
+    min-height: 48px;
+  }
+  
+  .modern-mobile-nav-link .modern-nav-text {
+    font-size: 0.875rem;
+  }
+  
+  .modern-mobile-login-button,
+  .modern-mobile-logout-button {
+    padding: 0.75rem;
+    min-height: 44px;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .modern-header-inner {
+    padding: 0.5rem;
+    min-height: 52px;
+  }
+  
+  .modern-logo-image {
+    height: 32px;
+  }
+  
+  .modern-mobile-nav-content {
+    padding: 0.5rem;
+  }
+  
+  .modern-mobile-nav-link {
+    padding: 0.5rem;
+    min-height: 44px;
+  }
+  
+  .modern-mobile-login-button,
+  .modern-mobile-logout-button {
+    padding: 0.5rem;
+    min-height: 40px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --header-bg: rgba(45, 31, 46, 0.9);
+    --header-border: rgba(236, 72, 153, 0.2);
+    --nav-link-color: #ec4899;
+    --nav-link-hover: rgba(236, 72, 153, 0.1);
+    --text-primary: #f1e1ec;
+    --text-secondary: #d1d5db;
+    --shadow-color: rgba(236, 72, 153, 0.15);
+  }
+
+  .modern-user-info,
+  .modern-mobile-user-info {
+    background: rgba(236, 72, 153, 0.1);
+    border-color: rgba(236, 72, 153, 0.2);
+  }
+
+  .modern-mobile-nav-link {
+    background: rgba(45, 31, 46, 0.5);
+    border-color: rgba(236, 72, 153, 0.2);
+  }
+
+  .modern-mobile-nav-link:hover {
+    background: rgba(236, 72, 153, 0.1);
+  }
+}
+
+.modern-nav-link:focus,
+.modern-mobile-nav-link:focus,
+.modern-login-button:focus,
+.modern-logout-button:focus,
+.modern-mobile-login-button:focus,
+.modern-mobile-logout-button:focus,
+.modern-mobile-menu-button:focus {
+  outline: 2px solid var(--nav-link-color);
+  outline-offset: 2px;
 }
