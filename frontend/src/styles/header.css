@@ -149,13 +149,6 @@
   background: rgba(236, 72, 153, 0.1);
 }
 
-.modern-nav-icon {
-  font-size: 1rem;
-  position: relative;
-  z-index: 1;
-  flex-shrink: 0;
-}
-
 .modern-nav-text {
   position: relative;
   z-index: 1;
@@ -434,7 +427,7 @@
   border-color: rgba(236, 72, 153, 0.2);
 }
 
-.modern-mobile-nav-link .modern-nav-icon {
+.modern-mobile-nav-link {
   display: none;
 }
 

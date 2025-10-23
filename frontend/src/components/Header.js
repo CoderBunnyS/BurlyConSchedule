@@ -75,23 +75,19 @@ export default function Header() {
         <nav className="modern-nav-desktop">
           <div className="modern-nav-links">
             <Link to="/" className="modern-nav-link">
-              <span className="modern-nav-icon">🏠</span>
               <span className="modern-nav-text">Home</span>
             </Link>
 
             <Link to="/volunteer" className="modern-nav-link">
-              <span className="modern-nav-icon">📅</span>
               <span className="modern-nav-text">Volunteer</span>
             </Link>
 
             <Link to="/profile" className="modern-nav-link">
-              <span className="modern-nav-icon">👤</span>
               <span className="modern-nav-text">My Profile</span>
             </Link>
 
             {(hasRole("Admin") || hasRole("Lead")) && (
               <Link to="/admin" className="modern-nav-link admin">
-                <span className="modern-nav-icon">🛠️</span>
                 <span className="modern-nav-text">Admin</span>
                 <span className="modern-admin-badge">Admin</span>
               </Link>
@@ -178,7 +174,6 @@ export default function Header() {
               className="modern-mobile-nav-link"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <span className="modern-nav-icon">🏠</span>
               <span className="modern-nav-text">Home</span>
             </Link>
 
@@ -187,7 +182,6 @@ export default function Header() {
               className="modern-mobile-nav-link"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <span className="modern-nav-icon">📅</span>
               <span className="modern-nav-text">Volunteer</span>
             </Link>
 
@@ -196,7 +190,6 @@ export default function Header() {
               className="modern-mobile-nav-link"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <span className="modern-nav-icon">👤</span>
               <span className="modern-nav-text">My Profile</span>
             </Link>
 
@@ -206,7 +199,6 @@ export default function Header() {
                 className="modern-mobile-nav-link admin"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <span className="modern-nav-icon">🛠️</span>
                 <span className="modern-nav-text">Admin</span>
                 <span className="modern-mobile-admin-badge">Admin</span>
               </Link>
