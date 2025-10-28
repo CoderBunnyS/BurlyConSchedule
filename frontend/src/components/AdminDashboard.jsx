@@ -174,8 +174,11 @@ export default function AdminDashboard() {
     ? Math.round((totalFilled / totalCapacity) * 100) 
     : 0;
 
-  const formatDateLabel = (date) =>
-    new Date(date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+const formatDateLabel = (date) => {
+  const [year, month, day] = date.split('-').map(Number);
+  const localDate = new Date(year, month - 1, day);
+  return localDate.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+};
 
   const formatTime = (timeStr) => {
     const [h, m] = (timeStr || "0:00").split(":").map(Number);
