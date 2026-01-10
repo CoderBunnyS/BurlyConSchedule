@@ -46,11 +46,11 @@ app.use("/api/hourlyneeds", hourlyNeedsRoutes);
 app.use("/api/auth", require("./routes/authRoutes"));
 
 
-// Serve frontend build
-app.use(express.static(path.join(__dirname, "../frontend/build")));
-app.get("*", (req, res) =>
-  res.sendFile(path.join(__dirname, "../frontend/build/index.html"))
-);
+// // Serve frontend build
+// app.use(express.static(path.join(__dirname, "../frontend/build")));
+// app.get("*", (req, res) =>
+//   res.sendFile(path.join(__dirname, "../frontend/build/index.html"))
+// );
 
 // job worker shutdown
 process.on("SIGINT", () => {
