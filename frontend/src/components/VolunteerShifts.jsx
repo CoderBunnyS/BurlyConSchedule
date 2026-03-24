@@ -24,11 +24,11 @@ export default function VolunteerShifts() {
   const [expandedRole, setExpandedRole] = useState(null);
 
   const dateOptions = [
-    { label: "Wed 11/5", value: "2025-11-05", day: "Wednesday" },
-    { label: "Thu 11/6", value: "2025-11-06", day: "Thursday" },
-    { label: "Fri 11/7", value: "2025-11-07", day: "Friday" },
-    { label: "Sat 11/8", value: "2025-11-08", day: "Saturday" },
-    { label: "Sun 11/9", value: "2025-11-09", day: "Sunday" },
+    { label: "Wed 11/4", value: "2026-11-04", day: "Wednesday" },
+    { label: "Thu 11/5", value: "2025-11-05", day: "Thursday" },
+    { label: "Fri 11/6", value: "2025-11-06", day: "Friday" },
+    { label: "Sat 11/7", value: "2025-11-07", day: "Saturday" },
+    { label: "Sun 11/8", value: "2025-11-08", day: "Sunday" },
   ];
 
 
