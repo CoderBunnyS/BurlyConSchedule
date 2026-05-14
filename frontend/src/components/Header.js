@@ -60,7 +60,7 @@ export default function Header() {
             title="Visit BurlyCon.org"
           >
             <img
-              src="https://burlycon.org/wp-content/uploads/2019/12/bc-logo-240.png"
+              src="https://i0.wp.com/burlycon.org/wp-content/uploads/2025/12/bc-logo-pink.png?resize=300%2C56&ssl=1"
               alt="BurlyCon Logo"
               className="modern-logo-image"
             />
