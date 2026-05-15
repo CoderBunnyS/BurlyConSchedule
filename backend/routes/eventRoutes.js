@@ -74,4 +74,80 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// POST clone shifts from one event to another
+router.post("/:targetId/clone-from/:sourceId", async (req, res) => {
+  try {
+    const FlexibleShift = require("../models/FlexibleShift");
+
+    const sourceEvent = await Event.findById(req.params.sourceId);
+    const targetEvent = await Event.findById(req.params.targetId);
+
+    if (!sourceEvent) return res.status(404).json({ message: "Source event not found" });
+    if (!targetEvent) return res.status(404).json({ message: "Target event not found" });
+
+    if (sourceEvent._id.equals(targetEvent._id)) {
+      return res.status(400).json({ message: "Source and target must differ" });
+    }
+
+    // Get all source shifts
+    const sourceShifts = await FlexibleShift.find({ eventId: sourceEvent._id });
+    if (sourceShifts.length === 0) {
+      return res.status(400).json({ message: "Source event has no shifts to clone" });
+    }
+
+    // Check if target already has shifts (safety)
+    const existingTargetCount = await FlexibleShift.countDocuments({ eventId: targetEvent._id });
+    if (existingTargetCount > 0 && !req.body.force) {
+      return res.status(409).json({
+        message: `Target event already has ${existingTargetCount} shifts. Pass { "force": true } to clone anyway (they will be added alongside existing shifts).`
+      });
+    }
+
+    // Date math: find the offset that aligns days-of-week
+    // Anchor on the start dates of both events
+    const sourceStart = new Date(sourceEvent.startDate);
+    const targetStart = new Date(targetEvent.startDate);
+
+    // Calculate the difference in days, then round to nearest 7
+    // so that the day-of-week aligns
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const rawDiffDays = Math.round((targetStart - sourceStart) / msPerDay);
+    const sourceDOW = sourceStart.getUTCDay();
+    const targetDOW = targetStart.getUTCDay();
+    const dowShift = (targetDOW - sourceDOW + 7) % 7;
+    // Final offset: shift in days from source date → target date that preserves DOW
+    const dayOffset = rawDiffDays + (dowShift === 0 ? 0 : dowShift) - ((rawDiffDays % 7 + 7) % 7);
+
+    // Build new shifts
+    const newShifts = sourceShifts.map((shift) => {
+      const oldDate = new Date(shift.date + "T00:00:00Z");
+      const newDate = new Date(oldDate.getTime() + dayOffset * msPerDay);
+      const newDateStr = newDate.toISOString().split("T")[0];
+
+      return {
+        eventId: targetEvent._id,
+        date: newDateStr,
+        role: shift.role,
+        startTime: shift.startTime,
+        endTime: shift.endTime,
+        volunteersNeeded: shift.volunteersNeeded,
+        volunteersRegistered: [],
+        notes: shift.notes,
+        reminderSent: false,
+      };
+    });
+
+    const created = await FlexibleShift.insertMany(newShifts);
+
+    res.json({
+      message: `Cloned ${created.length} shifts from ${sourceEvent.name} to ${targetEvent.name}`,
+      dayOffset,
+      shiftsCreated: created.length,
+    });
+  } catch (err) {
+    console.error("Clone error:", err);
+    res.status(500).json({ message: "Failed to clone shifts", error: err.message });
+  }
+});
+
 module.exports = router;
