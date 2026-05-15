@@ -11,6 +11,7 @@ import AdminHourlyNeeds from "./components/AdminHourlyNeeds";
 //import Callback from "./components/Callback";
 import OAuthCallback from "./components/OAuthCallback";
 import PrivateRoute from "./components/PrivateRoute";
+import AdminEvents from "./components/AdminEvents";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
       <Route path="/admin/roles" element={<PrivateRoute><AdminRoles /></PrivateRoute>} />
       <Route path="/admin/volunteers" element={<PrivateRoute><AdminVolunteers /></PrivateRoute>} />
       <Route path="/admin/hourly-needs" element={<PrivateRoute><AdminHourlyNeeds /></PrivateRoute>} />
+      <Route path="/admin/events" element={<PrivateRoute><AdminEvents /></PrivateRoute>} />
       {/* <Route path="/callback" element={<Callback />} /> */}
       <Route path="/oauth-callback" element={<OAuthCallback />} />
     </Routes>

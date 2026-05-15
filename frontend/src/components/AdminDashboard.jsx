@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
 import Header from "./Header";
 import { hasRole } from "../utils/authUtils";
@@ -18,87 +24,102 @@ export default function AdminDashboard() {
   const isAdmin = hasRole("Admin");
 
   const dates = useMemo(
-    () => ["2025-11-05", "2025-11-06", "2025-11-07", "2025-11-08", "2025-11-09"],
-    []
+    () => [
+      "2025-11-05",
+      "2025-11-06",
+      "2025-11-07",
+      "2025-11-08",
+      "2025-11-09",
+    ],
+    [],
   );
   const API_BASE = process.env.REACT_APP_API_BASE;
 
   const mountedRef = useRef(true);
-  useEffect(() => () => { mountedRef.current = false; }, []);
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+    },
+    [],
+  );
 
-  const loadData = useCallback(async (opts) => {
-    setLoading(true);
-    setError(null);
+  const loadData = useCallback(
+    async (opts) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      if (!API_BASE) {
-        setError("API base URL not configured.");
-        setLoading(false);
-        return;
-      }
-
-      const requests = dates.map((date) =>
-        fetch(`${API_BASE}/api/volunteer/${date}`, {
-          ...(opts?.signal ? { signal: opts.signal } : {}),
-          credentials: "include",
-          cache: "no-store",
-        }).then(async (r) => {
-          if (!r.ok) throw new Error(`GET /api/volunteer/${date} -> ${r.status}`);
-          const json = await r.json();
-          return { date, json };
-        })
-      );
-
-      const results = await Promise.allSettled(requests);
-
-      const allNeeds = {};
-      let total = 0;
-      const volunteers = new Set();
-      const allShifts = [];
-
-      results.forEach((res) => {
-        if (res.status === "fulfilled") {
-          const { date, json } = res.value;
-          const filtered = json.filter((n) => n.volunteersNeeded > 0);
-          if (filtered.length) allNeeds[date] = filtered;
-          total += json.length;
-
-          // Debug logs kept for Nov 9; feel free to remove
-          if (date === "2025-11-09") {
-            console.log("Nov 9 raw data:", json);
-            console.log("Nov 9 filtered:", filtered);
-            console.log("Will add to needsByDate?", filtered.length > 0);
-          }
-
-          json.forEach((shift) => {
-            allShifts.push({ ...shift, date });
-            if (shift.volunteersRegistered) {
-              shift.volunteersRegistered.forEach((v) => {
-                const id = v?._id ?? v?.id ?? v;
-                volunteers.add(id);
-              });
-            }
-          });
-        } else {
-          console.warn(res.reason);
-          setError("Some data failed to load. Retrying on focus.");
+      try {
+        if (!API_BASE) {
+          setError("API base URL not configured.");
+          setLoading(false);
+          return;
         }
-      });
 
-      if (!mountedRef.current) return;
+        const requests = dates.map((date) =>
+          fetch(`${API_BASE}/api/volunteer/${date}`, {
+            ...(opts?.signal ? { signal: opts.signal } : {}),
+            credentials: "include",
+            cache: "no-store",
+          }).then(async (r) => {
+            if (!r.ok)
+              throw new Error(`GET /api/volunteer/${date} -> ${r.status}`);
+            const json = await r.json();
+            return { date, json };
+          }),
+        );
 
-      setNeedsByDate(allNeeds);
-      setTotalShifts(total);
-      setVolunteerCount(volunteers.size);
-      setAllShiftsData(allShifts);
-    } catch (e) {
-      if (opts?.signal?.aborted) return;
-      console.error(e);
-      if (mountedRef.current) setError(e?.message || "Failed to load data.");
-    } finally {
-      if (mountedRef.current) setLoading(false);
-    }
-  }, [API_BASE, dates]);
+        const results = await Promise.allSettled(requests);
+
+        const allNeeds = {};
+        let total = 0;
+        const volunteers = new Set();
+        const allShifts = [];
+
+        results.forEach((res) => {
+          if (res.status === "fulfilled") {
+            const { date, json } = res.value;
+            const filtered = json.filter((n) => n.volunteersNeeded > 0);
+            if (filtered.length) allNeeds[date] = filtered;
+            total += json.length;
+
+            // Debug logs kept for Nov 9; feel free to remove
+            if (date === "2025-11-09") {
+              console.log("Nov 9 raw data:", json);
+              console.log("Nov 9 filtered:", filtered);
+              console.log("Will add to needsByDate?", filtered.length > 0);
+            }
+
+            json.forEach((shift) => {
+              allShifts.push({ ...shift, date });
+              if (shift.volunteersRegistered) {
+                shift.volunteersRegistered.forEach((v) => {
+                  const id = v?._id ?? v?.id ?? v;
+                  volunteers.add(id);
+                });
+              }
+            });
+          } else {
+            console.warn(res.reason);
+            setError("Some data failed to load. Retrying on focus.");
+          }
+        });
+
+        if (!mountedRef.current) return;
+
+        setNeedsByDate(allNeeds);
+        setTotalShifts(total);
+        setVolunteerCount(volunteers.size);
+        setAllShiftsData(allShifts);
+      } catch (e) {
+        if (opts?.signal?.aborted) return;
+        console.error(e);
+        if (mountedRef.current) setError(e?.message || "Failed to load data.");
+      } finally {
+        if (mountedRef.current) setLoading(false);
+      }
+    },
+    [API_BASE, dates],
+  );
 
   useEffect(() => {
     const c = new AbortController();
@@ -108,7 +129,9 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const onFocus = () => loadData();
-    const onVis = () => { if (!document.hidden) loadData(); };
+    const onVis = () => {
+      if (!document.hidden) loadData();
+    };
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVis);
     return () => {
@@ -136,7 +159,7 @@ export default function AdminDashboard() {
 
       const registered = shift.volunteersRegistered?.length || 0;
       const needed = shift.volunteersNeeded || 0;
-      const capacity = shift.capacity || (registered + needed);
+      const capacity = shift.capacity || registered + needed;
       const filled = registered;
 
       deptMap[deptName].shifts.push({
@@ -155,37 +178,42 @@ export default function AdminDashboard() {
       }
     });
 
-    return Object.values(deptMap).sort((a, b) => b.totalUnfilled - a.totalUnfilled);
+    return Object.values(deptMap).sort(
+      (a, b) => b.totalUnfilled - a.totalUnfilled,
+    );
   }, [allShiftsData]);
 
   const totalUnfilled = useMemo(
     () => departmentStats.reduce((sum, dept) => sum + dept.totalUnfilled, 0),
-    [departmentStats]
+    [departmentStats],
   );
 
   const totalFilled = useMemo(
     () => departmentStats.reduce((sum, dept) => sum + dept.totalFilled, 0),
-    [departmentStats]
+    [departmentStats],
   );
 
   const totalCapacity = useMemo(
     () => departmentStats.reduce((sum, dept) => sum + dept.totalCapacity, 0),
-    [departmentStats]
+    [departmentStats],
   );
 
   const criticalGaps = useMemo(
     () => departmentStats.reduce((sum, dept) => sum + dept.criticalShifts, 0),
-    [departmentStats]
+    [departmentStats],
   );
 
-  const coveragePercentage = totalCapacity > 0
-    ? Math.round((totalFilled / totalCapacity) * 100)
-    : 0;
+  const coveragePercentage =
+    totalCapacity > 0 ? Math.round((totalFilled / totalCapacity) * 100) : 0;
 
   const formatDateLabel = (date) => {
     const [year, month, day] = date.split("-").map(Number);
     const localDate = new Date(year, month - 1, day);
-    return localDate.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+    return localDate.toLocaleDateString(undefined, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
   };
 
   const formatTime = (timeStr) => {
@@ -234,7 +262,8 @@ export default function AdminDashboard() {
           <h1 className="modern-page-title">Admin Dashboard</h1>
           {isAdmin && (
             <p className="modern-page-subtitle">
-              Get a pulse on volunteer coverage and shift activity. Here's what's live and what needs attention.
+              Get a pulse on volunteer coverage and shift activity. Here's
+              what's live and what needs attention.
             </p>
           )}
         </div>
@@ -250,13 +279,20 @@ export default function AdminDashboard() {
                   setFilterView("all");
                   scrollToDepartments();
                 }}
-                style={{ cursor: "pointer", border: "none", textAlign: "left", width: "100%" }}
+                style={{
+                  cursor: "pointer",
+                  border: "none",
+                  textAlign: "left",
+                  width: "100%",
+                }}
               >
                 <div className="modern-summary-icon">📊</div>
                 <div className="modern-summary-content">
                   <h3 className="modern-summary-title">Coverage</h3>
                   <p className="modern-summary-number">{coveragePercentage}%</p>
-                  <p className="modern-summary-subtitle">{totalFilled} of {totalCapacity} spots filled</p>
+                  <p className="modern-summary-subtitle">
+                    {totalFilled} of {totalCapacity} spots filled
+                  </p>
                 </div>
               </button>
 
@@ -266,13 +302,20 @@ export default function AdminDashboard() {
                   setFilterView("unfilled");
                   scrollToDepartments();
                 }}
-                style={{ cursor: "pointer", border: "none", textAlign: "left", width: "100%" }}
+                style={{
+                  cursor: "pointer",
+                  border: "none",
+                  textAlign: "left",
+                  width: "100%",
+                }}
               >
                 <div className="modern-summary-icon">📋</div>
                 <div className="modern-summary-content">
                   <h3 className="modern-summary-title">Unfilled Shifts</h3>
                   <p className="modern-summary-number">{totalUnfilled}</p>
-                  <p className="modern-summary-subtitle">Across all departments</p>
+                  <p className="modern-summary-subtitle">
+                    Across all departments
+                  </p>
                 </div>
               </button>
 
@@ -282,13 +325,20 @@ export default function AdminDashboard() {
                   setFilterView("critical");
                   scrollToDepartments();
                 }}
-                style={{ cursor: "pointer", border: "none", textAlign: "left", width: "100%" }}
+                style={{
+                  cursor: "pointer",
+                  border: "none",
+                  textAlign: "left",
+                  width: "100%",
+                }}
               >
                 <div className="modern-summary-icon">🚨</div>
                 <div className="modern-summary-content">
                   <h3 className="modern-summary-title">Critical Gaps</h3>
                   <p className="modern-summary-number">{criticalGaps}</p>
-                  <p className="modern-summary-subtitle">Shifts with 0 volunteers</p>
+                  <p className="modern-summary-subtitle">
+                    Shifts with 0 volunteers
+                  </p>
                 </div>
               </button>
             </div>
@@ -300,7 +350,9 @@ export default function AdminDashboard() {
                   <div className="modern-nav-icon">📅</div>
                   <div className="modern-nav-content">
                     <h3 className="modern-nav-title">Manage Shifts</h3>
-                    <p className="modern-nav-description">Create and edit volunteer shifts</p>
+                    <p className="modern-nav-description">
+                      Create and edit volunteer shifts
+                    </p>
                   </div>
                   <div className="modern-nav-arrow">→</div>
                 </Link>
@@ -309,16 +361,33 @@ export default function AdminDashboard() {
                   <div className="modern-nav-icon">🛠️</div>
                   <div className="modern-nav-content">
                     <h3 className="modern-nav-title">Manage Volunteer Roles</h3>
-                    <p className="modern-nav-description">Define volunteer positions and requirements</p>
+                    <p className="modern-nav-description">
+                      Define volunteer positions and requirements
+                    </p>
                   </div>
                   <div className="modern-nav-arrow">→</div>
                 </Link>
 
-                <Link to="/admin/volunteers" className="modern-nav-link volunteers">
+                <Link
+                  to="/admin/volunteers"
+                  className="modern-nav-link volunteers"
+                >
                   <div className="modern-nav-icon">👥</div>
                   <div className="modern-nav-content">
                     <h3 className="modern-nav-title">View Volunteers</h3>
-                    <p className="modern-nav-description">See registered volunteers and assignments</p>
+                    <p className="modern-nav-description">
+                      See registered volunteers and assignments
+                    </p>
+                  </div>
+                  <div className="modern-nav-arrow">→</div>
+                </Link>
+                <Link to="/admin/events" className="modern-nav-link events">
+                  <div className="modern-nav-icon">📆</div>
+                  <div className="modern-nav-content">
+                    <h3 className="modern-nav-title">Manage Events</h3>
+                    <p className="modern-nav-description">
+                      Create new years and clone shifts
+                    </p>
                   </div>
                   <div className="modern-nav-arrow">→</div>
                 </Link>
@@ -335,7 +404,10 @@ export default function AdminDashboard() {
                       className="modern-filter-badge"
                       style={{ cursor: "pointer" }}
                     >
-                      {filterView === "critical" ? "Showing Critical Only" : "Showing Unfilled Only"} - Clear Filter
+                      {filterView === "critical"
+                        ? "Showing Critical Only"
+                        : "Showing Unfilled Only"}{" "}
+                      - Clear Filter
                     </button>
                   )}
                 </div>
@@ -348,14 +420,18 @@ export default function AdminDashboard() {
                     </div>
                   ) : error ? (
                     <div className="modern-error-state">
-                      <h4 className="modern-error-title">Couldn't load everything</h4>
+                      <h4 className="modern-error-title">
+                        Couldn't load everything
+                      </h4>
                       <p className="modern-error-description">{error}</p>
                     </div>
                   ) : filteredDepartments.length === 0 ? (
                     <div className="modern-success-state">
                       <div className="modern-success-icon">✅</div>
                       <h4 className="modern-success-title">
-                        {filterView === "critical" ? "No critical gaps!" : "All shifts are filled!"}
+                        {filterView === "critical"
+                          ? "No critical gaps!"
+                          : "All shifts are filled!"}
                       </h4>
                       <p className="modern-success-description">
                         {filterView === "critical"
@@ -367,21 +443,35 @@ export default function AdminDashboard() {
                     <div className="modern-department-grid">
                       {filteredDepartments.map((dept) => {
                         const isExpanded = expandedDepts[dept.name];
-                        const percentage = dept.totalCapacity > 0
-                          ? Math.round((dept.totalFilled / dept.totalCapacity) * 100)
-                          : 0;
+                        const percentage =
+                          dept.totalCapacity > 0
+                            ? Math.round(
+                                (dept.totalFilled / dept.totalCapacity) * 100,
+                              )
+                            : 0;
                         const percentageStr = percentage + "%";
 
                         return (
-                          <div key={dept.name} className="modern-department-card">
+                          <div
+                            key={dept.name}
+                            className="modern-department-card"
+                          >
                             <button
                               onClick={() => toggleDepartment(dept.name)}
                               className="modern-department-header"
-                              style={{ cursor: "pointer", border: "none", textAlign: "left", width: "100%", background: "transparent" }}
+                              style={{
+                                cursor: "pointer",
+                                border: "none",
+                                textAlign: "left",
+                                width: "100%",
+                                background: "transparent",
+                              }}
                             >
                               <div className="modern-department-title-row">
                                 <div className="modern-department-name">
-                                  <span className="modern-expand-icon">{isExpanded ? "▼" : "▶"}</span>
+                                  <span className="modern-expand-icon">
+                                    {isExpanded ? "▼" : "▶"}
+                                  </span>
                                   <span>{dept.name}</span>
                                   {dept.criticalShifts > 0 && (
                                     <span className="modern-critical-badge">
@@ -390,13 +480,15 @@ export default function AdminDashboard() {
                                   )}
                                 </div>
                                 <div className="modern-department-stats">
-                                  <span className={
-                                    dept.totalUnfilled === 0
-                                      ? "modern-status-badge filled"
-                                      : dept.totalUnfilled <= 3
-                                      ? "modern-status-badge minor"
-                                      : "modern-status-badge critical"
-                                  }>
+                                  <span
+                                    className={
+                                      dept.totalUnfilled === 0
+                                        ? "modern-status-badge filled"
+                                        : dept.totalUnfilled <= 3
+                                          ? "modern-status-badge minor"
+                                          : "modern-status-badge critical"
+                                    }
+                                  >
                                     {dept.totalUnfilled} open
                                   </span>
                                 </div>
@@ -410,28 +502,41 @@ export default function AdminDashboard() {
                                   />
                                 </div>
                                 <span className="modern-progress-text">
-                                  {dept.totalFilled} of {dept.totalCapacity} spots filled
+                                  {dept.totalFilled} of {dept.totalCapacity}{" "}
+                                  spots filled
                                 </span>
                               </div>
                             </button>
 
                             {isExpanded && (
                               <div className="modern-department-details">
-                                <h4 className="modern-details-title">All Shifts</h4>
+                                <h4 className="modern-details-title">
+                                  All Shifts
+                                </h4>
                                 {dept.shifts
                                   .slice()
                                   .sort((a, b) => {
-                                    const dateCompare = a.date.localeCompare(b.date);
+                                    const dateCompare = a.date.localeCompare(
+                                      b.date,
+                                    );
                                     if (dateCompare !== 0) return dateCompare;
                                     return b.needed - a.needed;
                                   })
                                   .map((shift, idx) => {
-                                    const shiftPercentage = shift.capacity > 0
-                                      ? Math.round((shift.filled / shift.capacity) * 100)
-                                      : 0;
-                                    const shiftPercentageStr = shiftPercentage + "%";
+                                    const shiftPercentage =
+                                      shift.capacity > 0
+                                        ? Math.round(
+                                            (shift.filled / shift.capacity) *
+                                              100,
+                                          )
+                                        : 0;
+                                    const shiftPercentageStr =
+                                      shiftPercentage + "%";
                                     const isUnfilled = shift.needed > 0;
-                                    const hasVolunteers = !!(shift.volunteersRegistered && shift.volunteersRegistered.length > 0);
+                                    const hasVolunteers = !!(
+                                      shift.volunteersRegistered &&
+                                      shift.volunteersRegistered.length > 0
+                                    );
 
                                     let badgeClass = "modern-shift-badge ";
                                     if (shift.filled === 0) {
@@ -443,11 +548,21 @@ export default function AdminDashboard() {
                                     }
 
                                     return (
-                                      <div key={idx} className="modern-shift-detail">
+                                      <div
+                                        key={idx}
+                                        className="modern-shift-detail"
+                                      >
                                         <div className="modern-shift-info">
                                           <div className="modern-shift-label">
-                                            <strong>{formatDateLabel(shift.date)}</strong>
-                                            <span> • {formatTime(shift.startTime)} – {formatTime(shift.endTime)}</span>
+                                            <strong>
+                                              {formatDateLabel(shift.date)}
+                                            </strong>
+                                            <span>
+                                              {" "}
+                                              • {formatTime(
+                                                shift.startTime,
+                                              )} – {formatTime(shift.endTime)}
+                                            </span>
                                           </div>
                                           {isUnfilled && (
                                             <span className={badgeClass}>
@@ -460,7 +575,9 @@ export default function AdminDashboard() {
                                           <div className="modern-progress-bar small">
                                             <div
                                               className="modern-progress-fill"
-                                              style={{ width: shiftPercentageStr }}
+                                              style={{
+                                                width: shiftPercentageStr,
+                                              }}
                                             />
                                           </div>
                                           <span className="modern-progress-text small">
@@ -470,20 +587,28 @@ export default function AdminDashboard() {
 
                                         {hasVolunteers && (
                                           <div className="modern-volunteer-chips">
-                                            {shift.volunteersRegistered.map((vol) => {
-                                              const id = vol?._id ?? vol?.id ?? String(vol);
-                                              const name = vol?.preferredName ?? vol?.name ?? String(vol);
-                                              return (
-                                                <Link
-                                                  key={id}
-                                                  to="/admin/volunteers"
-                                                  className="modern-volunteer-chip"
-                                                  title={name}
-                                                >
-                                                  {name}
-                                                </Link>
-                                              );
-                                            })}
+                                            {shift.volunteersRegistered.map(
+                                              (vol) => {
+                                                const id =
+                                                  vol?._id ??
+                                                  vol?.id ??
+                                                  String(vol);
+                                                const name =
+                                                  vol?.preferredName ??
+                                                  vol?.name ??
+                                                  String(vol);
+                                                return (
+                                                  <Link
+                                                    key={id}
+                                                    to="/admin/volunteers"
+                                                    className="modern-volunteer-chip"
+                                                    title={name}
+                                                  >
+                                                    {name}
+                                                  </Link>
+                                                );
+                                              },
+                                            )}
                                           </div>
                                         )}
                                       </div>
@@ -505,7 +630,9 @@ export default function AdminDashboard() {
                 <div className="modern-alert-header">
                   <h3 className="modern-alert-title">Gaps by Date</h3>
                   {totalUnfilled > 0 && (
-                    <div className="modern-alert-badge">{totalUnfilled} positions needed</div>
+                    <div className="modern-alert-badge">
+                      {totalUnfilled} positions needed
+                    </div>
                   )}
                 </div>
 
@@ -513,54 +640,93 @@ export default function AdminDashboard() {
                   {Object.keys(needsByDate).length === 0 ? (
                     <div className="modern-success-state">
                       <div className="modern-success-icon">✅</div>
-                      <h4 className="modern-success-title">All shifts are filled!</h4>
+                      <h4 className="modern-success-title">
+                        All shifts are filled!
+                      </h4>
                       <p className="modern-success-description">
-                        Great job! All volunteer positions are currently covered.
+                        Great job! All volunteer positions are currently
+                        covered.
                       </p>
                     </div>
                   ) : (
                     <div className="modern-gaps-grid">
                       {Object.entries(needsByDate).map(([date, needs]) => {
                         const totalNeeded = Array.isArray(needs)
-                          ? needs.reduce((sum, n) => sum + (n.volunteersNeeded || 0), 0)
+                          ? needs.reduce(
+                              (sum, n) => sum + (n.volunteersNeeded || 0),
+                              0,
+                            )
                           : 0;
 
                         return (
                           <div key={date} className="modern-gap-card">
                             <div className="modern-gap-header">
-                              <h4 className="modern-gap-date">{formatDateLabel(date)}</h4>
+                              <h4 className="modern-gap-date">
+                                {formatDateLabel(date)}
+                              </h4>
                               <div className="modern-gap-count">
                                 {totalNeeded} needed
                               </div>
                             </div>
 
                             <div className="modern-gap-shifts">
-                              {Array.isArray(needs) && needs
-                                .slice()
-                                .sort((a, b) => (b.volunteersNeeded || 0) - (a.volunteersNeeded || 0))
-                                .map((n) => {
-                                  const needed = n.volunteersNeeded || 0;
-                                  const isCritical = needed >= 2;
-                                  const pillClass = isCritical ? "modern-shift-pill critical" : "modern-shift-pill minor";
-                                  const icon = isCritical ? "🚨" : "📉";
+                              {Array.isArray(needs) &&
+                                needs
+                                  .slice()
+                                  .sort(
+                                    (a, b) =>
+                                      (b.volunteersNeeded || 0) -
+                                      (a.volunteersNeeded || 0),
+                                  )
+                                  .map((n) => {
+                                    const needed = n.volunteersNeeded || 0;
+                                    const isCritical = needed >= 2;
+                                    const pillClass = isCritical
+                                      ? "modern-shift-pill critical"
+                                      : "modern-shift-pill minor";
+                                    const icon = isCritical ? "🚨" : "📉";
 
-                                  return (
-                                    <div key={n._id} className="modern-shift-item">
-                                      <a href="https://www.burlyconvolunteers.com/admin/shifts" className={pillClass}>
-                                        <span className="modern-shift-icon">{icon}</span>
-                                        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                                          <span className="modern-shift-time">
-                                            {formatTime(n.startTime)}–{formatTime(n.endTime)}
+                                    return (
+                                      <div
+                                        key={n._id}
+                                        className="modern-shift-item"
+                                      >
+                                        <a
+                                          href="https://www.burlyconvolunteers.com/admin/shifts"
+                                          className={pillClass}
+                                        >
+                                          <span className="modern-shift-icon">
+                                            {icon}
                                           </span>
-                                          <span style={{ fontSize: "0.75rem", color: "#f9a8d4", fontWeight: 500 }}>
-                                            {n.role || "Role not specified"}
+                                          <div
+                                            style={{
+                                              flex: 1,
+                                              display: "flex",
+                                              flexDirection: "column",
+                                              gap: "0.25rem",
+                                            }}
+                                          >
+                                            <span className="modern-shift-time">
+                                              {formatTime(n.startTime)}–
+                                              {formatTime(n.endTime)}
+                                            </span>
+                                            <span
+                                              style={{
+                                                fontSize: "0.75rem",
+                                                color: "#f9a8d4",
+                                                fontWeight: 500,
+                                              }}
+                                            >
+                                              {n.role || "Role not specified"}
+                                            </span>
+                                          </div>
+                                          <span className="modern-shift-count">
+                                            ({needed})
                                           </span>
-                                        </div>
-                                        <span className="modern-shift-count">({needed})</span>
-                                      </a>
-                                    </div>
-                                  );
-                                })}
+                                        </a>
+                                      </div>
+                                    );
+                                  })}
                             </div>
                           </div>
                         );

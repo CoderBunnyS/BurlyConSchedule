@@ -9,7 +9,9 @@ router.get("/", async (req, res) => {
     const events = await Event.find().sort({ year: -1 });
     res.json(events);
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch events", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch events", error: err.message });
   }
 });
 
@@ -17,10 +19,13 @@ router.get("/", async (req, res) => {
 router.get("/active", async (req, res) => {
   try {
     const event = await Event.findOne({ isActive: true });
-    if (!event) return res.status(404).json({ message: "No active event found" });
+    if (!event)
+      return res.status(404).json({ message: "No active event found" });
     res.json(event);
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch active event", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch active event", error: err.message });
   }
 });
 
@@ -31,7 +36,9 @@ router.get("/:id", async (req, res) => {
     if (!event) return res.status(404).json({ message: "Event not found" });
     res.json(event);
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch event", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch event", error: err.message });
   }
 });
 
@@ -43,7 +50,9 @@ router.post("/", async (req, res) => {
     invalidateActiveEventCache();
     res.status(201).json(event);
   } catch (err) {
-    res.status(400).json({ message: "Failed to create event", error: err.message });
+    res
+      .status(400)
+      .json({ message: "Failed to create event", error: err.message });
   }
 });
 
@@ -58,7 +67,9 @@ router.patch("/:id", async (req, res) => {
     invalidateActiveEventCache();
     res.json(event);
   } catch (err) {
-    res.status(400).json({ message: "Failed to update event", error: err.message });
+    res
+      .status(400)
+      .json({ message: "Failed to update event", error: err.message });
   }
 });
 
@@ -70,7 +81,9 @@ router.delete("/:id", async (req, res) => {
     invalidateActiveEventCache();
     res.json({ message: "Event deleted", event });
   } catch (err) {
-    res.status(500).json({ message: "Failed to delete event", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to delete event", error: err.message });
   }
 });
 
@@ -82,8 +95,10 @@ router.post("/:targetId/clone-from/:sourceId", async (req, res) => {
     const sourceEvent = await Event.findById(req.params.sourceId);
     const targetEvent = await Event.findById(req.params.targetId);
 
-    if (!sourceEvent) return res.status(404).json({ message: "Source event not found" });
-    if (!targetEvent) return res.status(404).json({ message: "Target event not found" });
+    if (!sourceEvent)
+      return res.status(404).json({ message: "Source event not found" });
+    if (!targetEvent)
+      return res.status(404).json({ message: "Target event not found" });
 
     if (sourceEvent._id.equals(targetEvent._id)) {
       return res.status(400).json({ message: "Source and target must differ" });
@@ -92,14 +107,20 @@ router.post("/:targetId/clone-from/:sourceId", async (req, res) => {
     // Get all source shifts
     const sourceShifts = await FlexibleShift.find({ eventId: sourceEvent._id });
     if (sourceShifts.length === 0) {
-      return res.status(400).json({ message: "Source event has no shifts to clone" });
+      return res
+        .status(400)
+        .json({ message: "Source event has no shifts to clone" });
     }
 
     // Check if target already has shifts (safety)
-    const existingTargetCount = await FlexibleShift.countDocuments({ eventId: targetEvent._id });
+    const existingTargetCount = await FlexibleShift.countDocuments({
+      eventId: targetEvent._id,
+    });
     if (existingTargetCount > 0 && !req.body.force) {
       return res.status(409).json({
-        message: `Target event already has ${existingTargetCount} shifts. Pass { "force": true } to clone anyway (they will be added alongside existing shifts).`
+        message: `Target event already has ${existingTargetCount} shifts.`,
+        existingCount: existingTargetCount,
+        requiresForce: true,
       });
     }
 
@@ -116,7 +137,10 @@ router.post("/:targetId/clone-from/:sourceId", async (req, res) => {
     const targetDOW = targetStart.getUTCDay();
     const dowShift = (targetDOW - sourceDOW + 7) % 7;
     // Final offset: shift in days from source date → target date that preserves DOW
-    const dayOffset = rawDiffDays + (dowShift === 0 ? 0 : dowShift) - ((rawDiffDays % 7 + 7) % 7);
+    const dayOffset =
+      rawDiffDays +
+      (dowShift === 0 ? 0 : dowShift) -
+      (((rawDiffDays % 7) + 7) % 7);
 
     // Build new shifts
     const newShifts = sourceShifts.map((shift) => {
@@ -146,7 +170,9 @@ router.post("/:targetId/clone-from/:sourceId", async (req, res) => {
     });
   } catch (err) {
     console.error("Clone error:", err);
-    res.status(500).json({ message: "Failed to clone shifts", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to clone shifts", error: err.message });
   }
 });
 
