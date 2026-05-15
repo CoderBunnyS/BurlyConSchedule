@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema(
       shiftReminders: { type: String, enum: ["sms", "email", "both", "none"], default: "email" },
       shiftChanges:   { type: String, enum: ["sms", "email", "both", "none"], default: "email" },
     },
+    pinnedRoles: { type: [String], default: [] },
 
     volunteerShifts: [
       {

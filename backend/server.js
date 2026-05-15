@@ -43,6 +43,8 @@ app.use("/api/shiftroles", shiftRoleRoutes);
 app.use("/api/admin", adminVolunteerRoutes);
 app.use("/api/hourlyneeds", hourlyNeedsRoutes);
 app.use("/api/events", require("./routes/eventRoutes"));
+app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/dashboard", require("./routes/dashboardRoutes"));
 
 
 // Auth routes

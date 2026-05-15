@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const FusionAuthClient = require('@fusionauth/node-client');
+const { FusionAuthClient } = require('@fusionauth/node-client');
 
-const {
-  getUserProfile,
-  updateUserProfile,
-  getNotificationHistory
-} = require("../controllers/userController");
+// const {
+//   getUserProfile,
+//   updateUserProfile,
+//   getNotificationHistory
+// } = require("../controllers/userController");
 
 const User = require("../models/User");
 
@@ -28,9 +28,28 @@ const client = new FusionAuthClient(
 
 
 // ----- user endpoints -----
-router.get("/:id", authenticateUser, getUserProfile);
-router.patch("/:id", authenticateUser, updateUserProfile);
-router.get("/:id/notifications", authenticateUser, getNotificationHistory);
+// router.get("/:id", authenticateUser, getUserProfile);
+// router.patch("/:id", authenticateUser, updateUserProfile);
+// router.get("/:id/notifications", authenticateUser, getNotificationHistory);
+
+// PATCH pinned roles (user can update their own)
+router.patch("/:id/pinned-roles", authenticateUser, async (req, res, next) => {
+  try {
+    const { pinnedRoles } = req.body;
+    if (!Array.isArray(pinnedRoles)) {
+      return res.status(400).json({ error: "pinnedRoles must be an array of strings" });
+    }
+
+    const user = await User.findOneAndUpdate(
+      { fusionAuthId: req.params.id },
+      { $set: { pinnedRoles } },
+      { new: true }
+    );
+
+    if (!user) return res.status(404).json({ error: "user_not_found" });
+    res.json({ ok: true, pinnedRoles: user.pinnedRoles });
+  } catch (e) { next(e); }
+});
 
 // ----- toggles (Lead/Admin only) -----
 router.patch("/:id/noShow", authenticateUser, requireLeadOrAdmin, async (req, res, next) => {

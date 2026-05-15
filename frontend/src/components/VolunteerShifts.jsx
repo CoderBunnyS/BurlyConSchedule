@@ -21,7 +21,7 @@ export default function VolunteerShifts() {
   const [loading, setLoading] = useState(true);
   const [expandedRole, setExpandedRole] = useState(null);
 
-const dateOptions = [
+  const dateOptions = [
     { label: "Wed 11/4", value: "2026-11-04", day: "Wednesday" },
     { label: "Thu 11/5", value: "2026-11-05", day: "Thursday" },
     { label: "Fri 11/6", value: "2026-11-06", day: "Friday" },
@@ -29,20 +29,18 @@ const dateOptions = [
     { label: "Sun 11/8", value: "2026-11-08", day: "Sunday" },
   ];
 
-
-
   useEffect(() => {
     const id = getUserId();
     if (id) setUserId(id);
   }, []);
 
   // Preload schedule images
-useEffect(() => {
-  Object.values(scheduleImages).forEach((url) => {
-    const img = new Image();
-    img.src = url;
-  });
-}, []);
+  useEffect(() => {
+    Object.values(scheduleImages).forEach((url) => {
+      const img = new Image();
+      img.src = url;
+    });
+  }, []);
 
   // Fetch role details
   useEffect(() => {
@@ -90,7 +88,7 @@ useEffect(() => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userId }),
-        }
+        },
       );
 
       if (res.ok) {
@@ -101,8 +99,8 @@ useEffect(() => {
                   ...shift,
                   volunteersRegistered: [...shift.volunteersRegistered, userId],
                 }
-              : shift
-          )
+              : shift,
+          ),
         );
       }
     } catch (err) {
@@ -120,7 +118,7 @@ useEffect(() => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userId }),
-        }
+        },
       );
 
       if (res.ok) {
@@ -130,11 +128,11 @@ useEffect(() => {
               ? {
                   ...shift,
                   volunteersRegistered: shift.volunteersRegistered.filter(
-                    (id) => id !== userId
+                    (id) => id !== userId,
                   ),
                 }
-              : shift
-          )
+              : shift,
+          ),
         );
       }
     } catch (err) {
@@ -153,10 +151,10 @@ useEffect(() => {
   }, {});
 
   const selectedDateOption = dateOptions.find(
-    (option) => option.value === selectedDate
+    (option) => option.value === selectedDate,
   );
   const totalSignedUp = shifts.filter((shift) =>
-    shift.volunteersRegistered.includes(userId)
+    shift.volunteersRegistered.includes(userId),
   ).length;
 
   return (
@@ -256,96 +254,112 @@ useEffect(() => {
             </div>
           ) : (
             <div className="modern-roles-grid">
-              {Object.entries(grouped).map(([role, roleShifts]) => {
-                const roleInfo = roleDetails[role] || {};
-                const isExpanded = expandedRole === role;
+              {Object.entries(grouped)
+                .sort(([, aShifts], [, bShifts]) => {
+                  const aOpen = aShifts.reduce(
+                    (sum, s) =>
+                      sum +
+                      (s.volunteersNeeded - s.volunteersRegistered.length),
+                    0,
+                  );
+                  const bOpen = bShifts.reduce(
+                    (sum, s) =>
+                      sum +
+                      (s.volunteersNeeded - s.volunteersRegistered.length),
+                    0,
+                  );
+                  return bOpen - aOpen; // most-needy first
+                })
+                .map(([role, roleShifts]) => {
+                  const roleInfo = roleDetails[role] || {};
+                  const isExpanded = expandedRole === role;
 
-                return (
-                  <div
-                    key={role}
-                    className={`modern-role-card ${
-                      isExpanded ? "expanded" : ""
-                    }`}
-                  >
+                  return (
                     <div
-                      className="modern-role-header clickable"
-                      onClick={() => toggleRoleExpansion(role)}
+                      key={role}
+                      className={`modern-role-card ${
+                        isExpanded ? "expanded" : ""
+                      }`}
                     >
-                      <div className="modern-role-info">
-                        <h3 className="modern-role-title">{role}</h3>
-                        <p className="modern-role-count">
-                          {roleShifts.length} time slot
-                          {roleShifts.length !== 1 ? "s" : ""} available
-                        </p>
-                      </div>
-                      <div className="modern-role-actions">
-                        <div className="modern-role-icon">🌟</div>
-                        <div
-                          className={`modern-expand-icon ${
-                            isExpanded ? "expanded" : ""
-                          }`}
-                        >
-                          ▼
+                      <div
+                        className="modern-role-header clickable"
+                        onClick={() => toggleRoleExpansion(role)}
+                      >
+                        <div className="modern-role-info">
+                          <h3 className="modern-role-title">{role}</h3>
+                          <p className="modern-role-count">
+                            {roleShifts.length} time slot
+                            {roleShifts.length !== 1 ? "s" : ""} available
+                          </p>
+                        </div>
+                        <div className="modern-role-actions">
+                          <div className="modern-role-icon">🌟</div>
+                          <div
+                            className={`modern-expand-icon ${
+                              isExpanded ? "expanded" : ""
+                            }`}
+                          >
+                            ▼
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Role Details */}
-                    {isExpanded && (
-                      <div className="modern-role-details">
-                        <div className="modern-role-details-content">
-                          {/* Task Description from shifts */}
-                          {roleShifts[0]?.taskDescription && (
-                            <div className="modern-detail-section">
-                              <h4 className="modern-detail-title">
-                                <span className="modern-detail-icon">📝</span>
-                                What You'll Do
-                              </h4>
-                              <p className="modern-detail-text">
-                                {roleShifts[0].taskDescription}
-                              </p>
-                            </div>
-                          )}
+                      {/* Role Details */}
+                      {isExpanded && (
+                        <div className="modern-role-details">
+                          <div className="modern-role-details-content">
+                            {/* Task Description from shifts */}
+                            {roleShifts[0]?.taskDescription && (
+                              <div className="modern-detail-section">
+                                <h4 className="modern-detail-title">
+                                  <span className="modern-detail-icon">📝</span>
+                                  What You'll Do
+                                </h4>
+                                <p className="modern-detail-text">
+                                  {roleShifts[0].taskDescription}
+                                </p>
+                              </div>
+                            )}
 
-                          {/* Role Responsibilities */}
-                          {roleInfo.responsibilities && (
-                            <div className="modern-detail-section">
-                              <h4 className="modern-detail-title">
-                                <span className="modern-detail-icon">🎯</span>
-                                Responsibilities
-                              </h4>
-                              <p className="modern-detail-text">
-                                {roleInfo.responsibilities}
-                              </p>
-                            </div>
-                          )}
+                            {/* Role Responsibilities */}
+                            {roleInfo.responsibilities && (
+                              <div className="modern-detail-section">
+                                <h4 className="modern-detail-title">
+                                  <span className="modern-detail-icon">🎯</span>
+                                  Responsibilities
+                                </h4>
+                                <p className="modern-detail-text">
+                                  {roleInfo.responsibilities}
+                                </p>
+                              </div>
+                            )}
 
-                          {/* Location */}
-                          {roleInfo.location && (
-                            <div className="modern-detail-section">
-                              <h4 className="modern-detail-title">
-                                <span className="modern-detail-icon">📍</span>
-                                Location
-                              </h4>
-                              <p className="modern-detail-text">
-                                {roleInfo.location}
-                              </p>
-                            </div>
-                          )}
+                            {/* Location */}
+                            {roleInfo.location && (
+                              <div className="modern-detail-section">
+                                <h4 className="modern-detail-title">
+                                  <span className="modern-detail-icon">📍</span>
+                                  Location
+                                </h4>
+                                <p className="modern-detail-text">
+                                  {roleInfo.location}
+                                </p>
+                              </div>
+                            )}
 
-                          {/* Physical Requirements */}
-                          {roleInfo.physicalRequirements && (
-                            <div className="modern-detail-section">
-                              <h4 className="modern-detail-title">
-                                <span className="modern-detail-icon">💪</span>
-                                Physical Requirements
-                              </h4>
-                              <p className="modern-detail-text">
-                                {roleInfo.physicalRequirements}
-                              </p>
-                            </div>
-                          )}
-                          {/*commented out to remove contact info section from public view
+                            {/* Physical Requirements */}
+                            {roleInfo.physicalRequirements && (
+                              <div className="modern-detail-section">
+                                <h4 className="modern-detail-title">
+                                  <span className="modern-detail-icon">💪</span>
+                                  Physical Requirements
+                                </h4>
+                                <p className="modern-detail-text">
+                                  {roleInfo.physicalRequirements}
+                                </p>
+                              </div>
+                            )}
+                            {/*commented out to remove contact info section from public view
                            Contact Information
                           {(roleInfo.pointOfContact || roleInfo.contactPhone) && (
                             <div className="modern-detail-section">
@@ -369,50 +383,55 @@ useEffect(() => {
                             </div>
                           )} */}
 
-                          {/* Admin Notes */}
-                          {roleShifts.some((shift) => shift.notes) && (
-                            <div className="modern-detail-section">
-                              <h4 className="modern-detail-title">
-                                <span className="modern-detail-icon">📌</span>
-                                Additional Notes
-                              </h4>
-                              {roleShifts
-                                .filter((shift) => shift.notes)
-                                .map((shift) => (
-                                  <p
-                                    key={shift._id}
-                                    className="modern-detail-text modern-note"
-                                  >
-                                    {shift.notes}
-                                  </p>
-                                ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="modern-shifts-list">
-                      {roleShifts
-                        .sort((a, b) => a.startTime.localeCompare(b.startTime))
-                        .map((shift) => {
-                          const isSignedUp =
-                            shift.volunteersRegistered.includes(userId);
-                          const available =
-                            shift.volunteersNeeded -
-                            shift.volunteersRegistered.length;
-
-                          return (
-                            <div key={shift._id} className="modern-shift-item">
-                              <div className="modern-shift-time">
-                                <span className="modern-time-icon">🕒</span>
-                                <span className="modern-time-range">
-                                  {to12Hour(shift.startTime)}–
-                                  {to12Hour(shift.endTime)}
-                                </span>
+                            {/* Admin Notes */}
+                            {roleShifts.some((shift) => shift.notes) && (
+                              <div className="modern-detail-section">
+                                <h4 className="modern-detail-title">
+                                  <span className="modern-detail-icon">📌</span>
+                                  Additional Notes
+                                </h4>
+                                {roleShifts
+                                  .filter((shift) => shift.notes)
+                                  .map((shift) => (
+                                    <p
+                                      key={shift._id}
+                                      className="modern-detail-text modern-note"
+                                    >
+                                      {shift.notes}
+                                    </p>
+                                  ))}
                               </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
 
-                              {/* <div className="modern-shift-availability">
+                      <div className="modern-shifts-list">
+                        {roleShifts
+                          .sort((a, b) =>
+                            a.startTime.localeCompare(b.startTime),
+                          )
+                          .map((shift) => {
+                            const isSignedUp =
+                              shift.volunteersRegistered.includes(userId);
+                            const available =
+                              shift.volunteersNeeded -
+                              shift.volunteersRegistered.length;
+
+                            return (
+                              <div
+                                key={shift._id}
+                                className="modern-shift-item"
+                              >
+                                <div className="modern-shift-time">
+                                  <span className="modern-time-icon">🕒</span>
+                                  <span className="modern-time-range">
+                                    {to12Hour(shift.startTime)}–
+                                    {to12Hour(shift.endTime)}
+                                  </span>
+                                </div>
+
+                                {/* <div className="modern-shift-availability">
                                 <span
                                   className={`modern-availability-badge ${
                                     available <= 0
@@ -427,52 +446,54 @@ useEffect(() => {
                                 </span>
                               </div> */}
 
-                              <div className="modern-shift-action">
-                                {!userId ? (
-                                  <div className="modern-login-prompt">
-                                    <span className="modern-lock-icon">🔒</span>
-                                    <span className="modern-login-text">
-                                      Log in to sign up
-                                    </span>
-                                  </div>
-                                ) : isSignedUp ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleCancel(shift._id)}
-                                    className="modern-cancel-button"
-                                  >
-                                    <span className="modern-button-icon">
-                                      ❌
-                                    </span>
-                                    <span className="modern-button-text">
-                                      Cancel
-                                    </span>
-                                  </button>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleSignup(shift._id)}
-                                    disabled={available <= 0}
-                                    className={`modern-signup-button ${
-                                      available <= 0 ? "disabled" : ""
-                                    }`}
-                                  >
-                                    <span className="modern-button-icon">
-                                      ✨
-                                    </span>
-                                    <span className="modern-button-text">
-                                      {available <= 0 ? "Full" : "Sign Up"}
-                                    </span>
-                                  </button>
-                                )}
+                                <div className="modern-shift-action">
+                                  {!userId ? (
+                                    <div className="modern-login-prompt">
+                                      <span className="modern-lock-icon">
+                                        🔒
+                                      </span>
+                                      <span className="modern-login-text">
+                                        Log in to sign up
+                                      </span>
+                                    </div>
+                                  ) : isSignedUp ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCancel(shift._id)}
+                                      className="modern-cancel-button"
+                                    >
+                                      <span className="modern-button-icon">
+                                        ❌
+                                      </span>
+                                      <span className="modern-button-text">
+                                        Cancel
+                                      </span>
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleSignup(shift._id)}
+                                      disabled={available <= 0}
+                                      className={`modern-signup-button ${
+                                        available <= 0 ? "disabled" : ""
+                                      }`}
+                                    >
+                                      <span className="modern-button-icon">
+                                        ✨
+                                      </span>
+                                      <span className="modern-button-text">
+                                        {available <= 0 ? "Full" : "Sign Up"}
+                                      </span>
+                                    </button>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
             </div>
           )}
         </div>
