@@ -1,5 +1,8 @@
-const express = require("express");
 const dotenv = require("dotenv");
+dotenv.config({ path: ".env.local" });
+dotenv.config();
+
+const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const connectDB = require("./config/db");
@@ -12,7 +15,6 @@ const smsRoutes = require("./routes/sms");
 const reminderJob = require("./jobs/reminderJob");
 
 
-dotenv.config();
 connectDB();
 
 const app = express();

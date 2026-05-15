@@ -1,11 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function OAuthCallback() {
   const navigate = useNavigate();
+  const hasRun = useRef(false);
   console.log("OAuthCallback loaded");
 
   useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
+
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
 
@@ -40,12 +44,11 @@ export default function OAuthCallback() {
           navigate("/");
         }
       })
-.catch(err => {
-  console.error("Callback error:", err);
-  alert("Login failed. See console for details.");
-  navigate("/");
-});
-
+      .catch(err => {
+        console.error("Callback error:", err);
+        alert("Login failed. See console for details.");
+        navigate("/");
+      });
   }, [navigate]);
 
   return (
