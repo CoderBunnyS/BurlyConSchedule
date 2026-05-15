@@ -21,27 +21,43 @@ export default function AdminDashboard() {
   const [expandedDepts, setExpandedDepts] = useState({});
   const [filterView, setFilterView] = useState("all");
 
-  const isAdmin = hasRole("Admin");
+  const [activeEvent, setActiveEvent] = useState(null);
+  const [dates, setDates] = useState([]);
 
-  const dates = useMemo(
-    () => [
-      "2025-11-05",
-      "2025-11-06",
-      "2025-11-07",
-      "2025-11-08",
-      "2025-11-09",
-    ],
-    [],
-  );
+  const isAdmin = hasRole("Admin");
   const API_BASE = process.env.REACT_APP_API_BASE;
 
   const mountedRef = useRef(true);
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
       mountedRef.current = false;
-    },
-    [],
-  );
+    };
+  }, []);
+
+  // Fetch active event and generate the dates array
+  useEffect(() => {
+    fetch(`${API_BASE}/api/events/active`)
+      .then((res) => res.json())
+      .then((event) => {
+        setActiveEvent(event);
+        const generated = [];
+        const start = new Date(event.startDate);
+        const end = new Date(event.endDate);
+        for (
+          let d = new Date(start);
+          d <= end;
+          d.setUTCDate(d.getUTCDate() + 1)
+        ) {
+          generated.push(d.toISOString().split("T")[0]);
+        }
+        setDates(generated);
+      })
+      .catch((err) => {
+        console.error("Failed to load active event:", err);
+        setError("Failed to load active event");
+      });
+  }, [API_BASE]);
 
   const loadData = useCallback(
     async (opts) => {
@@ -82,13 +98,6 @@ export default function AdminDashboard() {
             if (filtered.length) allNeeds[date] = filtered;
             total += json.length;
 
-            // Debug logs kept for Nov 9; feel free to remove
-            if (date === "2025-11-09") {
-              console.log("Nov 9 raw data:", json);
-              console.log("Nov 9 filtered:", filtered);
-              console.log("Will add to needsByDate?", filtered.length > 0);
-            }
-
             json.forEach((shift) => {
               allShifts.push({ ...shift, date });
               if (shift.volunteersRegistered) {
@@ -99,8 +108,11 @@ export default function AdminDashboard() {
               }
             });
           } else {
-            console.warn(res.reason);
-            setError("Some data failed to load. Retrying on focus.");
+            // Ignore AbortErrors (happens on remount/refresh), only set error for real failures
+            if (res.reason?.name !== "AbortError") {
+              console.warn(res.reason);
+              setError("Some data failed to load. Retrying on focus.");
+            }
           }
         });
 
@@ -122,15 +134,18 @@ export default function AdminDashboard() {
   );
 
   useEffect(() => {
+    if (dates.length === 0) return;
     const c = new AbortController();
     loadData({ signal: c.signal });
     return () => c.abort();
-  }, [loadData]);
+  }, [loadData, dates]);
 
   useEffect(() => {
-    const onFocus = () => loadData();
+    const onFocus = () => {
+      if (dates.length > 0) loadData();
+    };
     const onVis = () => {
-      if (!document.hidden) loadData();
+      if (!document.hidden && dates.length > 0) loadData();
     };
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVis);
@@ -138,7 +153,7 @@ export default function AdminDashboard() {
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVis);
     };
-  }, [loadData]);
+  }, [loadData, dates]);
 
   const departmentStats = useMemo(() => {
     const deptMap = {};
@@ -217,7 +232,6 @@ export default function AdminDashboard() {
   };
 
   const formatTime = (timeStr) => {
-    // Accept "H", "H:M", "HH:MM"
     const safe = String(timeStr ?? "").trim();
     const parts = safe.includes(":") ? safe.split(":") : [safe, "0"];
     let h = Number(parts[0]);
