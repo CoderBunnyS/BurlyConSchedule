@@ -4,7 +4,7 @@ const smsService = require('../utils/smsService');
 const fusionAuthService = require('../utils/fusionAuthService');
 
 // Import shift model
-const Shift = require('../models/Shift');
+const Shift = require('../models/FlexibleShift');
 
 class ReminderJob {
   constructor() {

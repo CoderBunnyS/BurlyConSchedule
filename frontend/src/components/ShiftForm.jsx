@@ -2,15 +2,17 @@ import React, { useState, useEffect } from "react";
 
 export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
   const [roles, setRoles] = useState([]);
+  const [eventDates, setEventDates] = useState([]);
   const [formData, setFormData] = useState({
-    date: "2025-11-05",
-    startTime: "",   
-    endTime: "",     
+    date: "",
+    startTime: "",
+    endTime: "",
     role: "",
     volunteersNeeded: 1,
     notes: ""
   });
 
+  // Fetch roles
   useEffect(() => {
     fetch(`${process.env.REACT_APP_API_BASE}/api/shiftroles`)
       .then((res) => res.json())
@@ -18,12 +20,33 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
       .catch((err) => console.error("Error fetching shift roles:", err));
   }, []);
 
+  // Fetch active event and generate date options
+  useEffect(() => {
+    fetch(`${process.env.REACT_APP_API_BASE}/api/events/active`)
+      .then((res) => res.json())
+      .then((event) => {
+        const dates = [];
+        const start = new Date(event.startDate);
+        const end = new Date(event.endDate);
+        for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
+          const iso = d.toISOString().split("T")[0];
+          const weekday = d.toLocaleDateString(undefined, { weekday: "long", timeZone: "UTC" });
+          const display = d.toLocaleDateString(undefined, { month: "numeric", day: "numeric", timeZone: "UTC" });
+          dates.push({ value: iso, label: `${weekday} ${display}` });
+        }
+        setEventDates(dates);
+        if (dates.length > 0) {
+          setFormData((prev) => ({ ...prev, date: dates[0].value }));
+        }
+      })
+      .catch((err) => console.error("Error fetching active event:", err));
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // minutes since midnight
   const toMinutes = (timeStr) => {
     if (!timeStr) return 0;
     const [h, m] = timeStr.split(":").map(Number);
@@ -37,14 +60,13 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
       if (shift.date !== newShift.date) return false;
       const start = toMinutes(shift.startTime);
       const end = toMinutes(shift.endTime);
-      return newStart < end && newEnd > start; 
+      return newStart < end && newEnd > start;
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Send time picker values 
     const payload = {
       ...formData,
       date: formData.date,
@@ -70,7 +92,7 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
         const newShift = await response.json();
         onShiftCreated?.(newShift);
         setFormData({
-          date: "2025-11-05",
+          date: eventDates[0]?.value || "",
           startTime: "",
           endTime: "",
           role: "",
@@ -92,11 +114,9 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
       <label htmlFor="date">Date:</label>
       <select name="date" value={formData.date} onChange={handleChange} required>
         <option value="">-- Select a date --</option>
-        <option value="2025-11-05">Wednesday 11/5 (Setup)</option>
-        <option value="2025-11-06">Thursday 11/6</option>
-        <option value="2025-11-07">Friday 11/7</option>
-        <option value="2025-11-08">Saturday 11/8</option>
-        <option value="2025-11-09">Sunday 11/9</option>
+        {eventDates.map((d) => (
+          <option key={d.value} value={d.value}>{d.label}</option>
+        ))}
       </select>
 
       <label htmlFor="startTime">Start Time:</label>
@@ -106,7 +126,7 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
         name="startTime"
         value={formData.startTime}
         onChange={handleChange}
-        step="60"   
+        step="60"
         required
       />
 
@@ -130,11 +150,14 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [] }) {
         required
       >
         <option value="">-- Select a role --</option>
-        {roles.map((role) => (
-          <option key={role._id} value={role.name}>
-            {role.name}
-          </option>
-        ))}
+        {roles
+          .slice()
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((role) => (
+            <option key={role._id} value={role.name}>
+              {role.name}
+            </option>
+          ))}
       </select>
 
       <label htmlFor="volunteersNeeded">Volunteers Needed:</label>

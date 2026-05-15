@@ -1,5 +1,6 @@
 const FlexibleShift = require("../models/FlexibleShift");
 const User = require("../models/User");
+const { getActiveEvent } = require("../utils/getActiveEvent");
 
 // GET users shifts
 const getUserFlexShifts = async (req, res) => {
@@ -11,26 +12,23 @@ const getUserFlexShifts = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Filter shifts
+    const activeEvent = await getActiveEvent();
+
+    // Filter shifts (only those for the active event)
     const shifts = user.volunteerShifts
-      .filter((s) => s.shift && s.shift instanceof Object) 
+      .filter((s) => s.shift && s.shift instanceof Object)
+      .filter((s) => !activeEvent || String(s.shift.eventId) === String(activeEvent._id))
       .map((s) => ({
         ...s.shift.toObject(),
         status: s.status
       }));
 
     const totalHours = shifts.reduce((sum, shift) => {
-        const start = new Date(`1970-01-01T${shift.startTime}`);
-        let end = new Date(`1970-01-01T${shift.endTime}`);
-        
-        if (end < start) {
-          // allow shift to span midnight
-          end.setDate(end.getDate() + 1);
-        }
-        
-        const hours = (end - start) / (1000 * 60 * 60);
-        return sum + hours;
-        
+      const start = new Date(`1970-01-01T${shift.startTime}`);
+      let end = new Date(`1970-01-01T${shift.endTime}`);
+      if (end < start) end.setDate(end.getDate() + 1);
+      const hours = (end - start) / (1000 * 60 * 60);
+      return sum + hours;
     }, 0);
 
     res.json({ shifts, totalHours });
@@ -39,10 +37,13 @@ const getUserFlexShifts = async (req, res) => {
   }
 };
 
-// GET all shifts
+// GET all shifts (active event only)
 const getAllFlexShifts = async (req, res) => {
   try {
-    const shifts = await FlexibleShift.find()
+    const activeEvent = await getActiveEvent();
+    const query = activeEvent ? { eventId: activeEvent._id } : {};
+
+    const shifts = await FlexibleShift.find(query)
       .populate('volunteersRegistered', 'preferredName email fusionAuthId')
       .sort({ date: 1, startTime: 1 });
     res.json(shifts);
@@ -51,11 +52,14 @@ const getAllFlexShifts = async (req, res) => {
   }
 };
 
-// GET shifts by date
+// GET shifts by date (active event only)
 const getShiftsByDate = async (req, res) => {
   const { date } = req.params;
   try {
-    const shifts = await FlexibleShift.find({ date })
+    const activeEvent = await getActiveEvent();
+    const query = activeEvent ? { date, eventId: activeEvent._id } : { date };
+
+    const shifts = await FlexibleShift.find(query)
       .populate('volunteersRegistered', 'preferredName email fusionAuthId')
       .sort({ startTime: 1 });
     res.json(shifts);
@@ -64,10 +68,15 @@ const getShiftsByDate = async (req, res) => {
   }
 };
 
-// POST shifts
+// POST create shift (auto-tag with active event)
 const createFlexShift = async (req, res) => {
   try {
-    const shift = new FlexibleShift(req.body);
+    const activeEvent = await getActiveEvent();
+    if (!activeEvent) {
+      return res.status(400).json({ message: "No active event configured" });
+    }
+
+    const shift = new FlexibleShift({ ...req.body, eventId: activeEvent._id });
     await shift.save();
     res.status(201).json(shift);
   } catch (err) {
@@ -84,10 +93,7 @@ const updateFlexShift = async (req, res) => {
       { new: true, runValidators: true }
     );
 
-    if (!updated) {
-      return res.status(404).json({ message: "Shift not found" });
-    }
-
+    if (!updated) return res.status(404).json({ message: "Shift not found" });
     res.json(updated);
   } catch (err) {
     console.error("updateFlexShift error:", err);
@@ -95,22 +101,18 @@ const updateFlexShift = async (req, res) => {
   }
 };
 
-// POST new shift
+// POST signup
 const signUpForFlexShift = async (req, res) => {
-  const { userId } = req.body; 
+  const { userId } = req.body;
   const { id: shiftId } = req.params;
 
   try {
-    // gotta find the user by fusionAuthId to get MongoDB _id
     const user = await User.findOne({ fusionAuthId: userId });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     const shift = await FlexibleShift.findById(shiftId);
     if (!shift) return res.status(404).json({ message: "Shift not found" });
 
-    // Check MongoDB ObjectId
     if (shift.volunteersRegistered.some(id => id.equals(user._id))) {
       return res.status(400).json({ message: "Already signed up" });
     }
@@ -119,22 +121,18 @@ const signUpForFlexShift = async (req, res) => {
       return res.status(400).json({ message: "Shift full" });
     }
 
-    // Push MongoDB ObjectId
     shift.volunteersRegistered.push(user._id);
     await shift.save();
 
-    await User.findByIdAndUpdate(
-      user._id,
-      {
-        $push: {
-          volunteerShifts: {
-            shift: shift._id,
-            refModel: "FlexibleShift",
-            status: "registered"
-          }
+    await User.findByIdAndUpdate(user._id, {
+      $push: {
+        volunteerShifts: {
+          shift: shift._id,
+          refModel: "FlexibleShift",
+          status: "registered"
         }
       }
-    );
+    });
 
     res.json({ message: "Signed up successfully" });
   } catch (err) {
@@ -142,37 +140,26 @@ const signUpForFlexShift = async (req, res) => {
   }
 };
 
-// POST shift cancellation
+// POST cancel
 const cancelFlexShift = async (req, res) => {
-  const { userId } = req.body; 
+  const { userId } = req.body;
   const { id: shiftId } = req.params;
 
   try {
-    // Find user by fusionAuthId to get MongoDB _id
     const user = await User.findOne({ fusionAuthId: userId });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     const shift = await FlexibleShift.findById(shiftId);
     if (!shift) return res.status(404).json({ message: "Shift not found" });
 
-    // Remove using MongoDB ObjectId
     shift.volunteersRegistered = shift.volunteersRegistered.filter(
       (id) => !id.equals(user._id)
     );
     await shift.save();
 
-    await User.findByIdAndUpdate(
-      user._id,
-      {
-        $pull: {
-          volunteerShifts: {
-            shift: shift._id
-          }
-        }
-      }
-    );
+    await User.findByIdAndUpdate(user._id, {
+      $pull: { volunteerShifts: { shift: shift._id } }
+    });
 
     res.json({ message: "Shift canceled" });
   } catch (err) {

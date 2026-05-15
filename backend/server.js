@@ -7,7 +7,7 @@ const cors = require("cors");
 const path = require("path");
 const connectDB = require("./config/db");
 const hourlyNeedsRoutes = require("./routes/hourlyNeedsRoutes");
-const shiftRoutes = require("./routes/shiftRoutes");
+//const shiftRoutes = require("./routes/shiftRoutes");
 const volunteerRoutes = require("./routes/volunteerRoutes");
 const shiftRoleRoutes = require("./routes/shiftRoleRoutes");
 const adminVolunteerRoutes = require("./routes/adminVolunteerRoutes");
@@ -21,7 +21,7 @@ const app = express();
 
 const corsOptions = {
   origin: true,
-  methods: ["GET", "POST", "OPTIONS"],
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   credentials: true,
 };
 
@@ -37,11 +37,12 @@ app.use(express.json());
 app.get("/health", (req, res) => res.send("Backend is alive 🎉"));
 
 // Attach API routes
-app.use("/api/shifts", shiftRoutes);
+//app.use("/api/shifts", shiftRoutes);
 app.use("/api/volunteer", volunteerRoutes);
 app.use("/api/shiftroles", shiftRoleRoutes);
 app.use("/api/admin", adminVolunteerRoutes);
 app.use("/api/hourlyneeds", hourlyNeedsRoutes);
+app.use("/api/events", require("./routes/eventRoutes"));
 
 
 // Auth routes

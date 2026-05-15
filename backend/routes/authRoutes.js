@@ -64,20 +64,22 @@ router.post("/callback", async (req, res) => {
     }
 
     //  Display name
-    const preferredName =
-      faUser.preferred_username || faUser.name || faUser.given_name || faUser.nickname || email;
+const preferredName =
+  faUser.preferred_username || faUser.name || faUser.given_name || faUser.nickname || email;
+const phone = faUser.phone_number;
 
-    const user = await User.findOneAndUpdate(
-      { $or: [{ fusionAuthId }, { email }] },
-      {
-        $set: {
-          fusionAuthId,
-          email,
-          preferredName
-        }
-      },
-      { new: true, upsert: true }
-    );
+const user = await User.findOneAndUpdate(
+  { $or: [{ fusionAuthId }, { email }] },
+  {
+    $set: {
+      fusionAuthId,
+      email,
+      preferredName,
+      ...(phone && { phone })
+    }
+  },
+  { new: true, upsert: true }
+);
 
     // Return user + token
     res.json({ user, access_token: tokenData.access_token });

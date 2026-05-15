@@ -16,6 +16,12 @@ const userSchema = new mongoose.Schema(
     fusionAuthId: { type: String, required: true, unique: true },
     preferredName: String,
     email: { type: String, required: true, unique: true },
+    phone: { type: String },
+
+    notificationPrefs: {
+      shiftReminders: { type: String, enum: ["sms", "email", "both", "none"], default: "email" },
+      shiftChanges:   { type: String, enum: ["sms", "email", "both", "none"], default: "email" },
+    },
 
     volunteerShifts: [
       {

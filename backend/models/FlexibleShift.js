@@ -1,6 +1,12 @@
 const mongoose = require("mongoose");
 
 const flexibleShiftSchema = new mongoose.Schema({
+  eventId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Event",
+    required: true,
+    index: true,
+  },
   date: {
     type: String,
     required: true
@@ -27,6 +33,10 @@ const flexibleShiftSchema = new mongoose.Schema({
   }],
   notes: {
     type: String
+  },
+  reminderSent: {
+    type: Boolean,
+    default: false
   }
 }, { timestamps: true });
 
