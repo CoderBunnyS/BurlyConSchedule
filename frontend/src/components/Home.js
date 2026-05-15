@@ -17,7 +17,7 @@ export default function Home() {
       const clientId = process.env.REACT_APP_FUSIONAUTH_CLIENT_ID;
       const redirectUri = process.env.REACT_APP_FUSIONAUTH_REDIRECT_URI;
       const domain = process.env.REACT_APP_FUSIONAUTH_DOMAIN;
-      const scope = encodeURIComponent("openid email profile");
+      const scope = encodeURIComponent("openid email profile phone");
       const authorizationUrl = `${domain}/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
         redirectUri
       )}&response_type=code&scope=${scope}`;
