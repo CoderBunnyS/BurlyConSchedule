@@ -108,13 +108,18 @@ export default function AdminLanding() {
       </div>
 
       <div className="modern-content-wrapper">
-        {isAdmin && (
-          <div className="admin-landing-actions">
-            <Link to="/admin/all" className="admin-landing-all-link">
-              📊 View All Departments Dashboard →
-            </Link>
-          </div>
-        )}
+       {(isAdmin || isLead) && (
+  <div className="admin-landing-actions">
+    <Link to="/admin/all-timeline" className="admin-landing-all-link">
+      📋 Full Schedule (Ops View) →
+    </Link>
+    {isAdmin && (
+      <Link to="/admin/all" className="admin-landing-all-link">
+        📊 All Departments Dashboard →
+      </Link>
+    )}
+  </div>
+)}
 
         {loading ? (
           <div className="modern-loading-state">

@@ -14,6 +14,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import AdminEvents from "./components/AdminEvents";
 import AdminLanding from "./components/AdminLanding";
 import AdminRoleView from "./components/AdminRoleView";
+import AdminAllTimeline from "./components/AdminAllTimeline";
 
 function App() {
   return (
@@ -92,6 +93,7 @@ function App() {
           </PrivateRoute>
         }
       />
+      <Route path="/admin/all-timeline" element={<PrivateRoute><AdminAllTimeline /></PrivateRoute>} />
       {/* <Route path="/callback" element={<Callback />} /> */}
       <Route path="/oauth-callback" element={<OAuthCallback />} />
     </Routes>

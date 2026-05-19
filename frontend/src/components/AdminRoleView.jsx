@@ -430,7 +430,7 @@ export default function AdminRoleView() {
 
 // ---------- Timeline subcomponent ----------
 
-const HOUR_START = 8;
+const HOUR_START = 7;
 const HOUR_END = 26;
 const HOUR_HEIGHT = 60;
 
