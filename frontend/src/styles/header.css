@@ -634,10 +634,24 @@
   .modern-mobile-nav-link {
     background: rgba(45, 31, 46, 0.5);
     border-color: rgba(236, 72, 153, 0.2);
+    color: #f9a8d4;
+  }
+
+  .modern-mobile-nav-link.admin {
+    color: #f9a8d4;
   }
 
   .modern-mobile-nav-link:hover {
     background: rgba(236, 72, 153, 0.1);
+    color: #fbcfe8;
+  }
+
+  .modern-mobile-user-name {
+    color: #f1e1ec;
+  }
+
+  .modern-mobile-user-status {
+    color: #d1d5db;
   }
 }
 
