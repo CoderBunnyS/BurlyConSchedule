@@ -95,7 +95,7 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [], lockedR
           date: eventDates[0]?.value || "",
           startTime: "",
           endTime: "",
-          role: "",
+          role: lockedRole || "",
           volunteersNeeded: 1,
           notes: ""
         });
@@ -141,42 +141,33 @@ export default function ShiftForm({ onShiftCreated, existingShifts = [], lockedR
         required
       />
 
-      <label htmlFor="role">Role:</label>
-      <select
-        id="role"
-        name="role"
-        value={formData.role}
-        onChange={handleChange}
-        required
-      >
-{lockedRole ? (
-  <>
-    <label>Role:</label>
-    <input type="text" value={lockedRole} disabled />
-  </>
-) : (
-  <>
-    <label htmlFor="role">Role:</label>
-    <select
-      id="role"
-      name="role"
-      value={formData.role}
-      onChange={handleChange}
-      required
-    >
-      <option value="">-- Select a role --</option>
-      {roles
-        .slice()
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((role) => (
-          <option key={role._id} value={role.name}>
-            {role.name}
-          </option>
-        ))}
-    </select>
-  </>
-)}
-      </select>
+      {lockedRole ? (
+        <>
+          <label>Role:</label>
+          <input type="text" value={lockedRole} disabled />
+        </>
+      ) : (
+        <>
+          <label htmlFor="role">Role:</label>
+          <select
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            required
+          >
+            <option value="">-- Select a role --</option>
+            {roles
+              .slice()
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((role) => (
+                <option key={role._id} value={role.name}>
+                  {role.name}
+                </option>
+              ))}
+          </select>
+        </>
+      )}
 
       <label htmlFor="volunteersNeeded">Volunteers Needed:</label>
       <input
